@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "fbd:items/bladepiece_suzaku"
+    }
+}

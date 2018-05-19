@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "minecraft:lit_furnace" },
+        "facing=south": { "model": "minecraft:lit_furnace", "y": 180 },
+        "facing=west":  { "model": "minecraft:lit_furnace", "y": 270 },
+        "facing=east":  { "model": "minecraft:lit_furnace", "y": 90 }
+    }
+}

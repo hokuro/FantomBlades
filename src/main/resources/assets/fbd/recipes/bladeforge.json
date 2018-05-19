@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "bladeforge",
+  "pattern": [
+    "O O",
+    "O O",
+    "OOO"
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:clay_ball"
+    }
+  },
+  "result": {
+    "item": "fbd:bladeforge",
+    "count": 1
+  }
+}

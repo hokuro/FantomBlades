@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "summonseal",
+  "pattern": [
+    "P P",
+    "POP",
+    "PKP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "O": {
+      "item": "fbd:big_hunmmer"
+    },
+    "K": {
+      "item": "fbd:small_hunmmer"
+    }
+  },
+  "result": {
+    "item": "fbd:summonseal",
+    "count": 1,
+    "data":0
+  }
+}

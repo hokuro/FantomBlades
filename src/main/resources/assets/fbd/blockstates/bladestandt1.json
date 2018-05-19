@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=north": { "model": "fbd:bladestandt1"},
+        "facing=south": { "model": "fbd:bladestandt1", "y": 180 },
+        "facing=west":  { "model": "fbd:bladestandt1", "y": 270 },
+        "facing=east":  { "model": "fbd:bladestandt1", "y": 90 }
+    }
+}
+
