@@ -255,6 +255,7 @@ public class ItemBurret extends Item {
 	                	world.spawnParticle(EnumParticleTypes.SNOWBALL, (double)entityBurret.posX + world.rand.nextDouble(), (double)entityBurret.posY + 1.0D +world.rand.nextDouble() * 3.9D, (double)entityBurret.posZ + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
 	                }
 				}
+				break;
 			case SNOWMAN:
 				if (!world.isRemote){
 		            EntitySnowman entitysnowman = new EntitySnowman(world);

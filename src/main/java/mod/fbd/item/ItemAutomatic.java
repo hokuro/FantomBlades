@@ -43,7 +43,7 @@ public class ItemAutomatic extends Item {
             if (!worldIn.isRemote)
             {
             	EntityBurret entityburret = new EntityBurret(worldIn, entityLiving, burretStack);
-            	entityburret.shoot(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, ItemBurret.getGunPowder(burretStack)+1 * 5.0F, 0.1F);
+            	entityburret.shoot(entityplayer, entityplayer.rotationPitch, entityplayer.rotationYaw, 0.0F, ItemBurret.getGunPowder(burretStack)+10.0F, 1.0F);
                 stack.damageItem(1, entityplayer);
                 worldIn.spawnEntity(entityburret);
             }
