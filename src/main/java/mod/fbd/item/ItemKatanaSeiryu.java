@@ -1,18 +1,23 @@
 package mod.fbd.item;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.potion.PotionCore;
+import net.minecraft.block.IGrowable;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
@@ -42,20 +47,6 @@ public class ItemKatanaSeiryu extends ItemKatana {
 	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		super.onUpdate(stack, world, entity, indexOfMainSlot, isCurrent);
 		if (entity instanceof EntityLivingBase){
-			// 装備中毒、吐き気、盲目、空腹のポーション効果を受けないようにする
-			EntityLivingBase living = (EntityLivingBase)entity;
-			if (living.getHeldItemMainhand().getItem() == this){
-				List<PotionEffect> effects = new ArrayList<PotionEffect>();
-				effects.addAll(living.getActivePotionEffects());
-				for (PotionEffect effect : effects){
-					if (effect.getPotion() == MobEffects.NAUSEA ||
-						effect.getPotion() == MobEffects.POISON ||
-						effect.getPotion() == MobEffects.BLINDNESS ||
-						effect.getPotion() == MobEffects.HUNGER){
-						living.removeActivePotionEffect(effect.getPotion());
-					}
-				}
-			}
 		}
 	}
 
@@ -90,6 +81,57 @@ public class ItemKatanaSeiryu extends ItemKatana {
 		    }
 	 }
 
+	 public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+	 {
+	        ItemStack itemstack = player.getHeldItem(hand);
+            if (applyBonemeal(itemstack, worldIn, pos, player, hand))
+            {
+                if (!worldIn.isRemote)
+                {
+                    worldIn.playEvent(2005, pos, 0);
+                }
+
+            }
+            return EnumActionResult.SUCCESS;
+
+	 }
+
+	    public static boolean applyBonemeal(ItemStack stack, World worldIn, BlockPos target)
+	    {
+	        if (worldIn instanceof net.minecraft.world.WorldServer)
+	            return applyBonemeal(stack, worldIn, target, net.minecraftforge.common.util.FakePlayerFactory.getMinecraft((net.minecraft.world.WorldServer)worldIn), null);
+	        return false;
+	    }
+
+	    public static boolean applyBonemeal(ItemStack stack, World worldIn, BlockPos target, EntityPlayer player, @javax.annotation.Nullable EnumHand hand)
+	    {
+	        IBlockState iblockstate = worldIn.getBlockState(target);
+
+	        int hook = net.minecraftforge.event.ForgeEventFactory.onApplyBonemeal(player, worldIn, target, iblockstate, stack, hand);
+	        if (hook != 0) return hook > 0;
+
+	        if (iblockstate.getBlock() instanceof IGrowable)
+	        {
+	            IGrowable igrowable = (IGrowable)iblockstate.getBlock();
+
+	            if (igrowable.canGrow(worldIn, target, iblockstate, worldIn.isRemote))
+	            {
+	                if (!worldIn.isRemote)
+	                {
+	                    if (igrowable.canUseBonemeal(worldIn, worldIn.rand, target, iblockstate))
+	                    {
+	                        igrowable.grow(worldIn, worldIn.rand, target, iblockstate);
+	                    }
+
+	                }
+
+	                return true;
+	            }
+	        }
+
+	        return false;
+	    }
+
 	 public static ItemStack getDefaultStack(){
 		 ItemStack ret = new ItemStack(ItemCore.item_katana_seiryu);
 	    	ItemKatana.setMaxLevel(ret,255);
@@ -99,7 +141,7 @@ public class ItemKatanaSeiryu extends ItemKatana {
 			ItemKatana.setAttackSpeed(ret,-0.2D);
 			ItemKatana.setEndurance(ret, 1000);
 			ItemKatana.setUpdatePotionList(ret, new ArrayList<PotionEffect>(){
-				{add(new PotionEffect(MobEffects.POISON,600,1));}
+				{add(new PotionEffect(PotionCore.seiryupotion,600,1));}
 			});
 		 return ret;
 	 }

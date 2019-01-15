@@ -50,7 +50,11 @@ public class ItemKatana extends ItemSword {
 
 	public final ResourceLocation DEFAULT_KATANATEXTURE;
 	public ItemKatana(){
-		super(ToolMaterial.IRON);
+		this(Mod_FantomBlade.HAGANE);
+	}
+
+	public ItemKatana(ToolMaterial mat){
+		super(mat);
 		DEFAULT_KATANATEXTURE = new ResourceLocation("fbd","textures/entity/normalblade_default.png");
 		this.setMaxStackSize(1);
 		LEVELUP_EXP = 500;
@@ -79,14 +83,14 @@ public class ItemKatana extends ItemSword {
 
 		int level = this.getLevel(stack);
 		int rust = this.getRustValue(stack);
-		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			// 錆補正
+		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			    // 錆補正
 
 		// 攻撃力設定
 		attackDamage = this.getAttackDamage(stack) 																// 固有攻撃力
 				+ MathHelper.floor(this.getAttackDamage(stack)*(1-Math.exp((-1*level/100)/(1-Math.exp(-1)))))   // レベル補正
-				+ ToolMaterial.IRON.getAttackDamage();                                                          // 素材補正
+				+ Mod_FantomBlade.HAGANE.getAttackDamage();                                                                            // 素材補正
 		if (rust_h!= 0){
-			attackDamage = (float) (attackDamage * MathHelper.clamp(rust_h,0.4,1.0)); // 錆補正 最低0.4倍
+			attackDamage = (float) (attackDamage * MathHelper.clamp(rust_h,0.4,1.0));                           // 錆補正 最低0.4倍
 		}
 
 		// 攻撃速度設定
@@ -97,8 +101,6 @@ public class ItemKatana extends ItemSword {
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
-
-
 	}
 
 	@Override
@@ -281,7 +283,7 @@ public class ItemKatana extends ItemSword {
         if (tag.hasKey("AttackDamage")){
         	return tag.getFloat("AttackDamage");
         }
-        return ToolMaterial.IRON.getAttackDamage();
+        return 0.0F;
     }
 
     public static void setAttackDamage(ItemStack stack, float damager){
@@ -294,7 +296,7 @@ public class ItemKatana extends ItemSword {
         if (tag.hasKey("AttackSpeed")){
         	return tag.getDouble("AttackSpeed");
         }
-        return ToolMaterial.IRON.getAttackDamage();
+        return -3.0F;
     }
 
     public static void setAttackSpeed(ItemStack stack, double value){

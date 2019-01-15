@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.core.Mod_FantomBlade;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
@@ -12,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
-import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -58,7 +58,7 @@ public class ItemKatanaSuzaku extends ItemKatana {
 		// 攻撃力設定
 		attackDamage = (this.getAttackDamage(stack) 																// 固有攻撃力
 				+ MathHelper.floor(this.getAttackDamage(stack)*(1-Math.exp((-1*level/100)/(1-Math.exp(-1)))))   // レベル補正
-				+ ToolMaterial.IRON.getAttackDamage());                                                          // 素材補正
+				+ Mod_FantomBlade.HAGANE.getAttackDamage());                                                          // 素材補正
 		if (entity.dimension == -1){
 			// ネザーでは攻撃力3倍
 			attackDamage *= 3;
@@ -158,7 +158,7 @@ public class ItemKatanaSuzaku extends ItemKatana {
 			ItemKatana.setEndurance(ret, 1000);
 			ret.addEnchantment(Enchantments.FLAME, 1);
 			ItemKatana.setUpdatePotionList(ret, new ArrayList<PotionEffect>(){
-				{add(new PotionEffect(MobEffects.FIRE_RESISTANCE,20,1));}
+//				{add(new PotionEffect(MobEffects.FIRE_RESISTANCE,20,1));}
 			});
 		 return ret;
 	 }

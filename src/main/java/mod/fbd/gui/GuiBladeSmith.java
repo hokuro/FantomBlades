@@ -86,7 +86,7 @@ public class GuiBladeSmith extends GuiContainer{
         this.drawTexturedModalRect(i+150, j+74, 176, 18, (int)(20 *((float)entity.getExpParcent()/100.0F)), 8);
 
 
-        ItemStack stack = entity.getSmithInventory().getStackInSlot(12);
+        ItemStack stack = entity.getSmithInventory().getStackInSlot(2);
         if ( !stack.isEmpty()){
         	if (stack.isItemDamaged()){
             	fontRenderer.drawString("cost:" + ((InventorySmith)entity.getSmithInventory()).getRepaierCost(), i+120, j+46,

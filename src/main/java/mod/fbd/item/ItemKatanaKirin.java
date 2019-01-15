@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Random;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.equipmenteffect.EnchantmentCore;
 import mod.fbd.util.ModUtil;
 import net.minecraft.block.Block;
@@ -63,8 +64,8 @@ public class ItemKatanaKirin extends ItemKatana {
 		// 攻撃力設定
 		attackDamage = this.getAttackDamage(stack) 																// 固有攻撃力
 				+ MathHelper.floor(this.getAttackDamage(stack)*(1-Math.exp((-1*level/100)/(1-Math.exp(-1)))))   // レベル補正
-				+ ToolMaterial.IRON.getAttackDamage()                                                          // 素材補正
-				+ (world.getWorldInfo().isRaining()?20.0F:0F);												// 嵐補正
+				+ Mod_FantomBlade.HAGANE.getAttackDamage()                                                                             // 素材補正
+				+ (world.getWorldInfo().isRaining()?20.0F:0F);												    // 嵐補正
 		// 嵐の場合錆補正無効
 		if (rust_h!= 0 && !world.getWorldInfo().isRaining()){
 			attackDamage = (float) (attackDamage * MathHelper.clamp(rust_h,0.4,1.0)); // 錆補正 最低0.4倍

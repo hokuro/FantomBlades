@@ -6,14 +6,10 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class EntityElmBase extends EntityCreature{
-	private static final ResourceLocation TEXTURE_DEFAULT = new ResourceLocation("fbd","entity/bladesmith.png");
-	public static final String NAME= "bladesmith";
-	public static final ResourceLocation loot = new ResourceLocation("fbd:"+NAME);
 
 	/**************************************************************/
 	/** DataWatcher                                              **/

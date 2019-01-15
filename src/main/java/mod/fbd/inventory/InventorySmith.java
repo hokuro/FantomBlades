@@ -30,7 +30,8 @@ public class InventorySmith implements IInventory {
 
     public InventorySmith()
     {
-        this.stacks = NonNullList.<ItemStack>withSize(17, ItemStack.EMPTY);
+        /////this.stacks = NonNullList.<ItemStack>withSize(17, ItemStack.EMPTY);
+        this.stacks = NonNullList.<ItemStack>withSize(7, ItemStack.EMPTY);
     }
 
     /**
@@ -270,17 +271,16 @@ public class InventorySmith implements IInventory {
     {
         this.stacks.clear();
     }
-
     public static boolean allowItem(int index ,ItemStack stack){
-    	if (index == 12){
+    	if (index == 2){
     		return (stack.getItem() instanceof ItemKatana);
-    	}else if(index == 13){
+    	}else if(index == 3){
     		return (stack.getItem() == ItemCore.item_hunmmer_big);
-    	}else if (index == 14){
+    	}else if (index == 4){
     		return (stack.getItem() == ItemCore.item_hunmmer_small);
-    	}else if (index == 15){
+    	}else if (index == 5){
     		return (stack.getItem() == Items.SHEARS);
-    	}else if (index == 16){
+    	}else if (index == 6){
     		return (stack.getItem() == Items.COAL);
     	}else{
     		return ((stack.getItem() == ItemCore.item_tamahagane) ||
@@ -289,20 +289,46 @@ public class InventorySmith implements IInventory {
     			(stack.getItem() instanceof ItemEnchantedBook));
     	}
     }
+//    public static boolean allowItem(int index ,ItemStack stack){
+//    	if (index == 12){
+//    		return (stack.getItem() instanceof ItemKatana);
+//    	}else if(index == 13){
+//    		return (stack.getItem() == ItemCore.item_hunmmer_big);
+//    	}else if (index == 14){
+//    		return (stack.getItem() == ItemCore.item_hunmmer_small);
+//    	}else if (index == 15){
+//    		return (stack.getItem() == Items.SHEARS);
+//    	}else if (index == 16){
+//    		return (stack.getItem() == Items.COAL);
+//    	}else{
+//    		return ((stack.getItem() == ItemCore.item_tamahagane) ||
+//    			(stack.getItem() == ItemCore.item_bladepiece) ||
+//    			(stack.getItem() instanceof ItemPotion) ||
+//    			(stack.getItem() instanceof ItemEnchantedBook));
+//    	}
+//    }
 
     public int getRepaierCost(){
     	int cost = 0;
-    	ItemStack stack = stacks.get(12);
-    	if (!stack.isEmpty() && stacks.get(12).isItemDamaged()){
+    	ItemStack stack = stacks.get(2);
+    	if (!stack.isEmpty() && stacks.get(2).isItemDamaged()){
     		cost = (int) MathHelper.absMax(stack.getItemDamage()/10 *(2.0F + ((float)(stack.getMaxDamage() - stack.getItemDamage()))/(float)stack.getMaxDamage()),1);
     	}
     	return cost;
     }
+//    public int getRepaierCost(){
+//    	int cost = 0;
+//    	ItemStack stack = stacks.get(12);
+//    	if (!stack.isEmpty() && stacks.get(12).isItemDamaged()){
+//    		cost = (int) MathHelper.absMax(stack.getItemDamage()/10 *(2.0F + ((float)(stack.getMaxDamage() - stack.getItemDamage()))/(float)stack.getMaxDamage()),1);
+//    	}
+//    	return cost;
+//    }
 
     public boolean canRepaier(){
     	int count = 0;
     	int cost = getRepaierCost();
-    	for (int i = 0; i < 12; i++){
+    	for (int i = 0; i < 1; i++){
     		ItemStack stack = stacks.get(i);
     		if (stack.getItem() == ItemCore.item_tamahagane){
     			count += MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
@@ -314,10 +340,25 @@ public class InventorySmith implements IInventory {
     	return (count >= cost);
     }
 
+//    public boolean canRepaier(){
+//    	int count = 0;
+//    	int cost = getRepaierCost();
+//    	for (int i = 0; i < 12; i++){
+//    		ItemStack stack = stacks.get(i);
+//    		if (stack.getItem() == ItemCore.item_tamahagane){
+//    			count += MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+//    		}
+//    		if (count >= cost ){
+//    			break;
+//    		}
+//    	}
+//    	return (count >= cost);
+//    }
+
 	public void repairBlade() {
 		int count = 0;
 		int cost = this.getRepaierCost();
-    	for (int i = 0; i < 12; i++){
+    	for (int i = 0; i < 1; i++){
     		ItemStack stack = stacks.get(i);
     		if (stack.getItem() == ItemCore.item_tamahagane){
     			if (count + MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair()) <= cost){
@@ -339,8 +380,42 @@ public class InventorySmith implements IInventory {
     		}
 
     	}
-    	stacks.get(12).setItemDamage(0);
-    	ItemKatana.setRustValue(stacks.get(12), 0);
+    	stacks.get(2).setItemDamage(0);
+    	ItemKatana.setRustValue(stacks.get(2), 0);
+	}
+
+
+//	public void repairBlade() {
+//		int count = 0;
+//		int cost = this.getRepaierCost();
+//    	for (int i = 0; i < 12; i++){
+//    		ItemStack stack = stacks.get(i);
+//    		if (stack.getItem() == ItemCore.item_tamahagane){
+//    			if (count + MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair()) <= cost){
+//    				count += MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+//    				stacks.set(i, ItemStack.EMPTY);
+//    			}else{
+//    				int max = stack.getCount();
+//    				for (int j = 0; j < max; j++){
+//    					if (count >= cost){
+//    						stacks.get(i).shrink(j);
+//    						break;
+//    					}
+//    					count += MathHelper.fastFloor(EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+//    				}
+//    			}
+//        		if (count >= cost ){
+//        			break;
+//        		}
+//    		}
+//
+//    	}
+//    	stacks.get(12).setItemDamage(0);
+//    	ItemKatana.setRustValue(stacks.get(12), 0);
+//	}
+
+	public ItemStack getTamahagane(){
+		return stacks.get(0);
 	}
 
     public int getTamahagane(EnumTamahagane grade){
@@ -351,6 +426,10 @@ public class InventorySmith implements IInventory {
 			}
 		}
 		return ret;
+    }
+
+    public ItemStack getBladePiece(){
+    	return stacks.get(1);
     }
 
 	public int getBladePiece(EnumBladePieceType types) {
@@ -384,18 +463,32 @@ public class InventorySmith implements IInventory {
 	}
 
 	public void setBlade(ItemStack katana) {
-		stacks.set(12, katana);
-		for (int i = 0; i < 12; i++){
+		stacks.set(2, katana);
+		for (int i = 0; i < 2; i++){
 			stacks.set(i, ItemStack.EMPTY);
 		}
 	}
 
 	public boolean checkItem() {
-		return (!stacks.get(13).isEmpty() &&
-		!stacks.get(14).isEmpty() &&
-		!stacks.get(15).isEmpty() &&
-		(stacks.get(16).getCount() >= 64));
+		return (!stacks.get(3).isEmpty() &&
+		!stacks.get(4).isEmpty() &&
+		!stacks.get(5).isEmpty() &&
+		(stacks.get(6).getCount() >= 64));
 	}
+
+//	public void setBlade(ItemStack katana) {
+//		stacks.set(12, katana);
+//		for (int i = 0; i < 12; i++){
+//			stacks.set(i, ItemStack.EMPTY);
+//		}
+//	}
+//
+//	public boolean checkItem() {
+//		return (!stacks.get(13).isEmpty() &&
+//		!stacks.get(14).isEmpty() &&
+//		!stacks.get(15).isEmpty() &&
+//		(stacks.get(16).getCount() >= 64));
+//	}
 
 
 

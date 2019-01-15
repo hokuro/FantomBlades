@@ -2,7 +2,7 @@ package mod.fbd.client;
 
 import mod.fbd.core.CommonProxy;
 import mod.fbd.entity.EntityBurret;
-import mod.fbd.entity.mob.EntityBladeSmith;
+import mod.fbd.entity.mob.EntitySmithBase;
 import mod.fbd.render.RenderEntityBladeSmith;
 import mod.fbd.render.RenderEntityBurret;
 import mod.fbd.render.RenderTileEntityBladeAlter;
@@ -45,12 +45,14 @@ public class ClientProxy extends CommonProxy{
 
 	@Override
 	public void registerRender(){
-		RenderingRegistry.registerEntityRenderingHandler(EntityBladeSmith.class,  new IRenderFactory<EntityBladeSmith>() {
+		RenderingRegistry.registerEntityRenderingHandler(EntitySmithBase.class,  new IRenderFactory<EntitySmithBase>() {
 			@Override
-			public Render<? super EntityBladeSmith> createRenderFor(RenderManager manager) {
+			public Render<? super EntitySmithBase> createRenderFor(RenderManager manager) {
 				return new RenderEntityBladeSmith(manager, 0.5f);
 			}
 		});
+
+
 
 		RenderingRegistry.registerEntityRenderingHandler(EntityBurret.class,  new IRenderFactory<EntityBurret>() {
 			@Override

@@ -4,7 +4,7 @@ public final class ModCommon {
 	// デバッグモードかどうか
 	public static boolean isDebug = false;
 
-	public static boolean isDevelop= false;
+	public static boolean isDevelop= true;
 
 	// モッドID
 	public static final String MOD_ID = "fbd";
@@ -39,6 +39,10 @@ public final class ModCommon {
 	public static final int MESID_REPAIREBLADE = 4;
 	public static final int MESID_BLADESTANDUPDATE = 5;
 	public static final int MESID_BLADELEVELUPDATE = 6;
+
+	public static final int MESID_CREATEARMOR = 7;
+
+	public static final int MESID_REPAIREARMOR = 8;
 
 
 

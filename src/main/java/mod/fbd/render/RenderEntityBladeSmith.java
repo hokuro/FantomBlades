@@ -1,6 +1,7 @@
 package mod.fbd.render;
 
 import mod.fbd.entity.mob.EntityBladeSmith;
+import mod.fbd.entity.mob.EntitySmithBase;
 import mod.fbd.model.ModelBladeSmith;
 import mod.fbd.resource.TextureInfo;
 import net.minecraft.client.Minecraft;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderEntityBladeSmith extends RenderLiving<EntityBladeSmith>
+public class RenderEntityBladeSmith extends RenderLiving<EntitySmithBase>
 {
 	/**
 	 * デフォルトテクスチャ
@@ -35,7 +36,7 @@ public class RenderEntityBladeSmith extends RenderLiving<EntityBladeSmith>
     }
 
     @Override
-    protected void preRenderCallback(EntityBladeSmith entitylivingbaseIn, float partialTickTime)
+    protected void preRenderCallback(EntitySmithBase entitylivingbaseIn, float partialTickTime)
     {
         float f = 0.9375F;
         this.shadowSize = 0.5F;
@@ -43,7 +44,7 @@ public class RenderEntityBladeSmith extends RenderLiving<EntityBladeSmith>
     }
 
     @Override
-    public void doRender(EntityBladeSmith entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void doRender(EntitySmithBase entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
 
@@ -55,7 +56,7 @@ public class RenderEntityBladeSmith extends RenderLiving<EntityBladeSmith>
     }
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityBladeSmith entity) {
+	protected ResourceLocation getEntityTexture(EntitySmithBase entity) {
 		if (entity != null && (dynamicTexture == null || !entity.updateTexture())){
 			TextureInfo tex = entity.getTexture();
 			if (tex != null){

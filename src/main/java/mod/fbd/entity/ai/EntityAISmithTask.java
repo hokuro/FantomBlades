@@ -1,7 +1,7 @@
 package mod.fbd.entity.ai;
 
 import mod.fbd.block.BlockCore;
-import mod.fbd.entity.mob.EntityBladeSmith;
+import mod.fbd.entity.mob.EntitySmithBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.EnumFacing;
@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class EntityAISmithTask extends EntityAIBase {
 
-    protected EntityBladeSmith entity;
+    protected EntitySmithBase entity;
     /** The closest entity which is being watched by this one. */
     protected Entity closestEntity;
     /** This is the Maximum distance that the AI will look for the Entity */
@@ -18,7 +18,7 @@ public class EntityAISmithTask extends EntityAIBase {
     protected Class <? extends Entity > watchedClass;
 
 
-	public EntityAISmithTask(EntityBladeSmith entityIn) {
+	public EntityAISmithTask(EntitySmithBase entityIn) {
 		entity = entityIn;
 	}
 
@@ -27,7 +27,7 @@ public class EntityAISmithTask extends EntityAIBase {
      */
     public boolean shouldExecute()
     {
-    	return ((EntityBladeSmith)entity).Dw_ISWORK();
+    	return ((EntitySmithBase)entity).Dw_ISWORK();
     }
 
     /**
@@ -35,7 +35,7 @@ public class EntityAISmithTask extends EntityAIBase {
      */
     public boolean shouldContinueExecuting()
     {
-    	return ((EntityBladeSmith)entity).Dw_ISWORK();
+    	return ((EntitySmithBase)entity).Dw_ISWORK();
     }
 
     /**

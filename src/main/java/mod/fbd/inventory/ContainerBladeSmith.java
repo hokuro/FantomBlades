@@ -1,5 +1,6 @@
 package mod.fbd.inventory;
 
+import mod.fbd.item.ItemCore;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -18,61 +19,78 @@ public class ContainerBladeSmith extends Container {
     {
         this.smithInventory = bladesmith;
         this.world = worldIn;
-        // 材料スロット
-        for ( int r = 0; r < 2; r++){
-        	for (int c = 0; c < 6; c++){
-        		  this.addSlotToContainer(new Slot(this.smithInventory, c + (6*r), 8 + (18*c), 17 + (18*r))
-      			{
-      				public boolean isItemValid(ItemStack stack)
-      				{
-      					return  InventorySmith.allowItem(0, stack);
-      				}
-      			});
-        	}
-        }
-
-        // 刀スロット
-		this.addSlotToContainer(new Slot(this.smithInventory, 12, 138, 26)
+//        // 材料スロット
+//        for ( int r = 0; r < 2; r++){
+//        	/////for (int c = 0; c < 6; c++){
+//        	for(int c = 0; c < 1; c++){
+//        		  this.addSlotToContainer(new Slot(this.smithInventory, c + (6*r), 8 + (18*c), 17 + (18*r))
+//      			{
+//      				public boolean isItemValid(ItemStack stack)
+//      				{
+//      					return  InventorySmith.allowItem(0, stack);
+//      				}
+//      			});
+//        	}
+//        }
+        // 玉鋼スロット
+        this.addSlotToContainer(new Slot(this.smithInventory, 0, 8, 17)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
-					return  InventorySmith.allowItem(12, stack);
+					return (stack.getItem() == ItemCore.item_tamahagane);
+				}
+			});
+        // 欠片スロット
+        this.addSlotToContainer(new Slot(this.smithInventory, 1, 8, 35)
+			{
+				public boolean isItemValid(ItemStack stack)
+				{
+					return (stack.getItem() == ItemCore.item_bladepiece);
+				}
+			});
+
+        // 刀スロット
+		this.addSlotToContainer(new Slot(this.smithInventory, 2, 138, 26)
+			{
+				public boolean isItemValid(ItemStack stack)
+				{
+					return  InventorySmith.allowItem(2, stack);
 				}
 			});
 
         // ツールスロット
-		this.addSlotToContainer(new Slot(this.smithInventory, 13, 8, 71)
+		this.addSlotToContainer(new Slot(this.smithInventory, 3, 8, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
-				return  InventorySmith.allowItem(13, stack);
+				return  InventorySmith.allowItem(3, stack);
 			}
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 14, 26, 71)
+		this.addSlotToContainer(new Slot(this.smithInventory, 4, 26, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
-				return  InventorySmith.allowItem(14, stack);
+				return  InventorySmith.allowItem(4, stack);
 			}
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 15, 44, 71)
+		this.addSlotToContainer(new Slot(this.smithInventory, 5, 44, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
-				return  InventorySmith.allowItem(15, stack);
+				return  InventorySmith.allowItem(5, stack);
 			}
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 16, 62, 71)
+		this.addSlotToContainer(new Slot(this.smithInventory, 6, 62, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
-				return  InventorySmith.allowItem(16, stack);
+				return  InventorySmith.allowItem(6, stack);
 			}
 		});
 
@@ -119,9 +137,11 @@ public class ContainerBladeSmith extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index > 16)
+            //////if (index > 16)
+            if (index > 6)
             {
-                if (!this.mergeItemStack(itemstack1, 0, 17, false))
+                /////if (!this.mergeItemStack(itemstack1, 0, 17, false))
+                if (!this.mergeItemStack(itemstack1, 0, 7, false))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -130,7 +150,8 @@ public class ContainerBladeSmith extends Container {
             }
             else
             {
-            	if (!this.mergeItemStack(itemstack1, 16, this.inventorySlots.size(), false))
+            	/////if (!this.mergeItemStack(itemstack1, 16, this.inventorySlots.size(), false))
+                if (!this.mergeItemStack(itemstack1, 6, this.inventorySlots.size(), false))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -165,7 +186,8 @@ public class ContainerBladeSmith extends Container {
         if (!this.world.isRemote)
         {
         	ItemStack itemstack;
-        	for (int i = 0; i < 12; i++){
+        	/////for (int i = 0; i < 12; i++){
+            for (int i = 0; i < 2; i++){
         		itemstack = this.smithInventory.getStackInSlot(i);
         		if (!itemstack.isEmpty()){
         			playerIn.dropItem(itemstack.copy(), false);

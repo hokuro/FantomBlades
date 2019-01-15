@@ -1,6 +1,7 @@
 package mod.fbd.item;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.core.Mod_FantomBlade;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,7 +20,7 @@ import net.minecraft.world.World;
 public class ItemKatanaNiji extends ItemKatana {
 
 	public ItemKatanaNiji(){
-		super();
+		super(Mod_FantomBlade.NIJI);
 		LEVELUP_EXP = 2000;
 		POTION_UP = 500;
 		ENCHANT_UP = 500;
@@ -45,7 +46,7 @@ public class ItemKatanaNiji extends ItemKatana {
 		// 攻撃力設定
 		attackDamage = this.getAttackDamage(stack) 																// 固有攻撃力
 				+ MathHelper.floor(this.getAttackDamage(stack)*(1-Math.exp((-1*level/100)/(1-Math.exp(-1)))))   // レベル補正
-				+ ToolMaterial.IRON.getAttackDamage()                                                          // 素材補正
+				+ Mod_FantomBlade.NIJI.getAttackDamage()                                                                            // 素材補正
 				+ getKillCount(stack) / 100;                                                                    //　殺害補正
 
 		// 攻撃速度設定

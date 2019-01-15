@@ -16,10 +16,14 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.passive.EntityVillager.ITradeList;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item.ToolMaterial;
+import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -49,6 +53,16 @@ public class Mod_FantomBlade {
 
 	private ResourceManager texturemanager;
 
+	public static ToolMaterial HAGANE;
+	public static ToolMaterial NIJI;
+	public static ArmorMaterial ARMORHAGANE;
+	public static ArmorMaterial AROMORSEIRYU;
+	public static ArmorMaterial AROMORSUZAKU;
+	public static ArmorMaterial AROMORGENBU;
+	public static ArmorMaterial AROMORBYAKO;
+	public static ArmorMaterial AROMORKIRIN;
+	public static ArmorMaterial ARMORNIJI;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		rnd = new Random();
@@ -56,6 +70,18 @@ public class Mod_FantomBlade {
 
 		// コンフィグ読み込み
 		ConfigValue.init(event);
+
+		// マテリアル登録
+		HAGANE = EnumHelper.addToolMaterial("HAGANE", 3, 1000, 7.5F, 4.0F, 30);
+		NIJI = EnumHelper.addToolMaterial("NIJI", 3, 2000, 20.0F, 10.0F, 50);
+
+		ARMORHAGANE = EnumHelper.addArmorMaterial("HAGANE", ModCommon.MOD_ID + ":" + "hagane", 30, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 2.0F);
+		AROMORSEIRYU = EnumHelper.addArmorMaterial("SEIRYU", ModCommon.MOD_ID + ":" + "seiryu", 40, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
+		AROMORSUZAKU = EnumHelper.addArmorMaterial("SUZAKU", ModCommon.MOD_ID + ":" + "suzaku", 40, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
+		AROMORGENBU = EnumHelper.addArmorMaterial("GENBU", ModCommon.MOD_ID + ":" + "genbu", 40, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
+		AROMORBYAKO = EnumHelper.addArmorMaterial("BYAKO", ModCommon.MOD_ID + ":" + "byako", 40, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
+		AROMORKIRIN = EnumHelper.addArmorMaterial("KIRIN", ModCommon.MOD_ID + ":" + "kirin", 40, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
+		ARMORNIJI = EnumHelper.addArmorMaterial("NIJI", ModCommon.MOD_ID + ":" + "niji", 50, new int[]{3, 6, 8, 3}, 10, SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND, 4.0F);
 
 		// アイテム登録
 		ModRegister.RegisterItem(event);
@@ -71,9 +97,10 @@ public class Mod_FantomBlade {
 
 		// サウンド登録
 		ModRegister.RegisterSounds();
-		
+
 		// 村人登録
 		ModRegister.RegisterVillager();
+
 	}
 
 	@EventHandler

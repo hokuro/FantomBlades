@@ -1,6 +1,7 @@
 package mod.fbd.item;
 
 import mod.fbd.core.log.ModLog;
+import mod.fbd.entity.mob.EntityArmorSmith;
 import mod.fbd.entity.mob.EntityBladeSmith;
 import mod.fbd.entity.mob.EntityElmBase;
 import net.minecraft.entity.IEntityLivingData;
@@ -83,12 +84,14 @@ public class ItemSummonSeal extends Item {
 
 	public static enum EnumSummonType{
 		BLADESMITH(0,"bladesmith"),
+		ARMORSMITH(1,"armorsmith"),
 		IMOUTO(1,"imout");
 
 		private final int index;
 		private final String displayName;
 		private static final EnumSummonType[] values ={
 				BLADESMITH,
+				ARMORSMITH,
 				IMOUTO
 		};
 
@@ -104,6 +107,11 @@ public class ItemSummonSeal extends Item {
 			if (this == BLADESMITH){
 				if (EntityBladeSmith.canStartBladeSmith(world, pos, false, null)){
 					EntityBladeSmith smith = new EntityBladeSmith(world);
+					summon = smith;
+				}
+			}else if (this == ARMORSMITH){
+				if (EntityArmorSmith.canStartArmorSmith(world, pos, false, null)){
+					EntityArmorSmith smith = new EntityArmorSmith(world);
 					summon = smith;
 				}
 			}else if (this == IMOUTO){

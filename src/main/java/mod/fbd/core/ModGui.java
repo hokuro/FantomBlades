@@ -2,7 +2,9 @@ package mod.fbd.core;
 
 
 import mod.fbd.core.log.ModLog;
+import mod.fbd.entity.mob.EntityArmorSmith;
 import mod.fbd.entity.mob.EntityBladeSmith;
+import mod.fbd.gui.GuiArmorSmith;
 import mod.fbd.gui.GuiAutomatic;
 import mod.fbd.gui.GuiBladeAlter;
 import mod.fbd.gui.GuiBladeSmith;
@@ -10,6 +12,7 @@ import mod.fbd.gui.GuiBladeforge;
 import mod.fbd.gui.GuiCartridge;
 import mod.fbd.gui.GuiGunCustomize;
 import mod.fbd.gui.GuiRevolver;
+import mod.fbd.inventory.ContainerArmorSmith;
 import mod.fbd.inventory.ContainerAutomatic;
 import mod.fbd.inventory.ContainerBladeAlter;
 import mod.fbd.inventory.ContainerBladeSmith;
@@ -41,6 +44,7 @@ public class ModGui implements IGuiHandler {
 	public static final int GUI_ID_AUTOMATIC_MAINHAND = 5;
 	public static final int GUI_ID_CARTRIDGE = 6;
 	public static final int GUI_ID_GUNCUSTOMAIZER = 7;
+	public static final int GUI_ID_ARMORSMITH = 1000;
 
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
@@ -108,6 +112,16 @@ public class ModGui implements IGuiHandler {
 			}
 		}
 
+		if (id >= GUI_ID_ARMORSMITH){
+			int entid = id - GUI_ID_ARMORSMITH;
+			ModLog.log().debug("server gui entity id:"+entid);
+			Entity entity = world.getEntityByID(entid);
+			if (entity instanceof EntityArmorSmith){
+				Object obj = new ContainerArmorSmith(player.inventory, ((EntityArmorSmith)entity).getSmithInventory(), world);
+				//Mod_FantomBlade.proxy.setGuiTarget(null);
+				return obj;
+			}
+		}
 		return null;
 	}
 
@@ -171,6 +185,18 @@ public class ModGui implements IGuiHandler {
 			Entity entity = world.getEntityByID(entid);
 			if (entity instanceof EntityBladeSmith){
 				Object obj = new GuiBladeSmith(player, (EntityBladeSmith)entity);
+				//Mod_FantomBlade.proxy.setGuiTarget(null);
+				return obj;
+			}
+		}
+
+
+		if (id >= GUI_ID_ARMORSMITH) {
+			int entid = id - GUI_ID_ARMORSMITH;
+			ModLog.log().debug("client gui entity id:"+entid);
+			Entity entity = world.getEntityByID(entid);
+			if (entity instanceof EntityArmorSmith){
+				Object obj = new GuiArmorSmith(player, (EntityArmorSmith)entity);
 				//Mod_FantomBlade.proxy.setGuiTarget(null);
 				return obj;
 			}

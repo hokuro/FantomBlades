@@ -3,11 +3,14 @@ package mod.fbd.core;
 import mod.fbd.block.BlockCore;
 import mod.fbd.entity.EntityBurret;
 import mod.fbd.entity.ProfessionGunSmith;
+import mod.fbd.entity.mob.EntityArmorSmith;
 import mod.fbd.entity.mob.EntityBladeSmith;
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.ItemTamahagane.EnumTamahagane;
 import mod.fbd.network.MessageBladeforgeSmeltingStart;
+import mod.fbd.network.MessageCreateArmor;
 import mod.fbd.network.MessageCreateBlade;
+import mod.fbd.network.MessageRepairArmor;
 import mod.fbd.network.MessageRepairBlade;
 import mod.fbd.network.MessageSetRunAirPomp;
 import mod.fbd.network.MessageSetRunBladeforge;
@@ -40,6 +43,7 @@ public class ModRegister {
 
 	public static void RegisterEntity(CommonProxy proxy){
 		EntityRegistry.registerModEntity(EntityBladeSmith.loot, EntityBladeSmith.class, EntityBladeSmith.NAME, EntityBladeSmith.REGISTERID, Mod_FantomBlade.instance, 10, 1, false);
+		EntityRegistry.registerModEntity(EntityArmorSmith.loot, EntityArmorSmith.class, EntityArmorSmith.NAME, EntityArmorSmith.REGISTERID, Mod_FantomBlade.instance, 10, 1, false);
 		EntityRegistry.registerModEntity(new ResourceLocation(ModCommon.MOD_ID + ":" + EntityBurret.NAME), EntityBurret.class, EntityBurret.NAME, EntityBurret.REGISTERID, Mod_FantomBlade.instance, 10, 1, false);
 
 		// タイルエンティティはserverとclientで登録方法が違う為プロキシで分ける
@@ -64,6 +68,9 @@ public class ModRegister {
 		Mod_FantomBlade.Net_Instance.registerMessage(MessageCreateBlade.class,MessageCreateBlade.class,ModCommon.MESID_CREATEBLADE,Side.SERVER);
 		Mod_FantomBlade.Net_Instance.registerMessage(MessageRepairBlade.class,MessageRepairBlade.class,ModCommon.MESID_REPAIREBLADE,Side.SERVER);
 		Mod_FantomBlade.Net_Instance.registerMessage(Message_BladeLevelUpdate.class,Message_BladeLevelUpdate.class,ModCommon.MESID_BLADELEVELUPDATE, Side.SERVER);
+
+		Mod_FantomBlade.Net_Instance.registerMessage(MessageCreateArmor.class,MessageCreateArmor.class,ModCommon.MESID_CREATEARMOR, Side.SERVER);
+		Mod_FantomBlade.Net_Instance.registerMessage(MessageRepairArmor.class,MessageRepairArmor.class,ModCommon.MESID_REPAIREARMOR, Side.SERVER);
 	}
 
 	public static void RegisterSounds(){

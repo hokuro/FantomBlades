@@ -1,10 +1,10 @@
 package mod.fbd.item;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.equipmenteffect.EnchantmentCore;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -52,18 +52,19 @@ public class ItemKatanaByako extends ItemKatana {
 	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		super.onUpdate(stack, world, entity, indexOfMainSlot, isCurrent);
 		if (entity instanceof EntityLivingBase){
-			// 装備中 鈍足、攻撃力低下、採掘低下のポーション効果を受けない
 			EntityLivingBase living = (EntityLivingBase)entity;
+			// 効果変更白虎防具を追加してセットボーナスにする
+//			// 装備中 鈍足、攻撃力低下、採掘低下のポーション効果を受けない
 			if (living.getHeldItemMainhand().getItem() == this){
-				List<PotionEffect> effects = new ArrayList<PotionEffect>();
-				effects.addAll(living.getActivePotionEffects());
-				for (PotionEffect effect : effects){
-					if (effect.getPotion() == MobEffects.SLOWNESS ||
-						effect.getPotion() == MobEffects.MINING_FATIGUE ||
-						effect.getPotion() == MobEffects.WEAKNESS){
-						living.removeActivePotionEffect(effect.getPotion());
-					}
-				}
+//				List<PotionEffect> effects = new ArrayList<PotionEffect>();
+//				effects.addAll(living.getActivePotionEffects());
+//				for (PotionEffect effect : effects){
+//					if (effect.getPotion() == MobEffects.SLOWNESS ||
+//						effect.getPotion() == MobEffects.MINING_FATIGUE ||
+//						effect.getPotion() == MobEffects.WEAKNESS){
+//						living.removeActivePotionEffect(effect.getPotion());
+//					}
+//				}
 				for (PotionEffect effect : updatePotionList(stack)){
 					living.addPotionEffect(new PotionEffect(effect.getPotion(),20,effect.getAmplifier()));
 				}
@@ -126,10 +127,13 @@ public class ItemKatanaByako extends ItemKatana {
 		 ItemKatana.setAttackSpeed(ret,-0.1D);
 		 ItemKatana.setEndurance(ret, 1000);
 		 ret.addEnchantment(Enchantments.KNOCKBACK, 1);
-		 ret.addEnchantment(Enchantments.FEATHER_FALLING, 1);
+		 ret.addEnchantment(EnchantmentCore.enc_livingkiller,1);
+//       効果変更
+//		 ret.addEnchantment(Enchantments.FEATHER_FALLING, 1);
 		 ItemKatana.setUpdatePotionList(ret, new ArrayList<PotionEffect>(){
-				{add(new PotionEffect(MobEffects.SPEED,20,0));}
-				{add(new PotionEffect(MobEffects.JUMP_BOOST,20,0));}
+			 {add(new PotionEffect(MobEffects.INVISIBILITY));}
+//				{add(new PotionEffect(MobEffects.SPEED,20,0));}
+//				{add(new PotionEffect(MobEffects.JUMP_BOOST,20,0));}
 		 });
 		 return ret;
 	 }
@@ -151,9 +155,9 @@ public class ItemKatanaByako extends ItemKatana {
 				map.replace(Enchantments.KNOCKBACK, MathHelper.ceil(value/5F));
 				update = true;
 			}
-			lv = EnchantmentHelper.getEnchantmentLevel(Enchantments.FEATHER_FALLING, stack);
+			lv = EnchantmentHelper.getEnchantmentLevel(EnchantmentCore.enc_livingkiller, stack);
 			if (lv < MathHelper.ceil(value/5F) && lv < 10){
-				map.replace(Enchantments.FEATHER_FALLING, MathHelper.ceil(value/5F));
+				map.replace(EnchantmentCore.enc_livingkiller, MathHelper.ceil(value/5F));
 				update = true;
 			}
 			if (update){
@@ -161,6 +165,6 @@ public class ItemKatanaByako extends ItemKatana {
 			}
 	 }
 	 public Enchantment[] ignoreEnchantments(){
-		 return	new Enchantment[]{Enchantments.KNOCKBACK,Enchantments.FEATHER_FALLING};
+		 return	new Enchantment[]{Enchantments.KNOCKBACK,EnchantmentCore.enc_livingkiller};
 	 }
 }

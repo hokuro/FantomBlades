@@ -2,8 +2,10 @@ package mod.fbd.tileentity;
 
 import mod.fbd.block.BlockBladeforge;
 import mod.fbd.core.Mod_FantomBlade;
+import mod.fbd.item.ItemBladePiece.EnumBladePieceType;
 import mod.fbd.item.ItemCore;
 import mod.fbd.network.MessageSetRunBladeforge;
+import mod.fbd.util.ModUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -76,7 +78,7 @@ public class TileEntityBladeforge extends TileEntity implements IInventory, ITic
 			if (smelting_cnt <= 0){
 				// 精錬完了
 				this.frame_state = BlockBladeforge.STAGE_4;
-				// ブロックステートを性連中に設定
+				// ブロックステートを精錬中に設定
 				IBlockState state = world.getBlockState(pos);
 				world.setBlockState(pos, ((BlockBladeforge)state.getBlock()).setFrame(state, BlockBladeforge.STAGE_4));
 				// クライアント側に通知
@@ -436,6 +438,27 @@ public class TileEntityBladeforge extends TileEntity implements IInventory, ITic
 
 			int noro = randomStack(coal,14,16,10);
 			addStack(ret,ItemCore.item_noro,0,noro);
+
+
+			// 各欠片のできる数それぞれ別々に最大10個できる
+			int rd = Math.min(iron/100,10)*2+1;
+			int md = Math.min(rd/2, 10);
+			int genbu = ModUtil.random(rd)-10;
+			if (genbu > 0){
+				addStack(ret, ItemCore.item_bladepiece,EnumBladePieceType.GENBU.getIndex(),genbu);
+			}
+			int suzaku = ModUtil.random(rd)-10;
+			if (suzaku > 0){
+				addStack(ret, ItemCore.item_bladepiece,EnumBladePieceType.SUZAKU.getIndex(),suzaku);
+			}
+			int seiryu = ModUtil.random(rd)-10;
+			if (seiryu > 0){
+				addStack(ret, ItemCore.item_bladepiece,EnumBladePieceType.SEIRYU.getIndex(),seiryu);
+			}
+			int byako = ModUtil.random(rd)-10;
+			if (byako > 0){
+				addStack(ret, ItemCore.item_bladepiece,EnumBladePieceType.BYAKO.getIndex(),byako);
+			}
 		}
 		this.setField(FIELD_IRON, 0);
 		this.setField(FIELD_COAL, 0);

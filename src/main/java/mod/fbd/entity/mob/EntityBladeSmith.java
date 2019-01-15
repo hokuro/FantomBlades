@@ -49,8 +49,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -71,61 +69,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EntityBladeSmith extends EntityElmBase implements INpc
+public class EntityBladeSmith extends EntitySmithBase implements INpc
 {
 	public static final ResourceLocation TEXTURE_DEFAULT = new ResourceLocation("fbd","textures/entity/bladesmith_default.png");
 	public static final String NAME= "bladesmith";
 	public static final int REGISTERID = 1;
 	public static final ResourceLocation loot = new ResourceLocation("fbd:"+NAME);
 	public static final int MAX_LEVEL = 255;
-
-	/**************************************************************/
-	/** DataWatcher                                              **/
-	/**************************************************************/
-	// テクスチャー
-	 protected static final DataParameter<String> DW_TEXTURE = EntityDataManager.<String>createKey(EntityElmBase.class, DataSerializers.STRING);
-		public void Dw_Texture(String value){
-			this.dataManager.set(DW_TEXTURE, value);
-		}
-
-		public String Dw_Texture(){
-			return this.dataManager.get(DW_TEXTURE);
-		}
-	// 作業状況
-	protected static final DataParameter<Integer> DW_WORKTIMER = EntityDataManager.<Integer>createKey(EntityElmBase.class, DataSerializers.VARINT);
-	public void Dw_WORKTIMER(int value){
-		this.dataManager.set(DW_WORKTIMER, value);
-	}
-
-	public int Dw_WORKTIMER(){
-		return this.dataManager.get(DW_WORKTIMER);
-	}
-	public void addWorkTimeValue(int value){
-		Dw_WORKTIMER(Dw_WORKTIMER()+value);
-	}
-
-	// 作業状態
-	protected static final DataParameter<Boolean> DW_ISWORK = EntityDataManager.<Boolean>createKey(EntityElmBase.class, DataSerializers.BOOLEAN);
-	public void Dw_ISWORK(boolean value){
-		this.dataManager.set(DW_ISWORK, value);
-	}
-
-	public boolean Dw_ISWORK(){
-		return this.dataManager.get(DW_ISWORK);
-	}
-
-	// 腕ふり
-	protected static final DataParameter<Integer> DW_SWING = EntityDataManager.<Integer>createKey(EntityElmBase.class, DataSerializers.VARINT);
-	public void Dw_Swing(int value){
-		this.dataManager.set(DW_SWING, value);
-	}
-
-	public int Dw_Swing() {
-		return this.dataManager.get(DW_SWING);
-	}
-	public void addSwingValue(int value){
-		Dw_Swing(Dw_Swing()+value);
-	}
 
 	public void addExp(int nextExp) {
 		int value = Dw_Exp() + nextExp;
@@ -529,6 +479,7 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
     	this.smithInventory.setBlade(katana);
     }
 
+    @Override
     public boolean checkWork(World world, BlockPos pos){
     	boolean flag_anvil = false;
     	boolean flag_furnce = false;
@@ -617,6 +568,7 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
     	return (flag_anvil && flag_furnce && flag_cauldron && flag_crafting);
     }
 
+    @Override
     public void finishWork(World world,BlockPos pos, boolean success){
 
     	// ブロックをもとに戻す
@@ -678,10 +630,10 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
     	Dw_WORKTIMER(0);
 
     	// 道具乱を整理
-    	int clear = 12;
+    	int clear = 2;
 		if (!success){
 			// 失敗した場合できるはずだった刀もクリア
-			clear = 13;
+			clear = 3;
 		}else{
 			// 成功した場合経験値取得
 			this.addExp(nextExp);
@@ -698,7 +650,7 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
 		}
 
 		// 使った道具を破損させる
-		for (int i = 13; i < this.smithInventory.getSizeInventory(); i++){
+		for (int i = 3; i < this.smithInventory.getSizeInventory(); i++){
 			ItemStack stack = this.smithInventory.getStackInSlot(i);
 			if (stack.isItemStackDamageable()){
 				stack.damageItem(1, this);
@@ -828,9 +780,11 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
 	}
 
 	private boolean textureUpdate = false;
+	@Override
 	public boolean updateTexture() {
 		return textureUpdate;
 	}
+	@Override
 	public void updateTexture(boolean flag) {
 		textureUpdate = flag;
 	}
@@ -875,145 +829,284 @@ public class EntityBladeSmith extends EntityElmBase implements INpc
     		EnumBladePieceType.GENBU,EnumBladePieceType.KIRIN,EnumBladePieceType.NIJI};
     private static float[] parcent = {100,0,0,0,0,0,0};
 
-
-	public ItemStack createBlade(){
+    public ItemStack createBlade(){
 		ItemStack ret = ItemStack.EMPTY;
-		boolean isPeace = true;
 		int count = 0;
 		int level = getLevel();
-		int tamahagane = this.smithInventory.getTamahagane(EnumTamahagane.FIRST_GRADE);
-		if (tamahagane <= 0){
+
+		ItemStack tamahagane = this.smithInventory.getTamahagane();
+		if (tamahagane.getCount() <= 0){
 			// ざいりょうがねーよん
 			return ret;
 		}
-    	int piece_seiryu = this.smithInventory.getBladePiece(EnumBladePieceType.SEIRYU);
-    	int piece_suzaku = this.smithInventory.getBladePiece(EnumBladePieceType.SUZAKU);
-    	int piece_byako = this.smithInventory.getBladePiece(EnumBladePieceType.BYAKO);
-    	int piece_genbu = this.smithInventory.getBladePiece(EnumBladePieceType.GENBU);
-    	int piece_kirin = this.smithInventory.getBladePiece(EnumBladePieceType.KIRIN);
-    	int piece_niji = this.smithInventory.getBladePiece(EnumBladePieceType.NIJI);
-    	int[] pieces = {piece_seiryu,piece_suzaku,piece_byako,piece_genbu,piece_genbu,piece_kirin,piece_niji};
 
-    	// 欠片が使用されているか、レベルが10未満なら欠片はできない
-    	if ((piece_seiryu + piece_suzaku + piece_byako + piece_genbu + piece_kirin) <= 0){
-        	// レベル10以上必要
-    		if (level >= 10){
-            	for (int i = 1; i < parcent.length-1; i++){
-            		// レベル補正
-            		parcent[i] += Math.min(level / 10.0F * 5.0F,50.0F);
+		ItemStack piece = this.smithInventory.getBladePiece();
+		EnumBladePieceType makeItem = EnumBladePieceType.NORMAL;
+		boolean exblade = false;
+		if (piece.getCount() > 0 && level >= 10){
+			//　10レベル以上のスミスでかつ欠片が設定されている
+			if (level >= 250){
+				// レベル250以上の場合確実に特殊刀ができる
+				exblade = true;
+			}else{
+				// 特殊刀ができる確率を計算 最大70%
+				if (Math.min(level/10.0F*5.0F, 70.0F) >= ModUtil.random(101)){
+					exblade = true;
+					makeItem = EnumBladePieceType.getFromIndex(piece.getMetadata());
 
-            		// 玉鋼補正
-            		if (parcent[i] != 0){
-            			parcent[i] += tamahagane / 20.0F;
-            		}
-            		count = ModUtil.random((int)(tamahagane/20.0F));
-            		if (count == 0){
-            			count = ModUtil.random(level/2) + 1;
-            		}
-            	}
-    		}
-    	}else{
-    		for (int i = 1; i < parcent.length; i++){
-    			// 素材がない
-    			if (pieces[i-1] == 0 || level < names[i].getMakeLevel()){continue;}
-    			// 素材補正
-        		parcent[i] += tamahagane / 50.0F + pieces[i-1]/20.0F;
-        		// レベル補正
-        		parcent[i] += Math.min(level / 20.0F * 5.0F, 50.0F);
-    		}
-    	}
-
-    	// 確率計算
-    	float sum = 0;
-    	for (float f:parcent){sum+=f;}
-    	List<EnumBladePieceType> nameList = new ArrayList<EnumBladePieceType>();
-    	List<Float> parList = new ArrayList<Float>();
-
-    	for (int i = 0; i < parcent.length; i++){
-    		if (parcent[i] != 0){
-    			nameList.add(names[i]);
-    			parList.add(parcent[1]/sum + (i==0?0:parList.get(parList.size()-1)));
-    		}
-    	}
-
-    	double val = ModUtil.randomD();
-    	EnumBladePieceType makeItem = EnumBladePieceType.NORMAL;
-    	for (int i = 0; i < parList.size(); i++){
-    		if (val <= parList.get(i)){
-    			makeItem = nameList.get(i);
-    		}
-    	}
+				}
+			}
+		}
 
     	// 経験値
-    	nextExp = makeItem.getBaseExp() + ModUtil.random(makeItem.getOptionExp()/(isPeace?2:1));
-    	switch(makeItem){
-    			case NORMAL:
-    					ret = new ItemStack(ItemCore.item_katana);
-    					ItemKatana.setMaxLevel(ret,maxLevel(level,tamahagane));
-    					ItemKatana.setAttackDamage(ret,attackDamage(level,tamahagane));
-    					ItemKatana.setAttackSpeed(ret,attackSpeed(level,tamahagane));
-    					ItemKatana.setEndurance(ret, endurance(level,tamahagane));
-    					ItemKatana.setExp(ret,0);
-    					ItemKatana.setRustValue(ret, 0);
-    					if (level > 10){
-    						setPotionEffect(ret,level,tamahagane);
-    					}
-    					if (level > 5){
-    						setEnchant(ret,level,tamahagane);
-    					}
-    					String bladeName = ConfigValue.General.getRandomName();
-    					if (bladeName != null){
-    						ret.setStackDisplayName(bladeName);
-    					}
-    				break;
-    			case BYAKO:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.BYAKO.getIndex());
-    				}else{
-    					ret = ItemKatanaByako.getDefaultStack();
-    				}
-    				break;
-    			case GENBU:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.GENBU.getIndex());
-    				}else{
-    					ret =ItemKatanaGenbu.getDefaultStack();
-    				}
-    				break;
-    			case KIRIN:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.KIRIN.getIndex());
-    				}else{
-    					ret = ItemKatanaKirin.getDefaultStack();
-    				}
-    				break;
-    			case NIJI:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.NIJI.getIndex());
-    				}else{
-    					ret = ItemKatanaNiji.getDefaultStack();
-    				}
-    				break;
-    			case SEIRYU:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.SEIRYU.getIndex());
-    				}else{
-    					ret = ItemKatanaSeiryu.getDefaultStack();
-    				}
-    				break;
-    			case SUZAKU:
-    				if (isPeace){
-    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.SUZAKU.getIndex());
-    				}else{
-    					ret = ItemKatanaSuzaku.getDefaultStack();
-    				}
-    				break;
-    			default:
-    				break;
-    	    	}
-    	    	return ret;
+    	nextExp = makeItem.getBaseExp() + ModUtil.random(makeItem.getOptionExp());
+		if (exblade){
+			switch(makeItem){
+			case BYAKO:
+					ret = ItemKatanaByako.getDefaultStack();
+				break;
+			case GENBU:
+					ret =ItemKatanaGenbu.getDefaultStack();
+				break;
+			case KIRIN:
+					ret = ItemKatanaKirin.getDefaultStack();
+				break;
+			case NIJI:
+					ret = ItemKatanaNiji.getDefaultStack();
+				break;
+			case SEIRYU:
+					ret = ItemKatanaSeiryu.getDefaultStack();
+				break;
+			case SUZAKU:
+					ret = ItemKatanaSuzaku.getDefaultStack();
+				break;
+			default:
+				break;
+	    	}
+		}else{
+			float maxLevel = 0.0F;
+			float attackDamage=0.0F;
+			float attackSpeed=0.0F;
+			float endurance=0.0F;
 
+			// レベルから作れるランクを決定
+			// 最大レベルは製作者のレベル-0～10の範囲
+			maxLevel = MathHelper.clamp(level - ModUtil.random(11),1,300);
+			// 攻撃力は製作者のレベル+-1の範囲
+			attackDamage = Math.min(Math.max(((int)(level/10))+1 + (ModUtil.random(3)-1),1),10);
+			// スピード (レベル+-0~10の60%を最低値から引く)
+			attackSpeed = MathHelper.clamp((-3.0F+(0.5F * (level + (ModUtil.random(11)*20F-10F))) / 60F), -3.0F, -0.5F);
+			// 耐久度
+			endurance = 2000 + (level/10) * (ModUtil.random(100) - ModUtil.random(255-level));
+
+			// 玉鋼の数によるランク補正
+			// 最大レベル補正(なし)
+			// 攻撃力補正(なし)
+			// 攻撃速度補正(なし)
+			// 玉鋼のランクによる力ランク補正
+			if (tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+				// スピード補正(速度を0.0~0.9の範囲で下げる)
+				attackSpeed = MathHelper.clamp(attackSpeed + ModUtil.random(10)/10, -3.0F, -0.5F);
+				// 耐久度補正(玉鋼の数の10倍の耐久力)
+				endurance = endurance + tamahagane.getCount() * 10;
+				// 耐久度補正(1.2倍)
+				endurance = endurance *1.2F;
+			}else if (tamahagane.getMetadata() == EnumTamahagane.SECOND_GRADE.getIndex()){
+				// セカンドランク
+				//　最大レベル補正(最大レベルを0～10の範囲で下げる)
+				maxLevel = Math.min(level - ModUtil.random(11), 1);
+				// 攻撃力補正
+				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.1F)/10.0F;
+				//　スピード補正(何もしない)
+				// 耐久度補正(何もしない)
+				// 耐久度補正(玉鋼の数の10倍の耐久力)
+				endurance = endurance + tamahagane.getCount() * 5;
+			}else if(tamahagane.getMetadata() == EnumTamahagane.THERD_GRADE.getIndex()){
+				//　最大レベル補正(最大レベルを10～30の範囲で下げる)
+				maxLevel = Math.min(level - ModUtil.random(31)+10, 1);
+				// 攻撃力補正
+				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.5F)/10.0F;
+				// スピード補正(速度を0.0~0.9の範囲で上げる)
+				attackSpeed = MathHelper.clamp(attackSpeed - ModUtil.random(10)/10, -3.0F, -0.5F);
+				// 耐久度補正(玉鋼の数の10倍の耐久力)
+				endurance = endurance + tamahagane.getCount() * 3;
+				// 耐久度補正(0.8倍)
+				endurance = endurance *0.8F;
+			}else{
+				//　最大レベル補正(レベル上げを不可にする)
+				maxLevel = 1;
+				// 攻撃力補正
+				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.7F)/10.0F;
+				// スピード補正(速度を1.0~1.9の範囲で上げる)
+				attackSpeed = MathHelper.clamp(attackSpeed -1.0F - ModUtil.random(10)/10, -3.0F, -0.5F);
+				// 耐久度補正(玉鋼の数の3倍の耐久力が減る)
+				endurance = endurance - tamahagane.getCount() * 3;
+				// 耐久度補正(0.5倍)
+				endurance = endurance *0.5F;
+			}
+			ret = new ItemStack(ItemCore.item_katana);
+			ItemKatana.setMaxLevel(ret,(int)maxLevel);
+			ItemKatana.setAttackDamage(ret,attackDamage);
+			ItemKatana.setAttackSpeed(ret,attackSpeed);
+			ItemKatana.setEndurance(ret, (int)endurance);
+			ItemKatana.setExp(ret,0);
+			ItemKatana.setRustValue(ret, 0);
+
+			// ポーション効果とエンチャントは最上級玉鋼を使用した場合のみ付加する
+			if (level > 10 && tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+				setPotionEffect(ret,level,tamahagane.getCount());
+			}
+			if (level > 5 && tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+				setEnchant(ret,level,tamahagane.getCount());
+			}
+			String bladeName = ConfigValue.General.getRandomName();
+			if (bladeName != null){
+				ret.setStackDisplayName(bladeName);
+			}
+
+		}
+    	return ret;
 	}
+
+
+//	public ItemStack createBlade(){
+//		ItemStack ret = ItemStack.EMPTY;
+//		boolean isPeace = true;
+//		int count = 0;
+//		int level = getLevel();
+//		int tamahagane = this.smithInventory.getTamahagane(EnumTamahagane.FIRST_GRADE);
+//		if (tamahagane <= 0){
+//			// ざいりょうがねーよん
+//			return ret;
+//		}
+//    	int piece_seiryu = this.smithInventory.getBladePiece(EnumBladePieceType.SEIRYU);
+//    	int piece_suzaku = this.smithInventory.getBladePiece(EnumBladePieceType.SUZAKU);
+//    	int piece_byako = this.smithInventory.getBladePiece(EnumBladePieceType.BYAKO);
+//    	int piece_genbu = this.smithInventory.getBladePiece(EnumBladePieceType.GENBU);
+//    	int piece_kirin = this.smithInventory.getBladePiece(EnumBladePieceType.KIRIN);
+//    	int piece_niji = this.smithInventory.getBladePiece(EnumBladePieceType.NIJI);
+//    	int[] pieces = {piece_seiryu,piece_suzaku,piece_byako,piece_genbu,piece_genbu,piece_kirin,piece_niji};
+//
+//    	// 欠片が使用されているか、レベルが10未満なら欠片はできない
+//    	if ((piece_seiryu + piece_suzaku + piece_byako + piece_genbu + piece_kirin) <= 0){
+//        	// レベル10以上必要
+//    		if (level >= 10){
+//            	for (int i = 1; i < parcent.length-1; i++){
+//            		// レベル補正
+//            		parcent[i] += Math.min(level / 10.0F * 5.0F,50.0F);
+//
+//            		// 玉鋼補正
+//            		if (parcent[i] != 0){
+//            			parcent[i] += tamahagane / 20.0F;
+//            		}
+//            		count = ModUtil.random((int)(tamahagane/20.0F));
+//            		if (count == 0){
+//            			count = ModUtil.random(level/2) + 1;
+//            		}
+//            	}
+//    		}
+//    	}else{
+//    		for (int i = 1; i < parcent.length; i++){
+//    			// 素材がない
+//    			if (pieces[i-1] == 0 || level < names[i].getMakeLevel()){continue;}
+//    			// 素材補正
+//        		parcent[i] += tamahagane / 50.0F + pieces[i-1]/20.0F;
+//        		// レベル補正
+//        		parcent[i] += Math.min(level / 20.0F * 5.0F, 50.0F);
+//    		}
+//    	}
+//
+//    	// 確率計算
+//    	float sum = 0;
+//    	for (float f:parcent){sum+=f;}
+//    	List<EnumBladePieceType> nameList = new ArrayList<EnumBladePieceType>();
+//    	List<Float> parList = new ArrayList<Float>();
+//
+//    	for (int i = 0; i < parcent.length; i++){
+//    		if (parcent[i] != 0){
+//    			nameList.add(names[i]);
+//    			parList.add(parcent[1]/sum + (i==0?0:parList.get(parList.size()-1)));
+//    		}
+//    	}
+//
+//    	double val = ModUtil.randomD();
+//    	EnumBladePieceType makeItem = EnumBladePieceType.NORMAL;
+//    	for (int i = 0; i < parList.size(); i++){
+//    		if (val <= parList.get(i)){
+//    			makeItem = nameList.get(i);
+//    		}
+//    	}
+//
+//    	// 経験値
+//    	nextExp = makeItem.getBaseExp() + ModUtil.random(makeItem.getOptionExp()/(isPeace?2:1));
+//    	switch(makeItem){
+//    			case NORMAL:
+//    					ret = new ItemStack(ItemCore.item_katana);
+//    					ItemKatana.setMaxLevel(ret,maxLevel(level,tamahagane));
+//    					ItemKatana.setAttackDamage(ret,attackDamage(level,tamahagane));
+//    					ItemKatana.setAttackSpeed(ret,attackSpeed(level,tamahagane));
+//    					ItemKatana.setEndurance(ret, endurance(level,tamahagane));
+//    					ItemKatana.setExp(ret,0);
+//    					ItemKatana.setRustValue(ret, 0);
+//    					if (level > 10){
+//    						setPotionEffect(ret,level,tamahagane);
+//    					}
+//    					if (level > 5){
+//    						setEnchant(ret,level,tamahagane);
+//    					}
+//    					String bladeName = ConfigValue.General.getRandomName();
+//    					if (bladeName != null){
+//    						ret.setStackDisplayName(bladeName);
+//    					}
+//    				break;
+//    			case BYAKO:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.BYAKO.getIndex());
+//    				}else{
+//    					ret = ItemKatanaByako.getDefaultStack();
+//    				}
+//    				break;
+//    			case GENBU:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.GENBU.getIndex());
+//    				}else{
+//    					ret =ItemKatanaGenbu.getDefaultStack();
+//    				}
+//    				break;
+//    			case KIRIN:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.KIRIN.getIndex());
+//    				}else{
+//    					ret = ItemKatanaKirin.getDefaultStack();
+//    				}
+//    				break;
+//    			case NIJI:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.NIJI.getIndex());
+//    				}else{
+//    					ret = ItemKatanaNiji.getDefaultStack();
+//    				}
+//    				break;
+//    			case SEIRYU:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.SEIRYU.getIndex());
+//    				}else{
+//    					ret = ItemKatanaSeiryu.getDefaultStack();
+//    				}
+//    				break;
+//    			case SUZAKU:
+//    				if (isPeace){
+//    					ret = new ItemStack(ItemCore.item_bladepiece,ModUtil.random(count)+1,EnumBladePieceType.SUZAKU.getIndex());
+//    				}else{
+//    					ret = ItemKatanaSuzaku.getDefaultStack();
+//    				}
+//    				break;
+//    			default:
+//    				break;
+//    	    	}
+//    	    	return ret;
+//
+//	}
     private ItemStack setPotionEffect(ItemStack katana, int level, int t1){
     	List<ItemStack> p = this.smithInventory.getPotions();
     	int cnt = 1;

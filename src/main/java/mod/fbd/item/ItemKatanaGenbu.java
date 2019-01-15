@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import mod.fbd.core.ModCommon;
+import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.equipmenteffect.EnchantmentCore;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,7 +14,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -54,12 +54,12 @@ public class ItemKatanaGenbu extends ItemKatana {
 	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		int level = this.getLevel(stack);
 		int rust = this.getRustValue(stack);
-		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			// 錆補正
+		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			    // 錆補正
 
 		// 攻撃力設定
-		attackDamage = (this.getAttackDamage(stack) 																// 固有攻撃力
+		attackDamage = (this.getAttackDamage(stack) 														    // 固有攻撃力
 				+ MathHelper.floor(this.getAttackDamage(stack)*(1-Math.exp((-1*level/100)/(1-Math.exp(-1)))))   // レベル補正
-				+ ToolMaterial.IRON.getAttackDamage());                                                          // 素材補正
+				+ Mod_FantomBlade.HAGANE.getAttackDamage());                                                                           // 素材補正
 		if (world.getBlockState(entity.getPosition()).getMaterial() == Material.LAVA){
 			// 溶岩の中では攻撃力半減
 			attackDamage /=2;
@@ -84,7 +84,7 @@ public class ItemKatanaGenbu extends ItemKatana {
 			if (((EntityLivingBase) entity).getHeldItemMainhand().getItem() == this){
 				// 装備中水中呼吸の効果
 				for (PotionEffect effect : updatePotionList(stack)){
-					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(effect.getPotion(),20,effect.getAmplifier()));
+//					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(effect.getPotion(),20,effect.getAmplifier()));
 				}
 			}
 		}
@@ -120,6 +120,8 @@ public class ItemKatanaGenbu extends ItemKatana {
 				if (movingbjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
 					BlockPos blockpos = movingbjectposition.getBlockPos();
 					if (worldIn.getBlockState(blockpos).getMaterial() == Material.LAVA){
+						worldIn.setBlockState(blockpos, Blocks.MAGMA.getDefaultState());
+					}else if (worldIn.getBlockState(blockpos).getBlock() == Blocks.MAGMA){
 						worldIn.setBlockState(blockpos, Blocks.OBSIDIAN.getDefaultState());
 					}
 				}
@@ -152,9 +154,11 @@ public class ItemKatanaGenbu extends ItemKatana {
 			ItemKatana.setAttackDamage(ret,12.0F);
 			ItemKatana.setAttackSpeed(ret,-0.5D);
 			ItemKatana.setEndurance(ret, 1000);
-			ret.addEnchantment(Enchantments.DEPTH_STRIDER, 1);
-			ret.addEnchantment(Enchantments.RESPIRATION, 1);
+//			ret.addEnchantment(Enchantments.DEPTH_STRIDER, 1);
+//			ret.addEnchantment(Enchantments.RESPIRATION, 1);
+			// エンダーマンに追加ダメージ
 			ret.addEnchantment(EnchantmentCore.enc_enderkillre, 1);
+			ret.addEnchantment(EnchantmentCore.enc_waterkiller, 1);
 
 			ItemKatana.setUpdatePotionList(ret, new ArrayList<PotionEffect>(){
 				{add(new PotionEffect(MobEffects.WATER_BREATHING,20,1));}
@@ -174,19 +178,14 @@ public class ItemKatanaGenbu extends ItemKatana {
 
 			boolean update=false;
 			Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(stack);
-			int lv = EnchantmentHelper.getEnchantmentLevel(Enchantments.DEPTH_STRIDER, stack);
-			if (lv < MathHelper.ceil(value/5F) && lv < 5){
-				map.replace(Enchantments.DEPTH_STRIDER, MathHelper.ceil(value/5F));
-				update = true;
-			}
-			lv = EnchantmentHelper.getEnchantmentLevel(Enchantments.RESPIRATION, stack);
-			if (lv < MathHelper.ceil(value/5F) && lv < 5){
-				map.replace(Enchantments.RESPIRATION, MathHelper.ceil(value/5F));
-				update = true;
-			}
-			lv = EnchantmentHelper.getEnchantmentLevel(EnchantmentCore.enc_enderkillre, stack);
+			int lv = EnchantmentHelper.getEnchantmentLevel(EnchantmentCore.enc_enderkillre, stack);
 			if (lv < MathHelper.ceil(value/5F) && lv < 11){
 				map.replace(EnchantmentCore.enc_enderkillre, MathHelper.ceil(value/5F));
+				update = true;
+			}
+		    lv = EnchantmentHelper.getEnchantmentLevel(EnchantmentCore.enc_waterkiller, stack);
+			if (lv < MathHelper.ceil(value/5F) && lv < 11){
+				map.replace(EnchantmentCore.enc_waterkiller, MathHelper.ceil(value/5F));
 				update = true;
 			}
 			if (update){
@@ -194,6 +193,6 @@ public class ItemKatanaGenbu extends ItemKatana {
 			}
 	 }
 	 public Enchantment[] ignoreEnchantments(){
-		 return	new Enchantment[]{Enchantments.DEPTH_STRIDER,Enchantments.RESPIRATION,EnchantmentCore.enc_enderkillre};
+		 return	new Enchantment[]{EnchantmentCore.enc_enderkillre, EnchantmentCore.enc_waterkiller};
 	 }
 }
