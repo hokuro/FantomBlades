@@ -5,7 +5,6 @@ import java.util.Map;
 
 import mod.fbd.core.ModCommon;
 import mod.fbd.equipmenteffect.EnchantmentCore;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -14,6 +13,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -24,12 +25,11 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ItemKatanaByako extends ItemKatana {
-	public ItemKatanaByako(){
-		super();
+	public ItemKatanaByako(Item.Properties property){
+		super(property.defaultMaxDamage(200));
 		LEVELUP_EXP = 1000;
 		POTION_UP = 200;
 		ENCHANT_UP = 200;
@@ -49,8 +49,8 @@ public class ItemKatanaByako extends ItemKatana {
 	}
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
-		super.onUpdate(stack, world, entity, indexOfMainSlot, isCurrent);
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+		super.inventoryTick(stack, world, entity, indexOfMainSlot, isCurrent);
 		if (entity instanceof EntityLivingBase){
 			EntityLivingBase living = (EntityLivingBase)entity;
 			// 効果変更白虎防具を追加してセットボーナスにする
@@ -76,32 +76,16 @@ public class ItemKatanaByako extends ItemKatana {
 	 public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		 ItemStack stack = playerIn.getHeldItemMainhand();
 		 if (stack.getItem() == this){
-				float f = 1.0F;
-				float f1 = playerIn.prevRotationPitch + (playerIn.rotationPitch - playerIn.prevRotationPitch) * f;
-				float f2 = playerIn.prevRotationYaw + (playerIn.rotationYaw - playerIn.prevRotationYaw) * f;
-				double d0 = playerIn.prevPosX + (playerIn.posX - playerIn.prevPosX) * (double) f;
-				double d1 = (playerIn.prevPosY + (playerIn.posY-playerIn.prevPosY) * (double)f+1.6200000000000001D) - (double) playerIn.getYOffset();
-				double d2 = playerIn.prevPosZ + (playerIn.posZ -playerIn.prevPosZ) * (double)f;
-				Vec3d vec3 = new Vec3d(d0,d1,d2);
-				float f3 = MathHelper.cos(-f2 * 0.01745329F - 3.141593F);
-				float f4 = MathHelper.sin(-f2 * 0.01745329F - 3.141593F);
-				float f5 = -MathHelper.cos(-f1 * 0.01745329F);
-				float f6 = MathHelper.sin(-f1 * 0.01745329F);
-				float f7 = f4 * f5;
-				float f8 = f6;
-				float f9 = f3 * f5;
-				double range = 5D;
-				Vec3d vec3d1 =  vec3.addVector((double)f7*range, (double)f8*range, (double)f9*range);
-				RayTraceResult movingbjectposition = worldIn.rayTraceBlocks(vec3, vec3d1,true);
+				RayTraceResult movingbjectposition = this.rayTrace(worldIn, playerIn,true);
 
 				if (movingbjectposition == null){
 					return new ActionResult(EnumActionResult.FAIL, stack);
 				}
 
 				// 目の前のエンティティを奈落へ吹き飛ばす
-				if (movingbjectposition.entityHit != null ){
-					if (movingbjectposition.entityHit instanceof EntityLiving){
-						((EntityLiving)movingbjectposition.entityHit).setPosition(movingbjectposition.entityHit.posX, -10, movingbjectposition.entityHit.posZ);
+				if (movingbjectposition.hitInfo != null ){
+					if (movingbjectposition.hitInfo instanceof EntityLiving){
+						((EntityLiving)movingbjectposition.hitInfo).setPosition(((EntityLiving)movingbjectposition.hitInfo).posX, -10, ((EntityLiving)movingbjectposition.hitInfo).posZ);
 					}
 				}
 			return new ActionResult(EnumActionResult.SUCCESS,stack);
@@ -110,12 +94,10 @@ public class ItemKatanaByako extends ItemKatana {
 	 }
 
 	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		 if (this.isInCreativeTab(tab))
-	        {
-	            items.add(getDefaultStack());
-	        }
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
 	 }
 
 	 public static ItemStack getDefaultStack(){

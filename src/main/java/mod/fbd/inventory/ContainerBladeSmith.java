@@ -1,6 +1,7 @@
 package mod.fbd.inventory;
 
-import mod.fbd.item.ItemCore;
+import mod.fbd.item.ItemBladePiece;
+import mod.fbd.item.ItemTamahagane;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -23,7 +24,7 @@ public class ContainerBladeSmith extends Container {
 //        for ( int r = 0; r < 2; r++){
 //        	/////for (int c = 0; c < 6; c++){
 //        	for(int c = 0; c < 1; c++){
-//        		  this.addSlotToContainer(new Slot(this.smithInventory, c + (6*r), 8 + (18*c), 17 + (18*r))
+//        		  this.addSlot(new Slot(this.smithInventory, c + (6*r), 8 + (18*c), 17 + (18*r))
 //      			{
 //      				public boolean isItemValid(ItemStack stack)
 //      				{
@@ -33,24 +34,24 @@ public class ContainerBladeSmith extends Container {
 //        	}
 //        }
         // 玉鋼スロット
-        this.addSlotToContainer(new Slot(this.smithInventory, 0, 8, 17)
+        this.addSlot(new Slot(this.smithInventory, 0, 8, 17)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
-					return (stack.getItem() == ItemCore.item_tamahagane);
+					return (stack.getItem() instanceof ItemTamahagane);
 				}
 			});
         // 欠片スロット
-        this.addSlotToContainer(new Slot(this.smithInventory, 1, 8, 35)
+        this.addSlot(new Slot(this.smithInventory, 1, 8, 35)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
-					return (stack.getItem() == ItemCore.item_bladepiece);
+					return (stack.getItem() instanceof ItemBladePiece);
 				}
 			});
 
         // 刀スロット
-		this.addSlotToContainer(new Slot(this.smithInventory, 2, 138, 26)
+		this.addSlot(new Slot(this.smithInventory, 2, 138, 26)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
@@ -59,7 +60,7 @@ public class ContainerBladeSmith extends Container {
 			});
 
         // ツールスロット
-		this.addSlotToContainer(new Slot(this.smithInventory, 3, 8, 71)
+		this.addSlot(new Slot(this.smithInventory, 3, 8, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
@@ -68,7 +69,7 @@ public class ContainerBladeSmith extends Container {
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 4, 26, 71)
+		this.addSlot(new Slot(this.smithInventory, 4, 26, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
@@ -77,7 +78,7 @@ public class ContainerBladeSmith extends Container {
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 5, 44, 71)
+		this.addSlot(new Slot(this.smithInventory, 5, 44, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
@@ -86,7 +87,7 @@ public class ContainerBladeSmith extends Container {
 		});
 
 
-		this.addSlotToContainer(new Slot(this.smithInventory, 6, 62, 71)
+		this.addSlot(new Slot(this.smithInventory, 6, 62, 71)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
@@ -100,13 +101,13 @@ public class ContainerBladeSmith extends Container {
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
+                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 169));
+            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 169));
         }
     }
 

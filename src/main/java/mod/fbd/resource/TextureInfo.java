@@ -1,13 +1,12 @@
 package mod.fbd.resource;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.imageio.ImageIO;
-
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.log.ModLog;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.client.renderer.texture.NativeImage.PixelFormat;
 
 public class TextureInfo {
 	// ファイル名
@@ -19,7 +18,7 @@ public class TextureInfo {
 	// テクスチャのサイズ
 	private int[] texSize = new int[2];
 	// テクスチャイメージ
-	BufferedImage img;
+	NativeImage img;
 
 	// 使える？
 	private boolean canUse;
@@ -40,7 +39,7 @@ public class TextureInfo {
 			textureName = fileName.toString().replace(".png", "");
 
 			// サイズの取得
-			img = ImageIO.read(istream);
+			img = NativeImage.read(PixelFormat.RGBA, istream);
 			texSize = new int[]{img.getWidth(),img.getHeight()};
 			canUse = true;
 		} catch (IOException e) {
@@ -70,7 +69,7 @@ public class TextureInfo {
 	}
 
 	// テクスチャの画像を返す
-	public BufferedImage Image(){
+	public NativeImage Image(){
 		return img;
 	}
 

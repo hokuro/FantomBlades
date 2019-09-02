@@ -15,7 +15,6 @@ import mod.fbd.util.ModUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -24,8 +23,12 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
@@ -40,8 +43,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemKatana extends ItemSword {
 	public final static String NAME = "normalblade";
@@ -49,14 +50,13 @@ public class ItemKatana extends ItemSword {
 	protected double attackSpeed;
 
 	public final ResourceLocation DEFAULT_KATANATEXTURE;
-	public ItemKatana(){
-		this(Mod_FantomBlade.HAGANE);
+	public ItemKatana(Item.Properties property){
+		this(Mod_FantomBlade.HAGANE,property);
 	}
 
-	public ItemKatana(ToolMaterial mat){
-		super(mat);
+	public ItemKatana(IItemTier mat, Item.Properties property){
+		super(mat, (int)mat.getAttackDamage(), -2.4F, property);
 		DEFAULT_KATANATEXTURE = new ResourceLocation("fbd","textures/entity/normalblade_default.png");
-		this.setMaxStackSize(1);
 		LEVELUP_EXP = 500;
 		POTION_UP = -1;
 		ENCHANT_UP = -1;
@@ -79,8 +79,7 @@ public class ItemKatana extends ItemSword {
     }
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
-
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		int level = this.getLevel(stack);
 		int rust = this.getRustValue(stack);
 		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			    // 錆補正
@@ -97,7 +96,8 @@ public class ItemKatana extends ItemSword {
 		attackSpeed = this.getAttackSpeed(stack) + 1 - rust_h;
 
 		// 耐久力設定
-		this.setMaxDamage(this.getGetEndurance(stack));
+		//this.setMaxDamage(this.getGetEndurance(stack));
+		ModUtil.setPrivateValue(Item.class, this, this.getGetEndurance(stack), "maxDamage");
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
@@ -108,7 +108,7 @@ public class ItemKatana extends ItemSword {
     {
         Block block = state.getBlock();
 
-        if (block == Blocks.WEB)
+        if (block == Blocks.COBWEB)
         {
             return 15.0F;
         }
@@ -137,13 +137,13 @@ public class ItemKatana extends ItemSword {
     {
 		int level = this.getLevel(stack);
 		// 相手を殺したら経験値獲得
-		if(!target.isEntityAlive() && target.deathTime == 0 && attacker instanceof EntityPlayer){
+		if(!target.isAlive() && target.deathTime == 0 && attacker instanceof EntityPlayer){
 			// 相手の最大HPが経験値
 			this.addExp(stack, (int)target.getMaxHealth());
 			if (level != this.getLevel(stack)){
 				((EntityPlayer)attacker).sendStatusMessage(new TextComponentString("Katana Level Up "+level+"->"+this.getLevel(stack)),false);
 			}
-		}else if (target.isEntityAlive()){
+		}else if (target.isAlive()){
 			// 生きてるならポーション効果をお見舞い
 			for (PotionEffect effect : this.getPotionEffects(stack)){
 				target.addPotionEffect(new PotionEffect(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
@@ -154,6 +154,14 @@ public class ItemKatana extends ItemSword {
 		return true;
     }
 
+	 @Override
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
+	 }
+
+    @Override
     public void setDamage(ItemStack stack, int damage)
     {
     	if (damage >= this.getMaxDamage()){
@@ -180,28 +188,13 @@ public class ItemKatana extends ItemSword {
     @Override
     public boolean canHarvestBlock(IBlockState blockIn)
     {
-        return blockIn.getBlock() == Blocks.WEB;
-    }
-
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean isFull3D()
-    {
-        return true;
+        return blockIn.getBlock() == Blocks.COBWEB;
     }
 
     @Override
     public int getItemEnchantability()
     {
         return 0;
-    }
-
-
-    @Override
-    public String getToolMaterialName()
-    {
-        return "tamahagane";
     }
 
     @Override
@@ -224,7 +217,7 @@ public class ItemKatana extends ItemSword {
 
 
     @Override
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
+    public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot equipmentSlot)
     {
         Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
        // Mod_FantomBlade.proxy.getEntityPlayerInstance().inventory.getStackInSlot(equipmentSlot.getIndex());
@@ -237,15 +230,6 @@ public class ItemKatana extends ItemSword {
 
         return multimap;
     }
-
-	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		    if (this.isInCreativeTab(tab))
-		    {
-		        items.add(getDefaultStack());
-		    }
-	 }
 
 	 public static ItemStack getDefaultStack(){
 		 ItemStack ret = new ItemStack(ItemCore.item_katana);
@@ -267,7 +251,7 @@ public class ItemKatana extends ItemSword {
     public int getLevel(ItemStack stack){
         NBTTagCompound tag = getItemTagCompound(stack);
         if (tag.hasKey("BladeLevel")){
-        	return tag.getInteger("BladeLevel");
+        	return tag.getInt("BladeLevel");
         }
         return 1;
     }
@@ -307,29 +291,29 @@ public class ItemKatana extends ItemSword {
     public static int getGetEndurance(ItemStack stack){
         NBTTagCompound tag = getItemTagCompound(stack);
         if (tag.hasKey("MaxEndurance")){
-        	return tag.getInteger("MaxEndurance");
+        	return tag.getInt("MaxEndurance");
         }
-        return ToolMaterial.IRON.getMaxUses();
+        return ItemTier.IRON.getMaxUses();
     }
 
     public static void setEndurance(ItemStack stack, int value){
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	tag.setInteger("MaxEndurance", value);
+    	tag.setInt("MaxEndurance", value);
     }
 
     public static int getRustValue(ItemStack stack){
         NBTTagCompound tag = getItemTagCompound(stack);
         if (tag.hasKey("RustValue")){
-        	return tag.getInteger("RustValue");
+        	return tag.getInt("RustValue");
         }
-        return ToolMaterial.IRON.getMaxUses();
+        return ItemTier.IRON.getMaxUses();
     }
 
     public static void setRustValue(ItemStack stack, int value){
     	if (value < 0){value =0;}
     	else if (value > 1024){value = 1024;}
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	tag.setInteger("RustValue", value);
+    	tag.setInt("RustValue", value);
     }
 
     public static void addRustValue(ItemStack stack, int add){
@@ -339,20 +323,20 @@ public class ItemKatana extends ItemSword {
     public static int getMaxLevel(ItemStack stack){
         NBTTagCompound tag = getItemTagCompound(stack);
         if (tag.hasKey("MaxLevel")){
-        	return tag.getInteger("MaxLevel");
+        	return tag.getInt("MaxLevel");
         }
         return 1;
     }
 
     public static void setMaxLevel(ItemStack stack, int value){
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	tag.setInteger("MaxLevel", value);
+    	tag.setInt("MaxLevel", value);
     }
 
     public static int getExp(ItemStack stack){
         NBTTagCompound tag = getItemTagCompound(stack);
         if (tag.hasKey("Exp")){
-        	return tag.getInteger("Exp");
+        	return tag.getInt("Exp");
         }
         return 0;
     }
@@ -365,7 +349,7 @@ public class ItemKatana extends ItemSword {
     	if (value < 0){value = 0;}
     	else if (katana.getLevelUpExp() * 255 < value){value = katana.getLevelUpExp() *255;}
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	tag.setInteger("Exp", value);
+    	tag.setInt("Exp", value);
     }
 
     public static void addExp(ItemStack stack, int add){
@@ -394,7 +378,7 @@ public class ItemKatana extends ItemSword {
 
         String file = tag.getString("TextureFile");
         TextureInfo info;
-        return Mod_FantomBlade.instance.TextureManager().getTexture(NAME, file);
+        return Mod_FantomBlade.TextureManager().getTexture(NAME, file);
     }
 
     public static void setModelTexture(ItemStack par1ItemStack, TextureInfo info){
@@ -403,7 +387,7 @@ public class ItemKatana extends ItemSword {
 
     }
     public static void setRandomModelTexture(ItemStack par1ItemStack){
-    	TextureInfo info = Mod_FantomBlade.instance.TextureManager().getRandomTexture(NAME);
+    	TextureInfo info = Mod_FantomBlade.TextureManager().getRandomTexture(NAME);
     	NBTTagCompound tag = getItemTagCompound(par1ItemStack);
     	tag.setString("TextureFile", info.FileName());
 
@@ -411,11 +395,11 @@ public class ItemKatana extends ItemSword {
 
     public static NBTTagCompound getItemTagCompound(ItemStack stack){
 		NBTTagCompound tag;
-		if(stack.hasTagCompound()){
-			tag = stack.getTagCompound();
+		if(stack.hasTag()){
+			tag = stack.getTag();
 		}else{
 			tag = new NBTTagCompound();
-			stack.setTagCompound(tag);
+			stack.setTag(tag);
 		}
 		return tag;
 	}
@@ -425,13 +409,13 @@ public class ItemKatana extends ItemSword {
         NBTTagCompound nbtTagCompound = getItemTagCompound(itemStack);
 
 
-        nbtTagList.appendTag(
+        nbtTagList.add(
                 getAttrTag(
                         SharedMonsterAttributes.ATTACK_DAMAGE.getName()
                         , new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", attackDamage, 0)
                         , EntityEquipmentSlot.MAINHAND)
         );
-        nbtTagList.appendTag(
+        nbtTagList.add(
                 getAttrTag(SharedMonsterAttributes.ATTACK_SPEED.getName()
                         , new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier",attackSpeed, 0)
                         , EntityEquipmentSlot.MAINHAND)
@@ -448,7 +432,7 @@ public class ItemKatana extends ItemSword {
         nbttagcompound.setString("AttributeName",attrName);
         nbttagcompound.setString("Name", par0AttributeModifier.getName());
         nbttagcompound.setDouble("Amount", par0AttributeModifier.getAmount());
-        nbttagcompound.setInteger("Operation", par0AttributeModifier.getOperation());
+        nbttagcompound.setInt("Operation", par0AttributeModifier.getOperation());
         nbttagcompound.setUniqueId("UUID",par0AttributeModifier.getID());
         nbttagcompound.setString("Slot", slot.getName());
         return nbttagcompound;
@@ -457,13 +441,13 @@ public class ItemKatana extends ItemSword {
     public static List<PotionEffect> updatePotionList(ItemStack stack){
     	List<PotionEffect> ret = new ArrayList<PotionEffect>();
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	NBTTagList nbttaglist = tag.getTagList("updatePotion", 10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+    	NBTTagList nbttaglist = tag.getList("updatePotion", 10);
+        for (int i = 0; i < nbttaglist.size(); ++i)
         {
-			NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
-			int id = nbttagcompound.getInteger("id");
-			int d = nbttagcompound.getInteger("dulation");
-			int a = nbttagcompound.getInteger("amplefi");
+			NBTTagCompound nbttagcompound = nbttaglist.getCompound(i);
+			int id = nbttagcompound.getInt("id");
+			int d = nbttagcompound.getInt("dulation");
+			int a = nbttagcompound.getInt("amplefi");
 			ret.add(new PotionEffect(Potion.getPotionById(id),d,a));
         }
         return ret;
@@ -475,10 +459,10 @@ public class ItemKatana extends ItemSword {
         for (int i = 0; i < potions.size(); ++i)
         {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
-			nbttagcompound.setInteger("id",Potion.getIdFromPotion(potions.get(i).getPotion()));
-			nbttagcompound.setInteger("dulation",potions.get(i).getDuration());
-			nbttagcompound.setInteger("amplefi",potions.get(i).getAmplifier());
-			nbttaglist.appendTag(nbttagcompound);
+			nbttagcompound.setInt("id",Potion.getIdFromPotion(potions.get(i).getPotion()));
+			nbttagcompound.setInt("dulation",potions.get(i).getDuration());
+			nbttagcompound.setInt("amplefi",potions.get(i).getAmplifier());
+			nbttaglist.add(nbttagcompound);
 
         }
         tag.setTag("updatePotion", nbttaglist);

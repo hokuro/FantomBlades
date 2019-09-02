@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityAreaEffectCloud;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -22,26 +23,23 @@ import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ItemBurretPotion extends ItemBurret {
 
-	public ItemBurretPotion() {
-		super(EnumBurret.POTION);
+	public ItemBurretPotion(Item.Properties property) {
+		super(EnumBurret.POTION,property);
 		// TODO 自動生成されたコンストラクター・スタブ
 	}
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         PotionUtils.addPotionTooltip(stack, tooltip, 1.0F);
     }
-
-
-
 
 
 	public static void effectionPotion(World world, int potionType, PotionEffect effect, EntityLivingBase hitEntity, EntityLivingBase shooter, EntityBurret burret){
@@ -83,7 +81,7 @@ public class ItemBurretPotion extends ItemBurret {
 
     private static void applySplash(PotionEffect effects,EntityBurret burret, EntityLivingBase hitEntity, EntityLivingBase shooter)
     {
-        AxisAlignedBB axisalignedbb = burret.getEntityBoundingBox().grow(4.0D, 2.0D, 4.0D);
+        AxisAlignedBB axisalignedbb = burret.getBoundingBox().grow(4.0D, 2.0D, 4.0D);
         List<EntityLivingBase> list = burret.world.<EntityLivingBase>getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb);
 
         if (!list.isEmpty())
@@ -114,7 +112,7 @@ public class ItemBurretPotion extends ItemBurret {
 
                             if (i > 20)
                             {
-                                entitylivingbase.addPotionEffect(new PotionEffect(potion, i, effects.getAmplifier(), effects.getIsAmbient(), effects.doesShowParticles()));
+                                entitylivingbase.addPotionEffect(new PotionEffect(potion, i, effects.getAmplifier(), effects.isAmbient(), effects.doesShowParticles()));
                             }
                         }
                     }
@@ -190,7 +188,7 @@ public class ItemBurretPotion extends ItemBurret {
 		if (stack.getItem() instanceof ItemBurret){
 			NBTTagCompound tag = getItemTagCompound(stack);
 			if (tag.hasKey("potiontype")){
-				return tag.getInteger("potiontype");
+				return tag.getInt("potiontype");
 			}
 		}
 		return 0;
@@ -199,18 +197,18 @@ public class ItemBurretPotion extends ItemBurret {
 	public static void setPotionType(ItemStack stack, int value){
 		if (stack.getItem() instanceof ItemBurret){
 			NBTTagCompound tag = getItemTagCompound(stack);
-			tag.setInteger("potiontype", value);
+			tag.setInt("potiontype", value);
 		}
 	}
 
 
     public static NBTTagCompound getItemTagCompound(ItemStack stack){
 		NBTTagCompound tag;
-		if(stack.hasTagCompound()){
-			tag = stack.getTagCompound();
+		if(stack.hasTag()){
+			tag = stack.getTag();
 		}else{
 			tag = new NBTTagCompound();
-			stack.setTagCompound(tag);
+			stack.setTag(tag);
 		}
 		return tag;
 	}

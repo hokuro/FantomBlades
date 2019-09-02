@@ -4,9 +4,9 @@ import mod.fbd.item.ItemKatanaKirin;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentDamage;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -31,6 +31,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
+    @Override
     public int getMinEnchantability(int enchantmentLevel)
     {
         return 9999;
@@ -39,6 +40,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
+    @Override
     public int getMaxEnchantability(int enchantmentLevel)
     {
         return 9999;
@@ -47,6 +49,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Returns the maximum level that the enchantment can have.
      */
+    @Override
     public int getMaxLevel()
     {
         return 1;
@@ -56,7 +59,8 @@ public class EnchantMonsterKiller extends Enchantment {
      * Calculates the additional damage that will be dealt by an item with this enchantment. This alternative to
      * calcModifierDamage is sensitive to the targets EnumCreatureAttribute.
      */
-    public float calcDamageByCreature(int level, EnumCreatureAttribute creatureType)
+    @Override
+    public float calcDamageByCreature(int level, CreatureAttribute creatureType)
     {
     	return super.calcDamageByCreature(level, creatureType);
     }
@@ -64,6 +68,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Return the name of key in translation table of this enchantment.
      */
+    @Override
     public String getName()
     {
         return "enchantment.damage.monster";
@@ -72,6 +77,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Determines if the enchantment passed can be applyied together with this enchantment.
      */
+    @Override
     public boolean canApplyTogether(Enchantment ench)
     {
         return !(ench instanceof EnchantmentDamage);
@@ -80,6 +86,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Determines if this enchantment can be applied to a specific ItemStack.
      */
+    @Override
     public boolean canApply(ItemStack stack)
     {
         return stack.getItem() instanceof ItemKatanaKirin;
@@ -88,6 +95,7 @@ public class EnchantMonsterKiller extends Enchantment {
     /**
      * Called whenever a mob is damaged with an item that has this enchantment on it.
      */
+    @Override
     public void onEntityDamaged(EntityLivingBase user, Entity target, int level)
     {
     	// モブ系の相手にレベル*3の追加ダメージ

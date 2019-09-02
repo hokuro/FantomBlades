@@ -2,40 +2,46 @@ package mod.fbd.block;
 
 import mod.fbd.item.ItemKatana;
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.block.material.Material;
+import mod.fbd.tileentity.TileEntityBladeforge;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 public class BlockBladeStand extends BlockHorizontalContainer {
 	private final EnumBladeStand standType;
 
-	protected BlockBladeStand(EnumBladeStand stype) {
-		super(Material.GROUND);
-		this.setHardness(1.0F);
-		this.setResistance(3.0F);
+	protected BlockBladeStand(Block.Properties property, EnumBladeStand stype) {
+		super(property);
 		standType = stype;
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntityBladeStand(standType, EnumFacing.getFront(meta));
+	public TileEntity createNewTileEntity(IBlockReader world) {
+		return new TileEntityBladeStand();
 	}
 
 	@Override
-    public boolean isOpaqueCube(IBlockState state)
+	public TileEntity createTileEntity(IBlockState state, IBlockReader world) {
+		return new TileEntityBladeforge(state);
+	}
+
+	@Override
+    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder)
     {
-        return false;
+		super.fillStateContainer(builder);
     }
+
 
 	@Override
     public boolean isFullCube(IBlockState state)
@@ -43,28 +49,19 @@ public class BlockBladeStand extends BlockHorizontalContainer {
         return false;
     }
 
-	@Override
-    public boolean isFullBlock(IBlockState state)
-    {
-        return false;
-    }
-
-
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
+    public void onReplaced(IBlockState state, World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
     	if (!worldIn.isRemote){
     		TileEntity ent = worldIn.getTileEntity(pos);
     		if (ent instanceof TileEntityBladeStand){
     			InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory)ent);
     		}
     	}
-    	super.breakBlock(worldIn, pos, state);
+    	super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
     	ItemStack stack = playerIn.getHeldItemMainhand();
 
     	TileEntity ent = worldIn.getTileEntity(pos);
@@ -77,7 +74,8 @@ public class BlockBladeStand extends BlockHorizontalContainer {
         					playerIn.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
         				}
     				}
-    				this.setLightLevel(((TileEntityBladeStand)ent).getLightLevel());
+    				//lightValue = ((TileEntityBladeStand)ent).getLightLevel();
+    				//this.setLightLevel(((TileEntityBladeStand)ent).getLightLevel());
     			}
     		}else if(stack.isEmpty()){
     			ItemStack blade = ((TileEntityBladeStand)ent).getKatana();
@@ -85,15 +83,16 @@ public class BlockBladeStand extends BlockHorizontalContainer {
     				if (!worldIn.isRemote){
     					playerIn.setHeldItem(EnumHand.MAIN_HAND, blade.copy());
     				}
-    				this.setLightLevel(((TileEntityBladeStand)ent).getLightLevel());
+    				//lightValue = ((TileEntityBladeStand)ent).getLightLevel();
+    				//this.setLightLevel(((TileEntityBladeStand)ent).getLightLevel());
     			}
     		}
     	}
         return true;
     }
 
-    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
+    @Override
+    public int getLightValue(IBlockState state, IWorldReader world, BlockPos pos) {
     	TileEntity ent = world.getTileEntity(pos);
     	if (ent instanceof TileEntityBladeStand){
     		return ((TileEntityBladeStand)ent).getLightLevel();
@@ -124,14 +123,4 @@ public class BlockBladeStand extends BlockHorizontalContainer {
 			return values[integer];
 		}
     }
-
-
-
-
-	@Override
-	protected AxisAlignedBB getRealBoundingBox(IBlockState state) {
-		return FULL_BLOCK_AABB;
-	}
-
-
 }

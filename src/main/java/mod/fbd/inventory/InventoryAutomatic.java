@@ -8,6 +8,7 @@ import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryAutomatic implements IInventory {
 	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(1,ItemStack.EMPTY);
@@ -19,8 +20,8 @@ public class InventoryAutomatic implements IInventory {
 	}
 
 	@Override
-	public String getName() {
-		return "inventory.automatic";
+	public ITextComponent getName() {
+		return new TextComponentTranslation("inventory.automatic");
 	}
 
 	@Override
@@ -119,5 +120,11 @@ public class InventoryAutomatic implements IInventory {
 	public ITextComponent getDisplayName() {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
+	}
+
+	@Override
+	public ITextComponent getCustomName() {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.getName();
 	}
 }

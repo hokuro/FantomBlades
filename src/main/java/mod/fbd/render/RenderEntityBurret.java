@@ -11,10 +11,10 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RenderEntityBurret extends Render<EntityBurret>
 {
     public RenderEntityBurret(RenderManager renderManagerIn)
@@ -29,12 +29,12 @@ public class RenderEntityBurret extends Render<EntityBurret>
     public void doRender(EntityBurret entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         this.bindEntityTexture(entity);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.disableLighting();
-        GlStateManager.translate((float)x, (float)y, (float)z);
-        GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
+        GlStateManager.translatef((float)x, (float)y, (float)z);
+        GlStateManager.rotatef(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         int i = 0;
@@ -53,12 +53,12 @@ public class RenderEntityBurret extends Render<EntityBurret>
         if (f9 > 0.0F)
         {
             float f10 = -MathHelper.sin(f9 * 3.0F) * f9;
-            GlStateManager.rotate(f10, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotatef(f10, 0.0F, 0.0F, 1.0F);
         }
 
-        GlStateManager.rotate(45.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.scale(0.05625F, 0.05625F, 0.05625F);
-        GlStateManager.translate(-4.0F, 0.0F, 0.0F);
+        GlStateManager.rotatef(45.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scalef(0.05625F, 0.05625F, 0.05625F);
+        GlStateManager.translatef(-4.0F, 0.0F, 0.0F);
 
         if (this.renderOutlines)
         {
@@ -66,14 +66,14 @@ public class RenderEntityBurret extends Render<EntityBurret>
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
         }
 
-        GlStateManager.glNormal3f(0.05625F, 0.0F, 0.0F);
+        GlStateManager.normal3f(0.05625F, 0.0F, 0.0F);
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(-7.0D, -2.0D, -2.0D).tex(0.0D, 0.15625D).endVertex();
         bufferbuilder.pos(-7.0D, -2.0D, 2.0D).tex(0.15625D, 0.15625D).endVertex();
         bufferbuilder.pos(-7.0D, 2.0D, 2.0D).tex(0.15625D, 0.3125D).endVertex();
         bufferbuilder.pos(-7.0D, 2.0D, -2.0D).tex(0.0D, 0.3125D).endVertex();
         tessellator.draw();
-        GlStateManager.glNormal3f(-0.05625F, 0.0F, 0.0F);
+        GlStateManager.normal3f(-0.05625F, 0.0F, 0.0F);
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(-7.0D, 2.0D, -2.0D).tex(0.0D, 0.15625D).endVertex();
         bufferbuilder.pos(-7.0D, 2.0D, 2.0D).tex(0.15625D, 0.15625D).endVertex();
@@ -83,8 +83,8 @@ public class RenderEntityBurret extends Render<EntityBurret>
 
         for (int j = 0; j < 4; ++j)
         {
-            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.glNormal3f(0.0F, 0.0F, 0.05625F);
+            GlStateManager.rotatef(90.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.normal3f(0.0F, 0.0F, 0.05625F);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
             bufferbuilder.pos(-8.0D, -2.0D, 0.0D).tex(0.0D, 0.0D).endVertex();
             bufferbuilder.pos(8.0D, -2.0D, 0.0D).tex(0.5D, 0.0D).endVertex();

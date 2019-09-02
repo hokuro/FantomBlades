@@ -1,5 +1,6 @@
 package mod.fbd.util;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 
 public class Enchant {
@@ -27,6 +28,6 @@ public class Enchant {
 	}
 
 	public String toString(){
-		return net.minecraft.util.text.translation.I18n.translateToLocal(enc.getName()) + "/" + lvl;
+		return I18n.format(enc.getName()) + "/" + lvl;
 	}
 }

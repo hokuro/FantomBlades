@@ -1,0 +1,12 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "fbd:items/magnet_0"
+    },
+    "overrides":[
+       { "predicate":{"ironsand":0},"model":"fbd:items/magnet_0"},
+       { "predicate":{"ironsand":1},"model":"fbd:items/magnet_1"},
+       { "predicate":{"ironsand":2},"model":"fbd:items/magnet_2"},
+       { "predicate":{"ironsand":3},"model":"fbd:items/magnet_3"}
+    ]
+}

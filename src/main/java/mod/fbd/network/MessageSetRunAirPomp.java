@@ -1,15 +1,14 @@
 package mod.fbd.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
+
 import mod.fbd.tileentity.TileEntityAirPomp;
-import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class MessageSetRunAirPomp implements IMessage, IMessageHandler<MessageSetRunAirPomp, IMessage> {
+public class MessageSetRunAirPomp {
 
 
 	BlockPos ownPos;
@@ -23,37 +22,43 @@ public class MessageSetRunAirPomp implements IMessage, IMessageHandler<MessageSe
 		facing = face;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		ownPos = new BlockPos(
+	public static void encode(MessageSetRunAirPomp pkt, PacketBuffer buf)
+	{
+		buf.writeInt(pkt.ownPos.getX());
+		buf.writeInt(pkt.ownPos.getY());
+		buf.writeInt(pkt.ownPos.getZ());
+		buf.writeInt(pkt.targetPos.getX());
+		buf.writeInt(pkt.targetPos.getY());
+		buf.writeInt(pkt.targetPos.getZ());
+		buf.writeInt(pkt.facing);
+	}
+
+	public static MessageSetRunAirPomp decode(PacketBuffer buf)
+	{
+		BlockPos ownPos = new BlockPos(
 				buf.readInt(),
 				buf.readInt(),
 				buf.readInt());
 
-		targetPos = new BlockPos(
+		BlockPos targetPos = new BlockPos(
 				buf.readInt(),
 				buf.readInt(),
 				buf.readInt());
-		facing = buf.readInt();
+		int facing = buf.readInt();
+		return new MessageSetRunAirPomp(ownPos,targetPos,facing);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(ownPos.getX());
-		buf.writeInt(ownPos.getY());
-		buf.writeInt(ownPos.getZ());
-		buf.writeInt(targetPos.getX());
-		buf.writeInt(targetPos.getY());
-		buf.writeInt(targetPos.getZ());
-		buf.writeInt(facing);
-	}
-
-	@Override
-	public IMessage onMessage(MessageSetRunAirPomp message, MessageContext ctx){
-		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(message.ownPos);
-		if (te instanceof TileEntityAirPomp){
-			((TileEntityAirPomp)te).setRun(message.targetPos);
+	public static class Handler
+	{
+		public static void handle(final MessageSetRunAirPomp pkt, Supplier<NetworkEvent.Context> ctx)
+		{
+			ctx.get().enqueueWork(() -> {
+				TileEntity te = ctx.get().getSender().world.getTileEntity(pkt.ownPos);
+				if (te instanceof TileEntityAirPomp){
+					((TileEntityAirPomp)te).setRun(pkt.targetPos);
+				}
+			});
+			ctx.get().setPacketHandled(true);
 		}
-		return null;
 	}
 }

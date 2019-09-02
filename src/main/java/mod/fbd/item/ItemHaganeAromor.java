@@ -5,14 +5,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.IArmorMaterial;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 
 public class ItemHaganeAromor extends ItemArmor {
-    public ItemHaganeAromor(ItemArmor.ArmorMaterial armorMaterial, int renderIndex, EntityEquipmentSlot equipmentSlotIn) {
-        super(armorMaterial, renderIndex, equipmentSlotIn);
+    public ItemHaganeAromor(IArmorMaterial armorMaterial, EntityEquipmentSlot equipmentSlotIn, Item.Properties property) {
+        super(armorMaterial, equipmentSlotIn, property);
 //        出来たらいいな(めんどくさい)
 //        if (armorMaterial == Mod_FantomBlade.AROMORSUZAKU && equipmentSlotIn == EntityEquipmentSlot.HEAD){
 //        	// 反撃:火炎 ダメージ減少:ネザーのエンチャントを追加　ダメージ増加:水生生物
@@ -38,8 +40,8 @@ public class ItemHaganeAromor extends ItemArmor {
 
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
-		super.onUpdate(stack, world, entity, indexOfMainSlot, isCurrent);
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+		super.inventoryTick(stack, world, entity, indexOfMainSlot, isCurrent);
 		if (this.getEquipmentSlot() != EntityEquipmentSlot.HEAD){
 			// 頭防具で判定をする
 			return;
@@ -159,20 +161,4 @@ public class ItemHaganeAromor extends ItemArmor {
 			}
 		}
 	}
-
-//    /**
-//     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
-//     */
-//    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot)
-//    {
-//        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
-//
-//        if (equipmentSlot == this.armorType)
-//        {
-//            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.damageReduceAmount, 0));
-//            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", (double)this.toughness, 0));
-//        }
-//
-//        return multimap;
-//    }
 }

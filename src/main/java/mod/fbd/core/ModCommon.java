@@ -45,6 +45,16 @@ public final class ModCommon {
 	public static final int MESID_REPAIREARMOR = 8;
 
 
+	public static final String GUI_ID_BLADEFORGE = "gui_bladeforge";
+	public static final String GUI_ID_BLADESMITH = "gui_bladesmith";
+	public static final String GUI_ID_BLADEALTER = "gui_bladealter";
+	public static final String GUI_ID_REVOLVER = "gui_revolver";
+	public static final String GUI_ID_AUTOMATIC = "gui_automatic";
+	public static final String GUI_ID_CARTRIDGE = "gui_cartridge";
+	public static final String GUI_ID_GUNCUSTOMAIZER = "gui_guncustomizer";
+	public static final String GUI_ID_ARMORSMITH = "gui_aromorsmith";
+
+
 
 
 

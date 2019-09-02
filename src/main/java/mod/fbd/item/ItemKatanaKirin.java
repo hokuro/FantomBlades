@@ -10,17 +10,17 @@ import mod.fbd.util.ModUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -34,8 +34,8 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class ItemKatanaKirin extends ItemKatana {
 
-	public ItemKatanaKirin(){
-		super();
+	public ItemKatanaKirin(Item.Properties property){
+		super(property.defaultMaxDamage(200));
 		LEVELUP_EXP = 1000;
 		POTION_UP = 200;
 		ENCHANT_UP = 200;
@@ -55,7 +55,7 @@ public class ItemKatanaKirin extends ItemKatana {
 		return ENCHANT_UP;
 	}
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 
 		int level = this.getLevel(stack);
 		int rust = this.getRustValue(stack);
@@ -75,7 +75,8 @@ public class ItemKatanaKirin extends ItemKatana {
 		attackSpeed = this.getAttackSpeed(stack) - rust_h;
 
 		// 耐久力設定
-		this.setMaxDamage(this.getGetEndurance(stack));
+		//this.setMaxDamage(this.getGetEndurance(stack));
+		ModUtil.setPrivateValue(Item.class, this, this.getGetEndurance(stack), "maxDamage");
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
@@ -88,7 +89,7 @@ public class ItemKatanaKirin extends ItemKatana {
     {
         Block block = state.getBlock();
 
-        if (block == Blocks.WEB)
+        if (block == Blocks.COBWEB)
         {
             return 15.0F;
         }
@@ -110,7 +111,7 @@ public class ItemKatanaKirin extends ItemKatana {
 				 if (main.getItem() == this){
 					 //CommandWeather
 					 WorldInfo worldinfo = worldIn.getWorldInfo();
-					 worldinfo.setCleanWeatherTime(i);
+					 worldinfo.setClearWeatherTime(i);
 		             worldinfo.setRainTime(0);
 		             worldinfo.setThunderTime(0);
 		             worldinfo.setRaining(false);
@@ -124,7 +125,7 @@ public class ItemKatanaKirin extends ItemKatana {
 					 main = playerIn.getHeldItemOffhand();
 					 if (main.getItem() == this){
 						 WorldInfo worldinfo = worldIn.getWorldInfo();
-			             worldinfo.setCleanWeatherTime(0);
+			             worldinfo.setClearWeatherTime(0);
 			             worldinfo.setRainTime(i);
 			             worldinfo.setThunderTime(i);
 			             worldinfo.setRaining(true);
@@ -142,7 +143,7 @@ public class ItemKatanaKirin extends ItemKatana {
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
     {
     	super.hitEntity(stack, target, attacker);
-    	if (target instanceof EntityMob && target.isEntityAlive()){
+    	if (target instanceof EntityMob && target.isAlive()){
     		// 生きているなら落雷を落とす
     		if (!target.world.isRemote){
     			//target.onStruckByLightning(new EntityLightningBolt(target.world, target.posX, target.posY, target.posZ, true));
@@ -150,11 +151,11 @@ public class ItemKatanaKirin extends ItemKatana {
     		}
     	}
     	ResourceLocation soulentity = null;
-    	if(!target.isEntityAlive() && ((soulentity = EntityList.getKey(target.getClass()))!=null)){
+    	if(!target.isAlive() && ((soulentity = target.getType().getRegistryName())!=null)){
     		// 死んでいるなら10%の確率でソウルをドロップ
-    		if (ModUtil.random(100) < 80){
+    		if (ModUtil.random(100) < 10){
         		ItemStack soul = new ItemStack(ItemCore.item_mobsoule,1);
-        		ItemMobSoule.applyEntityIdToItemStack(soul, soulentity);
+        		((ItemMobSoule)soul.getItem()).setType(soul, target.getType());
         		InventoryHelper.spawnItemStack(target.world, target.posX, target.posY, target.posZ, soul);
     		}
     	}
@@ -162,12 +163,10 @@ public class ItemKatanaKirin extends ItemKatana {
     }
 
 	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		    if (this.isInCreativeTab(tab))
-		    {
-		        items.add(getDefaultStack());
-		    }
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
 	 }
 
 	 public static ItemStack getDefaultStack(){

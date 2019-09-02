@@ -1,6 +1,7 @@
 package mod.fbd.tileentity;
 
 import mod.fbd.block.BlockBladeforge;
+import mod.fbd.block.BlockHorizontalContainer;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.item.ItemBladePiece.EnumBladePieceType;
 import mod.fbd.item.ItemCore;
@@ -61,9 +62,9 @@ public class TileEntityBladeforge extends TileEntity implements IInventory, ITic
 		airPomp = EnumFacing.UP;
 	}
 
-	public TileEntityBladeforge(int meta){
+	public TileEntityBladeforge(IBlockState meta){
 		this();
-		frame_state = meta;
+		frame_state = meta.get(BlockHorizontalContainer.FACING).getHorizontalIndex();
 	}
 
 	public void onWork(){

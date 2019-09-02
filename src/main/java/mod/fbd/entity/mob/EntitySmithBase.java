@@ -1,6 +1,7 @@
 package mod.fbd.entity.mob;
 
 import mod.fbd.resource.TextureInfo;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.INpc;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -59,8 +60,8 @@ public abstract class EntitySmithBase extends EntityElmBase implements INpc{
 	}
 
 
-	public EntitySmithBase(World worldIn) {
-		super(worldIn);
+	public EntitySmithBase(EntityType<?> etype, World worldIn) {
+		super(etype, worldIn);
 		// TODO 自動生成されたコンストラクター・スタブ
 	}
 

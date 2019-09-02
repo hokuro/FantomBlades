@@ -16,42 +16,42 @@ public class ContainerRevolver extends Container{
     {
     	revolver = gun;
     	player = playerIn;
-    	this.addSlotToContainer(new Slot(revolver, 0, 80, 17)
+    	this.addSlot(new Slot(revolver, 0, 80, 17)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
 					return  (stack.getItem() instanceof ItemBurret);
 				}
 			});
-    	this.addSlotToContainer(new Slot(revolver, 1, 45, 37)
+    	this.addSlot(new Slot(revolver, 1, 45, 37)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
 					return  (stack.getItem() instanceof ItemBurret);
 				}
 			});
-    	this.addSlotToContainer(new Slot(revolver, 2, 46, 66)
+    	this.addSlot(new Slot(revolver, 2, 46, 66)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
 					return  (stack.getItem() instanceof ItemBurret);
 				}
 			});
-    	this.addSlotToContainer(new Slot(revolver, 3, 80, 86)
+    	this.addSlot(new Slot(revolver, 3, 80, 86)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
 					return  (stack.getItem() instanceof ItemBurret);
 				}
 			});
-    	this.addSlotToContainer(new Slot(revolver, 4, 115, 66)
+    	this.addSlot(new Slot(revolver, 4, 115, 66)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
 					return  (stack.getItem() instanceof ItemBurret);
 				}
 			});
-    	this.addSlotToContainer(new Slot(revolver, 5, 115, 37)
+    	this.addSlot(new Slot(revolver, 5, 115, 37)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
@@ -65,13 +65,13 @@ public class ContainerRevolver extends Container{
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
+                this.addSlot(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(player.inventory, k, 8 + k * 18, 169));
+            this.addSlot(new Slot(player.inventory, k, 8 + k * 18, 169));
         }
     }
 

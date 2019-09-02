@@ -4,9 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import mod.fbd.item.ItemBladePiece;
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.ItemKatana;
-import mod.fbd.item.ItemTamahagane.EnumTamahagane;
+import mod.fbd.item.ItemTamahagane;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -16,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryArmorSmith  implements IInventory {
@@ -172,9 +172,9 @@ public class InventoryArmorSmith  implements IInventory {
     /**
      * Get the name of this object. For players this returns their username
      */
-    public String getName()
+    public ITextComponent getName()
     {
-        return "inventory.armorsmith";
+        return new TextComponentTranslation("inventory.armorsmith");
     }
 
     /**
@@ -197,7 +197,7 @@ public class InventoryArmorSmith  implements IInventory {
      */
     public ITextComponent getDisplayName()
     {
-        return (ITextComponent)(this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName(), new Object[0]));
+        return this.getName();
     }
 
     /**
@@ -278,16 +278,16 @@ public class InventoryArmorSmith  implements IInventory {
     	}else if (index == 6){
     		return (stack.getItem() == Items.COAL);
     	}else{
-    		return ((stack.getItem() == ItemCore.item_tamahagane) ||
-    			(stack.getItem() == ItemCore.item_bladepiece));
+    		return ((stack.getItem() instanceof ItemTamahagane) ||
+    			(stack.getItem() instanceof ItemBladePiece));
     	}
     }
 
     public int getRepaierCost(){
     	int cost = 0;
     	ItemStack stack = stacks.get(2);
-    	if (!stack.isEmpty() && stacks.get(2).isItemDamaged()){
-    		cost = (int) MathHelper.absMax(stack.getItemDamage()/10 *(2.0F + ((float)(stack.getMaxDamage() - stack.getItemDamage()))/(float)stack.getMaxDamage()),1);
+    	if (!stack.isEmpty() && stacks.get(2).isDamaged()){
+    		cost = (int) MathHelper.absMax(stack.getDamage()/10 *(2.0F + ((float)(stack.getMaxDamage() - stack.getDamage()))/(float)stack.getMaxDamage()),1);
     	}
     	return cost;
     }
@@ -297,8 +297,8 @@ public class InventoryArmorSmith  implements IInventory {
     	int cost = getRepaierCost();
     	for (int i = 0; i < 1; i++){
     		ItemStack stack = stacks.get(i);
-    		if (stack.getItem() == ItemCore.item_tamahagane){
-    			count += MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+    		if (stack.getItem() instanceof ItemTamahagane){
+    			count += MathHelper.fastFloor(stack.getCount() * ((ItemTamahagane)stack.getItem()).getRepair());
     		}
     		if (count >= cost ){
     			break;
@@ -313,9 +313,9 @@ public class InventoryArmorSmith  implements IInventory {
 		int cost = this.getRepaierCost();
     	for (int i = 0; i < 1; i++){
     		ItemStack stack = stacks.get(i);
-    		if (stack.getItem() == ItemCore.item_tamahagane){
-    			if (count + MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair()) <= cost){
-    				count += MathHelper.fastFloor(stack.getCount() * EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+    		if (stack.getItem() instanceof ItemTamahagane){
+    			if (count + MathHelper.fastFloor(stack.getCount() * ((ItemTamahagane)stack.getItem()).getRepair()) <= cost){
+    				count += MathHelper.fastFloor(stack.getCount() * ((ItemTamahagane)stack.getItem()).getRepair());
     				stacks.set(i, ItemStack.EMPTY);
     			}else{
     				int max = stack.getCount();
@@ -324,7 +324,7 @@ public class InventoryArmorSmith  implements IInventory {
     						stacks.get(i).shrink(j);
     						break;
     					}
-    					count += MathHelper.fastFloor(EnumTamahagane.getFromIndex(stack.getMetadata()).getRepair());
+    					count += MathHelper.fastFloor(((ItemTamahagane)stack.getItem()).getRepair());
     				}
     			}
         		if (count >= cost ){
@@ -333,7 +333,7 @@ public class InventoryArmorSmith  implements IInventory {
     		}
 
     	}
-    	stacks.get(2).setItemDamage(0);
+    	stacks.get(2).setDamage(0);
     	ItemKatana.setRustValue(stacks.get(2), 0);
 	}
 
@@ -343,10 +343,10 @@ public class InventoryArmorSmith  implements IInventory {
 		return stacks.get(0);
 	}
 
-    public int getTamahagane(EnumTamahagane grade){
+    public int getTamahagane(ItemStack grade){
 		int ret = 0;
 		for (ItemStack stack : stacks){
-			if (stack.getItem() == ItemCore.item_tamahagane && stack.getMetadata() == grade.getIndex()){
+			if (stack.getItem() == grade.getItem()){
 				ret += stack.getCount();
 			}
 		}
@@ -377,5 +377,11 @@ public class InventoryArmorSmith  implements IInventory {
 
 	public ItemStack getMaterial() {
 		return stacks.get(1);
+	}
+
+	@Override
+	public ITextComponent getCustomName() {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.getName();
 	}
 }

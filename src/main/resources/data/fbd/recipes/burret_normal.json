@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "burret",
+  "pattern": [
+    " S ",
+    "SGS",
+    "SGS"
+  ],
+  "key": {
+    "S": {
+      "item": "fbd:steel"
+    },
+    "G": {
+      "item": "minecraft:gunpowder"
+    }
+  },
+  "result": {
+    "item": "fbd:burret_normal",
+    "count": 6
+  }
+}

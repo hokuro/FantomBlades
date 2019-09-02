@@ -10,10 +10,10 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RenderEntityBladeSmith extends RenderLiving<EntitySmithBase>
 {
 	/**
@@ -24,6 +24,10 @@ public class RenderEntityBladeSmith extends RenderLiving<EntitySmithBase>
 	 * カスタムテクスチャ
 	 */
 	protected ResourceLocation dynamicTexture = null;
+
+	public RenderEntityBladeSmith(RenderManager renderManagerIn){
+		this(renderManagerIn,0);
+	}
 
     public RenderEntityBladeSmith(RenderManager renderManagerIn, float f)
     {
@@ -40,7 +44,7 @@ public class RenderEntityBladeSmith extends RenderLiving<EntitySmithBase>
     {
         float f = 0.9375F;
         this.shadowSize = 0.5F;
-        GlStateManager.scale(f, f, f);
+        GlStateManager.scalef(f, f, f);
     }
 
     @Override
@@ -62,7 +66,7 @@ public class RenderEntityBladeSmith extends RenderLiving<EntitySmithBase>
 			if (tex != null){
 				try {
 					// 特製テクスチャを読み込む
-					dynamicTexture = Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(entity.getUniqueID() + "_texture",new DynamicTexture(tex.Image()));;
+					dynamicTexture = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation(entity.getUniqueID() + "_texture",new DynamicTexture(tex.Image()));;
 				} catch (Exception e) {
 					// 読み込めない場合デフォルトテクスチャを使用する
 					dynamicTexture = null;

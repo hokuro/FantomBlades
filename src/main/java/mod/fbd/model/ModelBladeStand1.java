@@ -13,8 +13,8 @@ package mod.fbd.model;
 
 import mod.fbd.render.RenderTileEntityBladeStand;
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelBladeStand1 extends ModelBlaseStandBase
@@ -298,14 +298,14 @@ public class ModelBladeStand1 extends ModelBlaseStandBase
 	  if (has1){
 			GlStateManager.pushMatrix();
 			if (idx == 1){
-				GlStateManager.translate((float) x -0.1875F + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
+				GlStateManager.translatef((float) x -0.1875F + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
 			}else if (idx == 3){
-				GlStateManager.translate((float) x +0.1875F + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
+				GlStateManager.translatef((float) x +0.1875F + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
 			}else{
-				GlStateManager.translate((float) x + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
+				GlStateManager.translatef((float) x + 0.5F , (float) y + 0.5F + 0.06F, (float) z + 0.5F);
 			}
-			GlStateManager.scale(0.0625D,0.0625D,0.0625D);
-			GlStateManager.rotate(90F * (idx+2),0,1,0);
+			GlStateManager.scaled(0.0625D,0.0625D,0.0625D);
+			GlStateManager.rotatef(90F * (idx+2),0,1,0);
 			render.bindTexturePublic(stand.getKatanaTexture(0));
 			this.katana1.render(null, 0, 0, 0, 0, 0, 1.0F);
 			GlStateManager.popMatrix();
@@ -316,16 +316,16 @@ public class ModelBladeStand1 extends ModelBlaseStandBase
 	  if (has2){
 			GlStateManager.pushMatrix();
 			if (idx == 3){
-				GlStateManager.translate((float) x + 0.0625F + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.5F);
+				GlStateManager.translatef((float) x + 0.0625F + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.5F);
 			}else if (idx == 1){
-				GlStateManager.translate((float) x + -0.0625F + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.5F);
+				GlStateManager.translatef((float) x + -0.0625F + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.5F);
 			}else if (idx == 0){
-				GlStateManager.translate((float) x + 0.5F , (float) y +  0.75f + 0.06F, (float) z + -0.125F +0.5F);
+				GlStateManager.translatef((float) x + 0.5F , (float) y +  0.75f + 0.06F, (float) z + -0.125F +0.5F);
 			}else if (idx==2){
-				GlStateManager.translate((float) x + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.125F +0.5F);
+				GlStateManager.translatef((float) x + 0.5F , (float) y +  0.75f + 0.06F, (float) z + 0.125F +0.5F);
 			}
-			GlStateManager.scale(0.0625D,0.0625D,0.0625D);
-			GlStateManager.rotate(90F * (idx+2),0,1,0);
+			GlStateManager.scaled(0.0625D,0.0625D,0.0625D);
+			GlStateManager.rotatef(90F * (idx+2),0,1,0);
 			render.bindTexturePublic(stand.getKatanaTexture(1));
 			this.katana2.render(null, 0, 0, 0, 0, 0, 1.0F);
 			GlStateManager.popMatrix();

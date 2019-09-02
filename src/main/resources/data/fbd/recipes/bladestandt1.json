@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "bladestandt",
+  "pattern": [
+    "W W",
+    "WWW",
+    "WKW"
+  ],
+  "key": {
+    "W":  [
+      {
+        "item": "minecraft:oak_planks"
+      },
+      {
+        "item": "minecraft:spruce_planks"
+      },
+      {
+        "item": "minecraft:birch_planks"
+      },
+      {
+        "item": "minecraft:jungle_planks"
+      },
+      {
+        "item": "minecraft:acacia_planks"
+      },
+      {
+        "item": "minecraft:dark_oak_planks"
+      }
+    ],
+    "K": {
+      "item": "minecraft:ink_sac"
+    }
+  },
+  "result": {
+    "item": "fbd:bladestandt1",
+    "count": 1
+  }
+}

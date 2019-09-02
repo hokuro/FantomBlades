@@ -6,50 +6,52 @@ import mod.fbd.util.ModUtil;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Particles;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class ItemBurret extends Item {
 
 	protected EnumBurret burretType = EnumBurret.NORMAL;
 
-	public ItemBurret(EnumBurret burret){
+	public ItemBurret(EnumBurret burret, Item.Properties property){
+		super(property);
 		burretType = burret;
-		EntityArrow x;
 	}
 
 	public EnumBurret getBurret(){
 		return burretType;
 	}
 
-    public String getItemStackDisplayName(ItemStack stack)
+	@Override
+    public ITextComponent getDisplayName(ItemStack stack)
     {
-    	String name = I18n.translateToLocal(this.getUnlocalizedNameInefficiently(stack) + ".name").trim();
+    	String name = I18n.format(stack.getTranslationKey());
     	if (ItemBurret.isFullMetal(stack)){
-    		name += " " + I18n.translateToLocal("burret.piassing");
+    		name += " " + I18n.format("burret.piassing");
     	}
     	if (ItemBurret.canWater(stack)){
-    		name += " " + I18n.translateToLocal("burret.canwater");
+    		name += " " + I18n.format("burret.canwater");
     	}
     	name += " +" + ItemBurret.getGunPowder(stack);
-        return name;
+        return new TextComponentTranslation(name);
     }
 
 	public static enum EnumBurret{
@@ -245,14 +247,14 @@ public class ItemBurret extends Item {
 	                entityirongolem.setLocationAndAngles((double)entityBurret.posX + 0.5D, (double)entityBurret.posY + 1.05D, (double)entityBurret.posZ + 0.5D, 0.0F, 0.0F);
 	                world.spawnEntity(entityirongolem);
 
-	                for (EntityPlayerMP entityplayermp1 : world.getEntitiesWithinAABB(EntityPlayerMP.class, entityirongolem.getEntityBoundingBox().grow(5.0D)))
+	                for (EntityPlayerMP entityplayermp1 : world.getEntitiesWithinAABB(EntityPlayerMP.class, entityirongolem.getBoundingBox().grow(5.0D)))
 	                {
 	                    CriteriaTriggers.SUMMONED_ENTITY.trigger(entityplayermp1, entityirongolem);
 	                }
 
 	                for (int j1 = 0; j1 < 120; ++j1)
 	                {
-	                	world.spawnParticle(EnumParticleTypes.SNOWBALL, (double)entityBurret.posX + world.rand.nextDouble(), (double)entityBurret.posY + 1.0D +world.rand.nextDouble() * 3.9D, (double)entityBurret.posZ + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
+	                	world.spawnParticle(Particles.ITEM_SNOWBALL, (double)entityBurret.posX + world.rand.nextDouble(), (double)entityBurret.posY + 1.0D +world.rand.nextDouble() * 3.9D, (double)entityBurret.posZ + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
 	                }
 				}
 			case SNOWMAN:
@@ -261,14 +263,14 @@ public class ItemBurret extends Item {
 		            entitysnowman.setLocationAndAngles((double)entityBurret.posX + 0.5D, (double)entityBurret.posY + 1.05D, (double)entityBurret.posZ + 0.5D, 0.0F, 0.0F);
 		            world.spawnEntity(entitysnowman);
 
-		            for (EntityPlayerMP entityplayermp : world.getEntitiesWithinAABB(EntityPlayerMP.class, entitysnowman.getEntityBoundingBox().grow(5.0D)))
+		            for (EntityPlayerMP entityplayermp : world.getEntitiesWithinAABB(EntityPlayerMP.class, entitysnowman.getBoundingBox().grow(5.0D)))
 		            {
 		                CriteriaTriggers.SUMMONED_ENTITY.trigger(entityplayermp, entitysnowman);
 		            }
 
 		            for (int l = 0; l < 120; ++l)
 		            {
-		            	world.spawnParticle(EnumParticleTypes.SNOW_SHOVEL, (double)entityBurret.posX + world.rand.nextDouble(), (double)entityBurret.posY + 1.0D + world.rand.nextDouble() * 2.5D, (double)entityBurret.posZ + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
+		            	world.spawnParticle(Particles.ITEM_SNOWBALL, (double)entityBurret.posX + world.rand.nextDouble(), (double)entityBurret.posY + 1.0D + world.rand.nextDouble() * 2.5D, (double)entityBurret.posZ + world.rand.nextDouble(), 0.0D, 0.0D, 0.0D);
 		            }
 				}
 				break;
@@ -337,7 +339,7 @@ public class ItemBurret extends Item {
 		int now = getGunPowder(stack);
 		if (canAddGunPowder(stack,add)){
 			NBTTagCompound tag = getItemTagCompound(stack);
-			tag.setInteger("gunpowder", now+add);
+			tag.setInt("gunpowder", now+add);
 			return true;
 		}
 		return false;
@@ -346,18 +348,18 @@ public class ItemBurret extends Item {
 	public static int getGunPowder(ItemStack stack){
 		NBTTagCompound tag = getItemTagCompound(stack);
 		if (tag.hasKey("gunpowder")){
-			return tag.getInteger("gunpowder");
+			return tag.getInt("gunpowder");
 		}
 		return 0;
 	}
 
     public static NBTTagCompound getItemTagCompound(ItemStack stack){
 		NBTTagCompound tag;
-		if(stack.hasTagCompound()){
-			tag = stack.getTagCompound();
+		if(stack.hasTag()){
+			tag = stack.getTag();
 		}else{
 			tag = new NBTTagCompound();
-			stack.setTagCompound(tag);
+			stack.setTag(tag);
 		}
 		return tag;
 	}

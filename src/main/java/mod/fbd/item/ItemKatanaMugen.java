@@ -2,12 +2,14 @@ package mod.fbd.item;
 
 import mod.fbd.core.ModCommon;
 import mod.fbd.core.Mod_FantomBlade;
-import net.minecraft.creativetab.CreativeTabs;
+import mod.fbd.util.ModUtil;
+import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -22,8 +24,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class ItemKatanaMugen extends ItemKatana {
-	public ItemKatanaMugen(){
-		super(Mod_FantomBlade.NIJI);
+	public ItemKatanaMugen(Item.Properties property){
+		super(Mod_FantomBlade.NIJI, property.defaultMaxDamage(200));
 		LEVELUP_EXP = 2000;
 		POTION_UP = 1000;
 		ENCHANT_UP = 1000;
@@ -44,7 +46,7 @@ public class ItemKatanaMugen extends ItemKatana {
 	}
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		int level = this.getLevel(stack);
 		// 攻撃力設定
 		attackDamage = this.getAttackDamage(stack) 																// 固有攻撃力
@@ -56,7 +58,8 @@ public class ItemKatanaMugen extends ItemKatana {
 		attackSpeed = this.getAttackSpeed(stack);
 
 		// 耐久力設定
-		this.setMaxDamage(this.getGetEndurance(stack));
+		//this.setMaxDamage(this.getGetEndurance(stack));
+		ModUtil.setPrivateValue(Item.class, this, this.getGetEndurance(stack), "maxDamage");
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
@@ -95,7 +98,7 @@ public class ItemKatanaMugen extends ItemKatana {
     {
 		int level = this.getLevel(stack);
 		// 相手を殺したら経験値獲得
-		if(!target.isEntityAlive() && target.deathTime == 0 && attacker instanceof EntityPlayer){
+		if(!target.isAlive() && target.deathTime == 0 && attacker instanceof EntityPlayer){
 			// 相手の最大HPが経験値
 			this.addExp(stack, (int)target.getMaxHealth());
 			if (level != this.getLevel(stack)){
@@ -104,12 +107,12 @@ public class ItemKatanaMugen extends ItemKatana {
 
 			// 殺人カウントアップ
 	    	ItemKatanaNiji.addKillCount(stack,1);
-		}else if (target.isEntityAlive()){
+		}else if (target.isAlive()){
 			// 生きてるならデバフ効果をお見舞い
 			for (PotionEffect effect : this.getPotionEffects(stack)){
 				if (effect.getPotion().isBadEffect() ||
-						(effect.getPotion() == MobEffects.INSTANT_HEALTH  && (target.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD)) ||
-						(effect.getPotion() == MobEffects.INSTANT_DAMAGE && (target.getCreatureAttribute() != EnumCreatureAttribute.UNDEAD))){
+						(effect.getPotion() == MobEffects.INSTANT_HEALTH  && (target.getCreatureAttribute() == CreatureAttribute.UNDEAD)) ||
+						(effect.getPotion() == MobEffects.INSTANT_DAMAGE && (target.getCreatureAttribute() != CreatureAttribute.UNDEAD))){
 					target.addPotionEffect(new PotionEffect(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
 				}
 			}
@@ -130,12 +133,12 @@ public class ItemKatanaMugen extends ItemKatana {
 	public static void setKillCount(ItemStack stack, int value) {
     	NBTTagCompound tag = getItemTagCompound(stack);
     	if (value > 10000){value = 10000;}
-    	tag.setInteger("killcount", value);
+    	tag.setInt("killcount", value);
 	}
 
 	public static int getKillCount(ItemStack stack){
 		NBTTagCompound tag = getItemTagCompound(stack);
-    	return tag.getInteger("killcount");
+    	return tag.getInt("killcount");
 	}
 
 	public static void addKillCount(ItemStack stack, int add){
@@ -168,12 +171,10 @@ public class ItemKatanaMugen extends ItemKatana {
 	}
 
 	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		    if (this.isInCreativeTab(tab))
-		    {
-		        items.add(getDefaultStack());
-		    }
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
 	 }
 
 	 public static ItemStack getDefaultStack(){

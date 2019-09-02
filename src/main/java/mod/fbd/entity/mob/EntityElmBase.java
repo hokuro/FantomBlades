@@ -1,6 +1,7 @@
 package mod.fbd.entity.mob;
 
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
@@ -38,30 +39,30 @@ public abstract class EntityElmBase extends EntityCreature{
 
     private int homeWorld;
 
-    public EntityElmBase(World worldIn)
+    public EntityElmBase(EntityType<?> etype, World worldIn)
     {
-        super(worldIn);
+        super(etype, worldIn);
     }
 
     @Override
-    protected void entityInit()
+    protected void registerData()
     {
-        super.entityInit();
+        super.registerData();
         this.dataManager.register(DW_SUMMONPOS, new BlockPos(0,-1,0));
 		this.dataManager.register(DW_EXP,0);
     }
 
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound compound)
+    public void writeAdditional(NBTTagCompound compound)
     {
-        super.writeEntityToNBT(compound);
+        super.writeAdditional(compound);
         NBTTagList nbttaglist = new NBTTagList();
 		// HomePosition
-        compound.setInteger("HOMEX", getPosition().getX());
-        compound.setInteger("HOMEY", getPosition().getY());
-        compound.setInteger("HOMEZ", getPosition().getZ());
-        compound.setInteger("HOMEWORLD", homeWorld);
+        compound.setInt("HOMEX", getPosition().getX());
+        compound.setInt("HOMEY", getPosition().getY());
+        compound.setInt("HOMEZ", getPosition().getZ());
+        compound.setInt("HOMEWORLD", homeWorld);
 		writeDWData(compound);
     }
 
@@ -69,26 +70,26 @@ public abstract class EntityElmBase extends EntityCreature{
 
     	NBTTagCompound dwtag = new NBTTagCompound();
         BlockPos summonPos = this.Dw_SUMMONPOS();
-        dwtag.setInteger("summonPosX", summonPos.getX());
-        dwtag.setInteger("summonPosY", summonPos.getY());
-        dwtag.setInteger("summonPosZ", summonPos.getZ());
-        dwtag.setInteger("level",getLevel());
-        dwtag.setInteger("exp", Dw_Exp());
+        dwtag.setInt("summonPosX", summonPos.getX());
+        dwtag.setInt("summonPosY", summonPos.getY());
+        dwtag.setInt("summonPosZ", summonPos.getZ());
+        dwtag.setInt("level",getLevel());
+        dwtag.setInt("exp", Dw_Exp());
         tagCompound.setTag("dwData", dwtag);
     }
 
 
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound compound)
+    public void readAdditional(NBTTagCompound compound)
     {
-        super.readEntityFromNBT(compound);
+        super.readAdditional(compound);
 		// HomePosition
-		int lhx = compound.getInteger("HOMEX");
-		int lhy = compound.getInteger("HOMEY");
-		int lhz = compound.getInteger("HOMEZ");
+		int lhx = compound.getInt("HOMEX");
+		int lhy = compound.getInt("HOMEY");
+		int lhz = compound.getInt("HOMEZ");
 		setHomePosAndDistance(new BlockPos(lhx, lhy, lhz),(int)getMaximumHomeDistance());
-		homeWorld = compound.getInteger("HOEMWORLD");
+		homeWorld = compound.getInt("HOEMWORLD");
 		readDWData(compound);
 
     }
@@ -99,11 +100,11 @@ public abstract class EntityElmBase extends EntityCreature{
     	NBTTagCompound dwtag = (NBTTagCompound)compound.getTag("dwData");
 
         this.Dw_SUMMONPOS(new BlockPos(
-        		dwtag.getInteger("summonPosX"),
-        		dwtag.getInteger("summonPosY"),
-        		dwtag.getInteger("summonPosZ")));
+        		dwtag.getInt("summonPosX"),
+        		dwtag.getInt("summonPosY"),
+        		dwtag.getInt("summonPosZ")));
 
-        Dw_Exp(dwtag.getInteger("exp"));
+        Dw_Exp(dwtag.getInt("exp"));
     }
 
     public World getWorld()

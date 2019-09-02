@@ -2,8 +2,8 @@ package mod.fbd.model;
 
 import mod.fbd.render.RenderTileEntityBladeStand;
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 
 public abstract class ModelBlaseStandBase extends ModelBase{
 	public abstract void render(TileEntityBladeStand entity, float scale);

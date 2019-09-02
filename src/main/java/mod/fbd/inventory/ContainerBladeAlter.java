@@ -20,7 +20,7 @@ public class ContainerBladeAlter extends Container{
 		entity = tile;
 		player = playerIn;
 		// 材料スロット
-		this.addSlotToContainer(new Slot(this.entity, 0, 8, 17)
+		this.addSlot(new Slot(this.entity, 0, 8, 17)
 		{
 			public boolean isItemValid(ItemStack stack)
 			{
@@ -33,13 +33,13 @@ public class ContainerBladeAlter extends Container{
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(playerIn.inventory, j + i * 9 + 9, 8 + j * 18, 126 + i * 18));
+                this.addSlot(new Slot(playerIn.inventory, j + i * 9 + 9, 8 + j * 18, 126 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(playerIn.inventory, k, 8 + k * 18, 184));
+            this.addSlot(new Slot(playerIn.inventory, k, 8 + k * 18, 184));
         }
 	}
 

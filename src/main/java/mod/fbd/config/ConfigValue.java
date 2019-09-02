@@ -1,37 +1,40 @@
 package mod.fbd.config;
 
 import mod.fbd.util.ModUtil;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.Builder;
 
 public class ConfigValue{
-	private static final ModConfig config = new ModConfig();
+	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final General GENERAL = new General(BUILDER);
+	public static final ForgeConfigSpec spec = BUILDER.build();
 
-	public static void init(FMLPreInitializationEvent event){
-		config.init(new Class<?>[]{
-			General.class
-		}, event);
-	}
-
-
-	public static void setting() {
-	}
-
-	public static void save(){
-		config.saveConfig();
-	}
 
 	public static class General{
-		@ConfigProperty(comment="show debutlog")
-		public static boolean isDebut=false;
-		@ConfigProperty(comment="show debutlog")
-		public static String[] BladeNames ={"刀"};
-		@ConfigProperty(comment="show debutlog")
-		public static boolean GunGuiAutoOpen = false;
+		public final ForgeConfigSpec.ConfigValue<String> bladeNames;
+		public final ForgeConfigSpec.ConfigValue<Boolean> gunGuiAutoOpen;;
 
-		public static String getRandomName() {
+		public General(Builder builder) {
+			builder.push("General");
+			bladeNames = builder
+				.comment("show debutlog")
+				.define("BladeNames","刀");
+			gunGuiAutoOpen = builder
+				.comment("show debutlog")
+				.define("GunGuiAutoOpen",false);
+			builder.pop();
+		}
+
+		public Boolean GunGuiAutoOpen() {
+			return gunGuiAutoOpen.get();
+		}
+
+
+		public String getRandomName() {
 			String ret = "刀";
-			if (BladeNames.length != 0){
-				ret = BladeNames[ModUtil.random(BladeNames.length)];
+			String[] blades = bladeNames.get().split(",");
+			if (blades.length != 0){
+				ret = blades[ModUtil.random(blades.length)];
 			}
 			return ret;
 		}

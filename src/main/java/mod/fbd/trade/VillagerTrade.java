@@ -58,12 +58,12 @@ public class VillagerTrade{
             if (i < 0)
             {
                 itemstack = itemToSel.copy();
-                itemstack1 = new ItemStack(this.itemToBuy.getItem(), -i, this.itemToBuy.getMetadata());
+                itemstack1 = new ItemStack(this.itemToBuy.getItem(), -i);
             }
             else
             {
-                itemstack = new ItemStack(itemToSel.getItem(), i, itemToSel.getMetadata());
-                itemstack1 = new ItemStack(this.itemToBuy.getItem(), 1, this.itemToBuy.getMetadata());
+                itemstack = new ItemStack(itemToSel.getItem(), i);
+                itemstack1 = new ItemStack(this.itemToBuy.getItem(), 1);
             }
 
             recipeList.add(new MerchantRecipe(itemstack, itemstack1));
@@ -101,8 +101,8 @@ public class VillagerTrade{
                 i = this.priceInfo.getPrice(random);
             }
 
-            ItemStack itemstack = new ItemStack(this.itemBySell.getItem(), i, this.itemBySell.getMetadata());
-            ItemStack itemstack1 = EnchantmentHelper.addRandomEnchantment(random, new ItemStack(this.enchantedItemStack.getItem(), 1, this.enchantedItemStack.getMetadata()), 5 + random.nextInt(15), false);
+            ItemStack itemstack = new ItemStack(this.itemBySell.getItem(), i);
+            ItemStack itemstack1 = EnchantmentHelper.addRandomEnchantment(random, new ItemStack(this.enchantedItemStack.getItem(), 1), 5 + random.nextInt(15), false);
             recipeList.add(new MerchantRecipe(itemstack, itemstack1));
         }
     }

@@ -5,10 +5,10 @@ import mod.fbd.model.ModelBladeStand2;
 import mod.fbd.model.ModelBlaseStandBase;
 import mod.fbd.tileentity.TileEntityBladeStand;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderTileEntityBladeStand extends TileEntitySpecialRenderer<TileEntityBladeStand> {
+public class RenderTileEntityBladeStand extends TileEntityRenderer<TileEntityBladeStand> {
 	private static final ResourceLocation tex1 = new ResourceLocation("fbd:textures/entity/bladestand1.png");
 	private static final ResourceLocation tex2 = new ResourceLocation("fbd:textures/entity/bladestand2.png");
 
@@ -17,7 +17,7 @@ public class RenderTileEntityBladeStand extends TileEntitySpecialRenderer<TileEn
 
 
 	@Override
-	public void render(TileEntityBladeStand te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(TileEntityBladeStand te, double x, double y, double z, float partialTicks, int destroyStage) {
 		switch(te.getStandType()){
 		case STAND1:
 			tex = tex1;
@@ -45,19 +45,19 @@ public class RenderTileEntityBladeStand extends TileEntitySpecialRenderer<TileEn
             this.bindTexture(DESTROY_STAGES[destroyStage]);
             GlStateManager.matrixMode(5890);
             GlStateManager.pushMatrix();
-            GlStateManager.scale(5.0F, 4.0F, 1.0F);
-            GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
+            GlStateManager.scalef(5.0F, 4.0F, 1.0F);
+            GlStateManager.translatef(0.0625F, 0.0625F, 0.0625F);
             GlStateManager.matrixMode(5888);
         }else{
     		this.bindTexture(tex);
         }
 
 		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F , (float) y +  0.06F, (float) z + 0.5F);
-		GlStateManager.scale(0.0625D,0.0625D,0.0625D);
-		GlStateManager.rotate(180,0F,0F,1F);
+		GlStateManager.translatef((float) x + 0.5F , (float) y +  0.06F, (float) z + 0.5F);
+		GlStateManager.scalef(0.0625F,0.0625F,0.0625F);
+		GlStateManager.rotatef(180,0F,0F,1F);
 		int idx = te.getFace().getHorizontalIndex();
-		GlStateManager.rotate(90F * (idx+2),0F,1F,0F);
+		GlStateManager.rotatef(90F * (idx+2),0F,1F,0F);
 		this.mainModel.render(te,1.0F);
 		GlStateManager.popMatrix();
 

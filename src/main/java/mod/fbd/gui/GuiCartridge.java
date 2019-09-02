@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
 
 public class GuiCartridge extends GuiContainer {
 	private static final ResourceLocation tex = new ResourceLocation("fbd", "textures/gui/cartridge.png");
@@ -24,21 +23,21 @@ public class GuiCartridge extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j){
-		fontRenderer.drawString(I18n.translateToFallback("gui.revolver.title"),8,4,4210752);
+		fontRenderer.drawString(net.minecraft.client.resources.I18n.format("gui.revolver.title"),8,4,4210752);
         fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 5, 4210752);
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks){
+	public void render(int mouseX, int mouseY, float partialTicks){
         this.drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y){
 		// 背景
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(tex);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;

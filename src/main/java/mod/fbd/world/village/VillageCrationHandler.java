@@ -5,27 +5,26 @@ import java.util.Random;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.StructureVillagePieces;
-import net.minecraft.world.gen.structure.StructureVillagePieces.PieceWeight;
-import net.minecraft.world.gen.structure.StructureVillagePieces.Start;
-import net.minecraft.world.gen.structure.StructureVillagePieces.Village;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.VillagePieces;
+import net.minecraft.world.gen.feature.structure.VillagePieces.PieceWeight;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.IVillageCreationHandler;
 
 public class VillageCrationHandler implements IVillageCreationHandler {
 
 	@Override
 	public PieceWeight getVillagePieceWeight(Random random, int i) {
-		return new StructureVillagePieces.PieceWeight(getComponentClass(), 8, MathHelper.getInt(random, 0 + i, 3 + i * 2));
+		return new VillagePieces.PieceWeight(getComponentClass(), 8, MathHelper.nextInt(random, 0 + i, 3 + i * 2));
 	}
 
 	@Override
-	public Class<? extends Village> getComponentClass() {
+	public Class<? extends VillagePieces.Village> getComponentClass() {
 		return ComponentVillageGunSmithHouse.class;
 	}
 
 	@Override
-	public Village buildComponent(PieceWeight villagePiece, Start startPiece, List<StructureComponent> pieces, Random random, int x, int y, int z, EnumFacing facing, int p5) {
+	public VillagePieces.Village buildComponent(VillagePieces.PieceWeight villagePiece, VillagePieces.Start startPiece, List<StructurePiece> pieces, Random random, int x,
+            int y, int z, EnumFacing facing, int p5){
 		return ComponentVillageGunSmithHouse.createPiece(startPiece, pieces, random, x, y, z, facing, p5);
 	}
 

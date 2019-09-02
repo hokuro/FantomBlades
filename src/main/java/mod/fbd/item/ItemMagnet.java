@@ -2,19 +2,19 @@ package mod.fbd.item;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -22,28 +22,43 @@ import net.minecraft.world.World;
 public class ItemMagnet extends Item {
 
 	protected BlockPos beforePos;
+	private static final IItemPropertyGetter DAMAGE_MAGNET = (stack, world, entity) -> {
+		if (stack.getItem() instanceof ItemMagnet) {
+			int damage = ((ItemMagnet)stack.getItem()).getSand(stack);
+			if (damage == 0){
+				return 0;
+			}else if (damage <= 64){
+				return 1;
+			}else if (damage <= 128){
+				return 2;
+			}else if (128 < damage){
+				return 3;
+			}
+		}
+		return 0;
+	};
 
-	public ItemMagnet(){
-		super();
-		this.setMaxStackSize(1);
-		this.setHasSubtypes(true);
+
+	public ItemMagnet(Item.Properties property){
+		super(property);
 		beforePos = new BlockPos(0,0,0);
+		this.addPropertyOverride(new ResourceLocation("ironsand"), DAMAGE_MAGNET);
 	}
 
 	@Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
-		ItemStack stack = player.getHeldItemMainhand();
-		if (stack.getItem() == ItemCore.item_magnet && stack.getItemDamage() > 0){
-			if (worldIn.isRemote){
-				worldIn.playSound((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.0F + worldIn.rand.nextFloat(), worldIn.rand.nextFloat() * 0.7F + 0.3F, false);
+	   public EnumActionResult onItemUse(ItemUseContext contex) {
+		ItemStack stack = contex.getItem();
+		BlockPos pos = contex.getPos();
+		if (stack.getItem() == ItemCore.item_magnet && hasSand(stack)){
+			if (contex.getWorld().isRemote){
+				contex.getWorld().playSound((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.0F + contex.getWorld().rand.nextFloat(), contex.getWorld().rand.nextFloat() * 0.7F + 0.3F, false);
 			}else{
 				int stackDamage = this.getSand(stack);
 				for (int i = 0; i < 4 && stackDamage > 0; i++){
 					if (stackDamage >= 64){
-						InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemCore.item_satetu,64));
+						InventoryHelper.spawnItemStack(contex.getWorld(), pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemCore.item_satetu,64));
 					}else{
-						InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemCore.item_satetu,stackDamage));
+						InventoryHelper.spawnItemStack(contex.getWorld(), pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemCore.item_satetu,stackDamage));
 					}
 					stackDamage -=64;
 				}
@@ -54,7 +69,7 @@ public class ItemMagnet extends Item {
     }
 
 	@Override
-	public void onUpdate(ItemStack itemstack, World world, Entity entity, int ix, boolean flag) {
+	public void inventoryTick(ItemStack itemstack, World world, Entity entity, int ix, boolean flag) {
 		if (world.isRemote) {
 			return;
 		}
@@ -78,67 +93,44 @@ public class ItemMagnet extends Item {
         return false;
     }
 
-
-	@Override
-    public int getMetadata(ItemStack stack)
-    {
-		int damage = this.getSand(stack);
-		if (damage == 0){
-			return 0;
-		}else if (damage <= 64){
-			return 1;
-		}else if (damage <= 128){
-			return 2;
-		}else if (128 < damage){
-			return 3;
-		}
-		return 0;
-    }
-
 	@Override
     public boolean isEnchantable(ItemStack stack)
     {
 		return false;
     }
 
-	@Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-    {
-        if (this.isInCreativeTab(tab))
-        {
-            items.add(new ItemStack(this));
-        }
-    }
-
 	public boolean hasSand(ItemStack stack){
-        NBTTagCompound nbttagcompound = stack.getTagCompound();
-        return nbttagcompound != null && nbttagcompound.hasKey("satetu", 1);
+        NBTTagCompound nbttagcompound = stack.getTag();
+        if (nbttagcompound != null) {
+        	return (nbttagcompound.getInt("satetu") > 0);
+        }
+        return false;
 	}
 
     public int getSand(ItemStack stack)
     {
     	int ret = 0;
-    	NBTTagCompound nbttagcompound = stack.getTagCompound();
+    	NBTTagCompound nbttagcompound = stack.getTag();
 
         if (nbttagcompound != null)
         {
-        	ret = nbttagcompound.getInteger("satetu");
+        	ret = nbttagcompound.getInt("satetu");
         }
         return ret;
     }
 
 	public void setSand(ItemStack stack, int cnt)
 	{
-        NBTTagCompound nbttagcompound = stack.getTagCompound();
+        NBTTagCompound nbttagcompound = stack.getTag();
         if (nbttagcompound == null)
         {
             nbttagcompound = new NBTTagCompound();
-            stack.setTagCompound(nbttagcompound);
+            stack.setTag(nbttagcompound);
         }
         if ( cnt > 256){
         	cnt = 256;
         }
-        nbttagcompound.setInteger("satetu", cnt);
+        nbttagcompound.setInt("satetu", cnt);
 	}
 
 	public void growSand(ItemStack stack, int amount){

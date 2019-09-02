@@ -1,16 +1,16 @@
 package mod.fbd.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
+
 import mod.fbd.tileentity.TileEntityBladeforge;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 
-public class MessageBladeforgeSmeltingStart  implements IMessage, IMessageHandler<MessageBladeforgeSmeltingStart, IMessage> {
+public class MessageBladeforgeSmeltingStart {
 
 	private int posx;
 	private int posy;
@@ -23,28 +23,34 @@ public class MessageBladeforgeSmeltingStart  implements IMessage, IMessageHandle
 		posz = z;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		posx = buf.readInt();
-		posy = buf.readInt();
-		posz = buf.readInt();
+	public static void encode(MessageBladeforgeSmeltingStart pkt, PacketBuffer buf)
+	{
+		buf.writeInt(pkt.posx);
+		buf.writeInt(pkt.posy);
+		buf.writeInt(pkt.posz);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(posx);
-		buf.writeInt(posy);
-		buf.writeInt(posz);
+	public static MessageBladeforgeSmeltingStart decode(PacketBuffer buf)
+	{
+		int posx = buf.readInt();
+		int posy = buf.readInt();
+		int posz = buf.readInt();
+		return new MessageBladeforgeSmeltingStart(posx,posy,posz);
 	}
 
-	@Override
-	public IMessage onMessage(MessageBladeforgeSmeltingStart message, MessageContext ctx){
-		EntityPlayer player = ctx.getServerHandler().player;
-		BlockPos pos = new BlockPos(message.posx,message.posy,message.posz);
-		TileEntity ent = player.world.getTileEntity(pos);
-		if (ent instanceof TileEntityBladeforge){
-			((TileEntityBladeforge)ent).StartSmelting(player);
+	public static class Handler
+	{
+		public static void handle(final MessageBladeforgeSmeltingStart pkt, Supplier<NetworkEvent.Context> ctx)
+		{
+			ctx.get().enqueueWork(() -> {
+				EntityPlayer player = ctx.get().getSender();
+				BlockPos pos = new BlockPos(pkt.posx,pkt.posy,pkt.posz);
+				TileEntity ent = player.world.getTileEntity(pos);
+				if (ent instanceof TileEntityBladeforge){
+					((TileEntityBladeforge)ent).StartSmelting(player);
+				}
+			});
+			ctx.get().setPacketHandled(true);
 		}
-		return null;
 	}
 }

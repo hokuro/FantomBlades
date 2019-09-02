@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "summonseal",
+  "pattern": [
+    "AOB",
+    "PEP",
+    "CKD"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "O": {
+      "item": "fbd:big_hunmmer"
+    },
+    "K": {
+      "item": "fbd:small_hunmmer"
+    },
+    "A":{
+      "item": "minecraft:diamond_sword"
+    },
+    "B":{
+      "item": "minecraft:golden_sword"
+    },
+    "C":{
+      "item": "minecraft:iron_sword"
+    },
+    "D":{
+      "item": "minecraft:stone_sword"
+    },
+    "E":{
+      "item": "minecraft:wooden_sword"
+    }
+  },
+  "result": {
+    "item": "fbd:summon_bladesmith",
+    "count": 1
+  }
+}

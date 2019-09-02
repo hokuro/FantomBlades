@@ -11,6 +11,7 @@ import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryCartridge implements IInventory {
 	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(10,ItemStack.EMPTY);
@@ -25,8 +26,8 @@ public class InventoryCartridge implements IInventory {
 	}
 
 	@Override
-	public String getName() {
-		return "inventory.cartridge";
+	public ITextComponent getName() {
+		return new TextComponentTranslation("inventory.cartridge");
 	}
 
 	@Override
@@ -131,5 +132,11 @@ public class InventoryCartridge implements IInventory {
 	public ITextComponent getDisplayName() {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
+	}
+
+	@Override
+	public ITextComponent getCustomName() {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.getName();
 	}
 }

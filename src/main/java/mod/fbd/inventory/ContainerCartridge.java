@@ -18,7 +18,7 @@ public class ContainerCartridge extends Container{
     	player = playerIn;
     	for (int i = 0; i < 2; i++){
     		for (int j = 0; j < 5; j++ ){
-    	    	this.addSlotToContainer(new Slot(cartridge, j + (5*i), 8 + 18*j, 17 + 18*i)
+    	    	this.addSlot(new Slot(cartridge, j + (5*i), 8 + 18*j, 17 + 18*i)
     			{
     				public boolean isItemValid(ItemStack stack)
     				{
@@ -34,13 +34,13 @@ public class ContainerCartridge extends Container{
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
+                this.addSlot(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(player.inventory, k, 8 + k * 18, 169));
+            this.addSlot(new Slot(player.inventory, k, 8 + k * 18, 169));
         }
     }
 

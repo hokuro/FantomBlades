@@ -1,16 +1,16 @@
 package mod.fbd.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
+
 import mod.fbd.entity.mob.EntityArmorSmith;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class MessageCreateArmor  implements IMessage, IMessageHandler<MessageCreateArmor, IMessage> {
+public class MessageCreateArmor{
 
 
 	private EntityArmorSmith entity;
@@ -20,37 +20,47 @@ public class MessageCreateArmor  implements IMessage, IMessageHandler<MessageCre
 
 	public MessageCreateArmor(EntityArmorSmith entity2) {
 		entity = entity2;
+		id = entity2.getEntityId();
 	}
 
-
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		id = buf.readInt();
+	public MessageCreateArmor(int entid) {
+		id = entid;
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(entity.getEntityId());
+	public static void encode(MessageCreateArmor pkt, PacketBuffer buf)
+	{
+		buf.writeInt(pkt.id);
 	}
 
-	@Override
-	public IMessage onMessage(MessageCreateArmor message, MessageContext ctx){
-		Entity ent = ctx.getServerHandler().player.world.getEntityByID(message.id);
-		if (ent instanceof EntityArmorSmith){
-			EntityArmorSmith smith = ((EntityArmorSmith)ent);
-				BlockPos checkPos = smith.getPos().add(0,-1,0);
-				if (smith.canStartArmorSmith(ctx.getServerHandler().player.world, checkPos, true, smith)){
-					ItemStack katana = smith.createBlade();
-					if (!katana.isEmpty()){
-						smith.startWork(ctx.getServerHandler().player.world, smith.getPos(), katana);
-						ctx.getServerHandler().player.closeContainer();
+	public static MessageCreateArmor decode(PacketBuffer buf)
+	{
+		return new MessageCreateArmor(buf.readInt());
+	}
+
+	public static class Handler
+	{
+		public static void handle(final MessageCreateArmor pkt, Supplier<NetworkEvent.Context> ctx)
+		{
+			ctx.get().enqueueWork(() -> {
+				Entity ent = ctx.get().getSender().world.getEntityByID(pkt.id);
+				if (ent instanceof EntityArmorSmith){
+					EntityArmorSmith smith = ((EntityArmorSmith)ent);
+					BlockPos checkPos = smith.getPos().add(0,-1,0);
+					if (smith.canStartArmorSmith(ctx.get().getSender().world, checkPos, true, smith)){
+						ItemStack katana = smith.createBlade();
+						if (!katana.isEmpty()){
+							smith.startWork(ctx.get().getSender().world, smith.getPos(), katana);
+							ctx.get().getSender().closeContainer();
+						}else{
+							ctx.get().getSender().sendStatusMessage(new TextComponentString("please give me TAMAHAGANE"),false);
+						}
 					}else{
-						ctx.getServerHandler().player.sendStatusMessage(new TextComponentString("please give me TAMAHAGANE"),false);
+						ctx.get().getSender().sendStatusMessage(new TextComponentString("not ready for work"),false);
 					}
-				}else{
-					ctx.getServerHandler().player.sendStatusMessage(new TextComponentString("not ready for work"),false);
 				}
+			});
+			ctx.get().setPacketHandled(true);
 		}
-		return null;
 	}
+
 }

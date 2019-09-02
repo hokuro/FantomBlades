@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryGunCustomize implements IInventory {
@@ -47,9 +46,9 @@ public class InventoryGunCustomize implements IInventory {
     /**
      * Get the name of this object. For players this returns their username
      */
-    public String getName()
+    public ITextComponent getName()
     {
-        return "Result";
+        return new TextComponentTranslation("Result");
     }
 
     /**
@@ -65,7 +64,7 @@ public class InventoryGunCustomize implements IInventory {
      */
     public ITextComponent getDisplayName()
     {
-        return (ITextComponent)(this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName(), new Object[0]));
+        return this.getName();
     }
 
     /**
@@ -151,4 +150,10 @@ public class InventoryGunCustomize implements IInventory {
     {
         this.stackResult.clear();
     }
+
+	@Override
+	public ITextComponent getCustomName() {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.getName();
+	}
 }

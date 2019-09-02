@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "summonseal",
+  "pattern": [
+    "AOB",
+    "P P",
+    "CKD"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "O": {
+      "item": "fbd:big_hunmmer"
+    },
+    "K": {
+      "item": "fbd:small_hunmmer"
+    },
+    "A":{
+      "item": "minecraft:diamond_chestplate"
+    },
+    "B":{
+      "item": "minecraft:golden_chestplate"
+    },
+    "C":{
+      "item": "minecraft:iron_chestplate"
+    },
+    "D":{
+      "item": "minecraft:leather_chestplate"
+    }
+  },
+  "result": {
+    "item": "fbd:summon_armorsmith",
+    "count": 1
+  }
+}

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "fbd:guncustomizer" }
+        "normal": { "model": "fbd:block/guncustomizer" }
     }
 }

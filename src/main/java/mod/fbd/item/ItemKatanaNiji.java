@@ -2,10 +2,12 @@ package mod.fbd.item;
 
 import mod.fbd.core.ModCommon;
 import mod.fbd.core.Mod_FantomBlade;
-import net.minecraft.creativetab.CreativeTabs;
+import mod.fbd.util.ModUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -19,8 +21,8 @@ import net.minecraft.world.World;
 
 public class ItemKatanaNiji extends ItemKatana {
 
-	public ItemKatanaNiji(){
-		super(Mod_FantomBlade.NIJI);
+	public ItemKatanaNiji(Item.Properties property){
+		super(Mod_FantomBlade.NIJI, property.maxStackSize(200));
 		LEVELUP_EXP = 2000;
 		POTION_UP = 500;
 		ENCHANT_UP = 500;
@@ -41,7 +43,7 @@ public class ItemKatanaNiji extends ItemKatana {
 	}
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		int level = this.getLevel(stack);
 		// 攻撃力設定
 		attackDamage = this.getAttackDamage(stack) 																// 固有攻撃力
@@ -53,7 +55,8 @@ public class ItemKatanaNiji extends ItemKatana {
 		attackSpeed = this.getAttackSpeed(stack);
 
 		// 耐久力設定
-		this.setMaxDamage(this.getGetEndurance(stack));
+		//this.setMaxDamage(this.getGetEndurance(stack));
+		ModUtil.setPrivateValue(Item.class, this, this.getGetEndurance(stack), "maxDamage");
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
@@ -78,7 +81,7 @@ public class ItemKatanaNiji extends ItemKatana {
     {
     	super.hitEntity(stack, target, attacker);
     	// 切った相手にポーション効果を付与
-    	if (target.isEntityAlive()){
+    	if (target.isAlive()){
     		for (PotionEffect effect : ItemKatana.getPotionEffects(stack)){
     			target.addPotionEffect(new PotionEffect(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
     		}
@@ -100,12 +103,12 @@ public class ItemKatanaNiji extends ItemKatana {
 	public static void setKillCount(ItemStack stack, int value) {
     	NBTTagCompound tag = getItemTagCompound(stack);
     	if (value > 1000){value = 1000;}
-    	tag.setInteger("killcount", value);
+    	tag.setInt("killcount", value);
 	}
 
 	public static int getKillCount(ItemStack stack){
 		NBTTagCompound tag = getItemTagCompound(stack);
-    	return tag.getInteger("killcount");
+    	return tag.getInt("killcount");
 	}
 
 	public static void addKillCount(ItemStack stack, int add){
@@ -115,13 +118,10 @@ public class ItemKatanaNiji extends ItemKatana {
 	}
 
 	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		    if (this.isInCreativeTab(tab))
-		    {
-
-		        items.add(getDefaultStack());
-		    }
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
 	 }
 
 	 public static ItemStack getDefaultStack(){

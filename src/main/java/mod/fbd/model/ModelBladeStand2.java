@@ -13,8 +13,8 @@ package mod.fbd.model;
 
 import mod.fbd.render.RenderTileEntityBladeStand;
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelBladeStand2 extends ModelBlaseStandBase
@@ -254,11 +254,11 @@ public class ModelBladeStand2 extends ModelBlaseStandBase
 				offtz=0.1875F;
 				angle=-110F;
 			}
-			GlStateManager.translate((float) x + offtx + 0.5F , (float) y + offty +  0.06F, (float) z + offtz + 0.5F);
-			GlStateManager.scale(0.0625D,0.0625D,0.0625D);
-			GlStateManager.rotate(90F * (idx+2),0,1,0);
-			GlStateManager.rotate(-90F,0,1,0);;
-			GlStateManager.rotate(angle,0,0,1);
+			GlStateManager.translatef((float) x + offtx + 0.5F , (float) y + offty +  0.06F, (float) z + offtz + 0.5F);
+			GlStateManager.scaled(0.0625D,0.0625D,0.0625D);
+			GlStateManager.rotatef(90F * (idx+2),0,1,0);
+			GlStateManager.rotatef(-90F,0,1,0);;
+			GlStateManager.rotatef(angle,0,0,1);
 			render.bindTexturePublic(stand.getKatanaTexture(0));
 			this.katana1.render(null, 0, 0, 0, 0, 0, 1.0F);
 			GlStateManager.popMatrix();

@@ -1,33 +1,18 @@
 package mod.fbd.item;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.translation.I18n;
 
 public class ItemBladePiece extends Item {
 
-	public ItemBladePiece(){
-		this.setHasSubtypes(true);
+	private EnumBladePieceType pieceType;
+	public ItemBladePiece(EnumBladePieceType piece, Item.Properties property){
+		super(property);
+		pieceType = piece;
 	}
 
-	@Override
-    public String getItemStackDisplayName(ItemStack stack)
-    {
-        return I18n.translateToLocal(this.getUnlocalizedNameInefficiently(stack)+"_"+EnumBladePieceType.getFromIndex(stack.getMetadata()).getDisplayName() + ".name").trim();
-    }
-
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-    {
-        if (this.isInCreativeTab(tab))
-        {
-        	for (int i = 0;i < EnumBladePieceType.bladeNum(); i++){
-        		items.add(new ItemStack(this,1,EnumBladePieceType.getFromIndex(i).getMetaData()));
-        	}
-        }
-    }
-
+	public EnumBladePieceType getPieceType() {
+		return pieceType;
+	}
 
     public static enum EnumBladePieceType{
     	NORMAL(0,"normal",100,100,1),

@@ -1,10 +1,10 @@
 {
     "variants": {
-        "normal": { "model": "fbd:bladeforge"},
-        "frame=0": { "model": "fbd:bladeforge"},
-        "frame=1": { "model": "fbd:bladeforge_off"},
-        "frame=2": { "model": "fbd:bladeforge_on"},
-        "frame=3": { "model": "fbd:bladeforge_finish"},
-        "frame=4": { "model": "fbd:bladeforge_missing"}
+        "normal": { "model": "fbd:block/bladeforge"},
+        "frame=0": { "model": "fbd:block/bladeforge"},
+        "frame=1": { "model": "fbd:block/bladeforge_off"},
+        "frame=2": { "model": "fbd:block/bladeforge_on"},
+        "frame=3": { "model": "fbd:block/bladeforge_finish"},
+        "frame=4": { "model": "fbd:block/bladeforge_missing"}
     }
 }

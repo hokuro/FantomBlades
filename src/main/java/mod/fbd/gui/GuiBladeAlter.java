@@ -2,12 +2,11 @@ package mod.fbd.gui;
 
 import java.io.IOException;
 
-import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.inventory.ContainerBladeAlter;
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.ItemKatana;
 import mod.fbd.item.ItemKatanaNiji;
-import mod.fbd.network.Message_BladeLevelUpdate;
+import mod.fbd.network.MessageHandler;
 import mod.fbd.network.Message_BladeLevelUpdate.EnumLevelKind;
 import mod.fbd.tileentity.TileEntityBladeAlter;
 import mod.fbd.util.Enchant;
@@ -18,7 +17,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
 
 public class GuiBladeAlter extends GuiContainer {
 	private static final ResourceLocation tex = new ResourceLocation("fbd", "textures/gui/bladealter.png");
@@ -58,7 +56,7 @@ public class GuiBladeAlter extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j){
-		fontRenderer.drawString(I18n.translateToFallback("gui.bladealter.title"),8,4,4210752);
+		fontRenderer.drawString(net.minecraft.client.resources.I18n.format("gui.bladealter.title"),8,4,4210752);
         fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 5, 4210752);
 
         fontRenderer.drawString("Lv+", 11, 58, 0xFFFFFFFF);
@@ -134,7 +132,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_LVUP[0]-1) >= 0 && (k2-BUTTON_LVUP[1]-1) >= 0 && (j2-BUTTON_LVUP[0]-1) < 27 && (k2-BUTTON_LVUP[1]-1) < 13)
             {
                 // 刀レベルアップ
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_BLADE, entity.getPos()));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_BLADE, entity.getPos());
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_BLADE, entity.getPos()));
             }
         }
 
@@ -143,7 +142,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_MUGEN[0]-1) >= 0 && (k2-BUTTON_MUGEN[1]-1) >= 0 && (j2-BUTTON_MUGEN[0]-1) < 27 && (k2-BUTTON_MUGEN[1]-1) < 13)
             {
                 // 虹ランクアップ
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.NIJI, entity.getPos()));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.NIJI, entity.getPos());
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.NIJI, entity.getPos()));
             }
         }
 
@@ -152,7 +152,8 @@ public class GuiBladeAlter extends GuiContainer {
         	if ((j2-BUTTON_ENC_UP[0]-1) >= 0 && (k2-BUTTON_ENC_UP[1]-1) >= 0 && (j2-BUTTON_ENC_UP[0]-1) < 27 && (k2-BUTTON_ENC_UP[1]-1) < 13)
             {
                 // エンチャントレベルアップ
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),1));
             }
         }
 
@@ -161,7 +162,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_ENC_DOWN[0]-1) >= 0 && (k2-BUTTON_ENC_DOWN[1]-1) >= 0 && (j2-BUTTON_ENC_DOWN[0]-1) < 27 && (k2-BUTTON_ENC_DOWN[1]-1) < 13)
             {
                 // エンチャントレベルダウン
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),-1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),-1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),-1));
             }
     	}
 
@@ -170,7 +172,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_ENC_DEL[0]-1) >= 0 && (k2-BUTTON_ENC_DEL[1]-1) >= 0 && (j2-BUTTON_ENC_DEL[0]-1) < 27 && (k2-BUTTON_ENC_DEL[1]-1) < 13)
             {
                 // エンチャント削除
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),0));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),0);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),0));
             }
         }
 
@@ -179,7 +182,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_POT_UP[0]-1) >= 0 && (k2-BUTTON_POT_UP[1]-1) >= 0 && (j2-BUTTON_POT_UP[0]-1) < 27 && (k2-BUTTON_POT_UP[1]-1) < 13)
             {
             	// ポーション効果レベルアップ
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),1));
             }
     	}
 
@@ -188,7 +192,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_POT_DOWN[0]-1) >= 0 && (k2-BUTTON_POT_DOWN[1]-1) >= 0 && (j2-BUTTON_POT_DOWN[0]-1) < 27 && (k2-BUTTON_POT_DOWN[1]-1) < 13)
             {
             	// ポーション効果レベルダウン
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),-1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),-1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),-1));
             }
     	}
 
@@ -197,7 +202,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_POT_TUP[0]-1) >= 0 && (k2-BUTTON_POT_TUP[1]-1) >= 0 && (j2-BUTTON_POT_TUP[0]-1) < 27 && (k2-BUTTON_POT_TUP[1]-1) < 13)
             {
                 // ポーション効果時間延長
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),1));
             }
     	}
 
@@ -206,7 +212,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_POT_TDOWN[0]-1) >= 0 && (k2-BUTTON_POT_TDOWN[1]-1) >= 0 && (j2-BUTTON_POT_TDOWN[0]-1) < 27 && (k2-BUTTON_POT_TDOWN[1]-1) < 13)
             {
                // ポーション効果時間短縮
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),-1));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),-1);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),-1));
             }
     	}
 
@@ -215,7 +222,8 @@ public class GuiBladeAlter extends GuiContainer {
             if ((j2-BUTTON_POT_DEL[0]-1) >= 0 && (k2-BUTTON_POT_DEL[1]-1) >= 0 && (j2-BUTTON_POT_DEL[0]-1) < 27 && (k2-BUTTON_POT_DEL[1]-1) < 13)
             {
                 // ポーション効果削除
-            	Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),0));
+            	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),0);
+            	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),0));
             }
         }
 
@@ -252,16 +260,16 @@ public class GuiBladeAlter extends GuiContainer {
 
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks){
+	public void render(int mouseX, int mouseY, float partialTicks){
         this.drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y){
 		// 背景
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(tex);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;

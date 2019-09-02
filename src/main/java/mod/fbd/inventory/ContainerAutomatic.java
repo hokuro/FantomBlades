@@ -16,7 +16,7 @@ public class ContainerAutomatic  extends Container{
     {
     	automatic = gun;
     	player = playerIn;
-    	this.addSlotToContainer(new Slot(automatic, 0, 86, 65)
+    	this.addSlot(new Slot(automatic, 0, 86, 65)
 			{
 				public boolean isItemValid(ItemStack stack)
 				{
@@ -28,13 +28,13 @@ public class ContainerAutomatic  extends Container{
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
+                this.addSlot(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(player.inventory, k, 8 + k * 18, 169));
+            this.addSlot(new Slot(player.inventory, k, 8 + k * 18, 169));
         }
     }
 

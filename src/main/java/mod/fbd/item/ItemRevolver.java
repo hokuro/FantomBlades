@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mod.fbd.config.ConfigValue;
-import mod.fbd.core.ModGui;
-import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.SoundManager;
 import mod.fbd.entity.EntityBurret;
+import mod.fbd.intaractionobject.IntaractionObjectRevolver;
 import mod.fbd.inventory.InventoryRevolver;
+import mod.fbd.util.ModUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -22,6 +23,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class ItemRevolver extends Item{
 	public static final int BURRET_MAX = 6;
@@ -29,9 +31,8 @@ public class ItemRevolver extends Item{
 
 	protected InventoryRevolver inventory;
 
-	public ItemRevolver(){
-		this.maxStackSize = 1;
-        this.setMaxDamage(500);
+	public ItemRevolver(Item.Properties property){
+		super(property);
 	}
 
     protected void gunFire(ItemStack stack, World worldIn, EntityPlayer entityLiving)
@@ -49,19 +50,18 @@ public class ItemRevolver extends Item{
             }
             // 残弾を減らす
             shootBurret(stack);
-            worldIn.playSound((EntityPlayer)null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundManager.sound_gun_gunshot, SoundCategory.PLAYERS, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + ItemBurret.getGunPowder(burretStack)+1 * 0.5F);
+            worldIn.playSound((EntityPlayer)null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundManager.sound_gun_gunshot, SoundCategory.PLAYERS, 1.0F, 1.0F / (ModUtil.randomF() * 0.4F + 1.2F) + ItemBurret.getGunPowder(burretStack)+1 * 0.5F);
         }
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack stack)
+    public EnumAction getUseAction(ItemStack stack)
     {
         return EnumAction.NONE;
     }
 
-    /**
-     * Called when the equipped item is right clicked.
-     */
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
     	if (handIn == EnumHand.MAIN_HAND){
@@ -71,9 +71,14 @@ public class ItemRevolver extends Item{
     		if (getReloadTime(gunStack) <= 0){
         		if (burretStack.isEmpty()){
         			// 残弾無し
-            		if (ConfigValue.General.GunGuiAutoOpen && offHand.isEmpty()){
+            		if (ConfigValue.GENERAL.GunGuiAutoOpen() && offHand.isEmpty()){
             			// 片手が空いてるなら弾込めする
-            			playerIn.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_REVOLVER_MAINHAND, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
+            			NetworkHooks.openGui((EntityPlayerMP)playerIn,
+                    			new IntaractionObjectRevolver(EnumHand.MAIN_HAND),
+                    			(buf)->{
+            						buf.writeInt(EnumHand.MAIN_HAND.ordinal());
+            					});
+                    	//playerIn.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_REVOLVER_MAINHAND, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
             		}else if (offHand.getItem() instanceof ItemBurret){
             			// 銃弾を持ってるなら弾込め
         				ItemStack newOffHand = reload(gunStack,offHand.copy());
@@ -83,7 +88,7 @@ public class ItemRevolver extends Item{
             			// リロード時間設定(6発分)
             			setReloadTime(gunStack,RELOAD_TIME*6);
             		}else{
-            		    worldIn.playSound((EntityPlayer)null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundManager.sound_gun_noburret, SoundCategory.PLAYERS, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F));
+            		    worldIn.playSound((EntityPlayer)null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundManager.sound_gun_noburret, SoundCategory.PLAYERS, 1.0F, 1.0F / (ModUtil.randomF() * 0.4F + 1.2F));
             		}
         		}else{
         			// 残弾蟻なら弾を打つ
@@ -98,13 +103,19 @@ public class ItemRevolver extends Item{
     		// オフハンドで持っている場合GUIを開く
     		ItemStack gunStack = playerIn.getHeldItem(handIn);
     		if (gunStack.getItem() instanceof ItemRevolver && playerIn.getHeldItemMainhand().isEmpty()){
-        		playerIn.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_REVOLVER_OFFHAND, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
+    			NetworkHooks.openGui((EntityPlayerMP)playerIn,
+            			new IntaractionObjectRevolver(EnumHand.OFF_HAND),
+            			(buf)->{
+    						buf.writeInt(EnumHand.OFF_HAND.ordinal());
+    					});
+            	//playerIn.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_REVOLVER_OFFHAND, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
     		}
     		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, gunStack);
     	}
     }
 
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
+    @Override
+    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
     {
     	if (stack.getItem() instanceof ItemRevolver){
     		int time = getReloadTime(stack);
@@ -112,7 +123,7 @@ public class ItemRevolver extends Item{
     			time--;
     			setReloadTime(stack,time);
     			if (time%RELOAD_TIME == 9){
-    				worldIn.playSound((EntityPlayer)null, entityIn.posX, entityIn.posY, entityIn.posZ, SoundManager.sound_gun_reload, SoundCategory.PLAYERS, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F));
+    				worldIn.playSound((EntityPlayer)null, entityIn.posX, entityIn.posY, entityIn.posZ, SoundManager.sound_gun_reload, SoundCategory.PLAYERS, 1.0F, 1.0F / (ModUtil.randomF() * 0.4F + 1.2F));
     			}
     		}
     	}
@@ -126,14 +137,14 @@ public class ItemRevolver extends Item{
     public static int getReloadTime(ItemStack stack){
     	NBTTagCompound tag = getItemTagCompound(stack);
     	if (tag.hasKey("reloadtime")){
-    		return tag.getInteger("reloadtime");
+    		return tag.getInt("reloadtime");
     	}
     	return 0;
     }
 
     public static void setReloadTime(ItemStack stack, int value){
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	tag.setInteger("reloadtime", value);
+    	tag.setInt("reloadtime", value);
     }
 
     public static ItemStack getNextBurret(ItemStack stack){
@@ -162,7 +173,7 @@ public class ItemRevolver extends Item{
             if (i < BURRET_MAX){
                 if (!itemstack.isEmpty())
                 {
-                    nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
+                    nbttaglist.add(itemstack.write(new NBTTagCompound()));
                 }
                 itemstack = ItemStack.EMPTY;
             }
@@ -175,10 +186,10 @@ public class ItemRevolver extends Item{
     public static List<ItemStack> getBurrets(ItemStack stack){
     	List<ItemStack> retList = new ArrayList<ItemStack>();
     	NBTTagCompound tag = getItemTagCompound(stack);
-    	NBTTagList nbttaglist = tag.getTagList("burrets", 10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+    	NBTTagList nbttaglist = tag.getList("burrets", 10);
+        for (int i = 0; i < nbttaglist.size(); ++i)
         {
-            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
+            ItemStack itemstack = ItemStack.read(nbttaglist.getCompound(i));
             if (!itemstack.isEmpty())
             {
             	retList.add(itemstack);
@@ -206,11 +217,11 @@ public class ItemRevolver extends Item{
 
     public static NBTTagCompound getItemTagCompound(ItemStack stack){
 		NBTTagCompound tag;
-		if(stack.hasTagCompound()){
-			tag = stack.getTagCompound();
+		if(stack.hasTag()){
+			tag = stack.getTag();
 		}else{
 			tag = new NBTTagCompound();
-			stack.setTagCompound(tag);
+			stack.setTag(tag);
 		}
 		return tag;
 	}

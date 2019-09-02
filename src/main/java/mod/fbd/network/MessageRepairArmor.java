@@ -1,13 +1,13 @@
 package mod.fbd.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
+
 import mod.fbd.entity.mob.EntityArmorSmith;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class MessageRepairArmor  implements IMessage, IMessageHandler<MessageRepairArmor, IMessage> {
+public class MessageRepairArmor {
 
 	private EntityArmorSmith entity;
 	private int id;
@@ -16,25 +16,35 @@ public class MessageRepairArmor  implements IMessage, IMessageHandler<MessageRep
 
 	public MessageRepairArmor(EntityArmorSmith entityIn) {
 		entity = entityIn;
+		id = entityIn.getEntityId();
+	}
+
+	public MessageRepairArmor(int entid) {
+		id = entid;
 	}
 
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		id = buf.readInt();
+	public static void encode(MessageRepairArmor pkt, PacketBuffer buf)
+	{
+		buf.writeInt(pkt.id);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(entity.getEntityId());
+	public static MessageRepairArmor decode(PacketBuffer buf)
+	{
+		return new MessageRepairArmor(buf.readInt());
 	}
 
-	@Override
-	public IMessage onMessage(MessageRepairArmor message, MessageContext ctx){
-		Entity ent = ctx.getServerHandler().player.world.getEntityByID(message.id);
-		if (ent instanceof EntityArmorSmith){
-			((EntityArmorSmith)ent).repairArmor();
+	public static class Handler
+	{
+		public static void handle(final MessageRepairArmor pkt, Supplier<NetworkEvent.Context> ctx)
+		{
+			ctx.get().enqueueWork(() -> {
+				Entity ent = ctx.get().getSender().world.getEntityByID(pkt.id);
+				if (ent instanceof EntityArmorSmith){
+					((EntityArmorSmith)ent).repairArmor();
+				}
+			});
+			ctx.get().setPacketHandled(true);
 		}
-		return null;
 	}
 }

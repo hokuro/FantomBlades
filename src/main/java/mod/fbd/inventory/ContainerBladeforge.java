@@ -9,8 +9,8 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ContainerBladeforge extends Container{
 
@@ -22,7 +22,7 @@ public class ContainerBladeforge extends Container{
 	public ContainerBladeforge(IInventory player, IInventory tile){
 		entity = tile;
 		// 砂鉄
-	  	  addSlotToContainer(
+	  	  addSlot(
 				  new Slot(tile, 0, 26, 17){
 					    public boolean isItemValid(ItemStack stack)
 					    {
@@ -30,11 +30,11 @@ public class ContainerBladeforge extends Container{
 					    }
 				  });
 	  	// 木炭
-	  	  addSlotToContainer(
+	  	  addSlot(
 				  new Slot(tile, 1, 134, 17){
 					    public boolean isItemValid(ItemStack stack)
 					    {
-					        return (stack.getItem() == Items.COAL && stack.getMetadata() == 1);
+					        return (stack.getItem() == Items.COAL);
 					    }
 				  });
 
@@ -43,13 +43,13 @@ public class ContainerBladeforge extends Container{
         {
             for (int i1 = 0; i1 < 9; ++i1)
             {
-                this.addSlotToContainer(new Slot(player, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
+                this.addSlot(new Slot(player, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
             }
         }
 
         for (int l = 0; l < 9; ++l)
         {
-            this.addSlotToContainer(new Slot(player, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(player, l, 8 + l * 18, 142));
         }
 	}
 
@@ -135,7 +135,7 @@ public class ContainerBladeforge extends Container{
 	    }
 
 
-	    @SideOnly(Side.CLIENT)
+	    @OnlyIn(Dist.CLIENT)
 	    public void updateProgressBar(int id, int data)
 	    {
 	    	((TileEntityBladeforge)this.entity).setField(id, data);

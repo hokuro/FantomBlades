@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import mod.fbd.block.BlockHorizontalContainer;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.log.ModLog;
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.ItemKatana;
 import mod.fbd.item.ItemKatanaMugen;
 import mod.fbd.util.Enchant;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.registry.IRegistry;
 
 public class TileEntityBladeAlter extends TileEntity implements IInventory {
 	public static final String NAME = "bladealter";
@@ -34,8 +37,9 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 		this(EnumFacing.NORTH);
 	}
 
-	public TileEntityBladeAlter(EnumFacing face){
-		facing = face;
+	public TileEntityBladeAlter(IBlockState face){
+		this();
+		facing = face.get(BlockHorizontalContainer.FACING);
 	}
 
 	@Override
@@ -154,23 +158,26 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 		if (stack.getItem() == ItemCore.item_katana_niji || stack.getItem() == ItemCore.item_katana_mugen){
 			List<PotionEffect> work_pot = ((ItemKatana)stack.getItem()).getPotionEffects(stack);
 			pot_list = new ArrayList<PotionEffect>();
-			for (int i = 0; i < Mod_FantomBlade.swordPotion.size(); i++){
-				PotionEffect e = Mod_FantomBlade.swordPotion.get(i);
+			IRegistry.field_212631_t.forEach(potion->{
+				boolean flg = true;
 				for (PotionEffect effect : work_pot){
-					if (effect.getPotion() == e.getPotion()){
+					if (effect.getPotion() == potion){
 						pot_list.add(new PotionEffect(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
-						e = null;
+						flg = false;
 						break;
 					}
 				}
-				if (e!=null){
-					pot_list.add(new PotionEffect(e.getPotion(),e.getDuration(),e.getAmplifier()));
-				}
-			}
+//				if (flg){
+//					pot_list.add(new PotionEffect(potion,potion.,potion.getAmplifier()));
+//				}
+			});
 		}
 	}
 
 	private void makeEnchantList(ItemStack stack){
+		if (Mod_FantomBlade.swordEnchantments.size() == 0) {
+			Mod_FantomBlade.createSwordEnchant();
+		}
 		Enchantment[] ignore = ((ItemKatana)stack.getItem()).ignoreEnchantments();
 		Map<Enchantment,Integer> enchants = EnchantmentHelper.getEnchantments(stack);
 		for (Enchantment enc : Mod_FantomBlade.swordEnchantments){

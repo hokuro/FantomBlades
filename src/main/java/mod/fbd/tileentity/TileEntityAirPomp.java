@@ -21,6 +21,7 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 	private int count;
 
 	public TileEntityAirPomp(){
+		super(Mod_FantomBlade.RegistryEvents.AIRPOMP);
 		facing = EnumFacing.DOWN;
 		targetForge = null;
 		count = 30;

@@ -50,24 +50,20 @@ public class GuiGunCustomize extends GuiContainer implements IContainerListener{
         this.fontRenderer.drawString(I18n.format("container.guncustomizer"), 60, 6, 4210752);
     }
 
-    /**
-     * Draws the screen and all the components in it.
-     */
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         GlStateManager.disableLighting();
         GlStateManager.disableBlend();
     }
 
-    /**
-     * Draws the background layer of this container (behind the items).
-     */
+    @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(TEXTURE);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
@@ -77,6 +73,7 @@ public class GuiGunCustomize extends GuiContainer implements IContainerListener{
     /**
      * update the crafting window inventory with the items in the list
      */
+    @Override
     public void sendAllContents(Container containerToSend, NonNullList<ItemStack> itemsList)
     {
         this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());

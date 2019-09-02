@@ -6,8 +6,8 @@ import java.util.Map;
 import mod.fbd.core.ModCommon;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.equipmenteffect.EnchantmentCore;
+import mod.fbd.util.ModUtil;
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -15,6 +15,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -26,12 +28,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ItemKatanaGenbu extends ItemKatana {
-	public ItemKatanaGenbu(){
-		super();
+	public ItemKatanaGenbu(Item.Properties proerty){
+		super(proerty.defaultMaxDamage(200));
 		LEVELUP_EXP = 1000;
 		POTION_UP = 200;
 		ENCHANT_UP = 200;
@@ -50,8 +51,9 @@ public class ItemKatanaGenbu extends ItemKatana {
 	public int getEnchantLevelUpExp(){
 		return ENCHANT_UP;
 	}
+
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
 		int level = this.getLevel(stack);
 		int rust = this.getRustValue(stack);
 		double rust_h = (Math.exp(-1.0D*(rust/1024.0D))*(1.0D-Math.exp(-0.2D))) * (rust==0?0:1);			    // 錆補正
@@ -75,7 +77,8 @@ public class ItemKatanaGenbu extends ItemKatana {
 		attackSpeed = this.getAttackSpeed(stack) - rust_h;
 
 		// 耐久力設定
-		this.setMaxDamage(this.getGetEndurance(stack));
+		//this.setMaxDamage(this.getGetEndurance(stack));
+		ModUtil.setPrivateValue(Item.class, this, this.getGetEndurance(stack), "maxDamage");
 		if (entity instanceof EntityPlayer){
 			updateAttackAmplifier(stack,(EntityPlayer)entity);
 		}
@@ -94,34 +97,18 @@ public class ItemKatanaGenbu extends ItemKatana {
 	 public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		 ItemStack stack = playerIn.getHeldItemMainhand();
 		 if (stack.getItem() == this){
-				float f = 1.0F;
-				float f1 = playerIn.prevRotationPitch + (playerIn.rotationPitch - playerIn.prevRotationPitch) * f;
-				float f2 = playerIn.prevRotationYaw + (playerIn.rotationYaw - playerIn.prevRotationYaw) * f;
-				double d0 = playerIn.prevPosX + (playerIn.posX - playerIn.prevPosX) * (double) f;
-				double d1 = (playerIn.prevPosY + (playerIn.posY-playerIn.prevPosY) * (double)f+1.6200000000000001D) - (double) playerIn.getYOffset();
-				double d2 = playerIn.prevPosZ + (playerIn.posZ -playerIn.prevPosZ) * (double)f;
-				Vec3d vec3 = new Vec3d(d0,d1,d2);
-				float f3 = MathHelper.cos(-f2 * 0.01745329F - 3.141593F);
-				float f4 = MathHelper.sin(-f2 * 0.01745329F - 3.141593F);
-				float f5 = -MathHelper.cos(-f1 * 0.01745329F);
-				float f6 = MathHelper.sin(-f1 * 0.01745329F);
-				float f7 = f4 * f5;
-				float f8 = f6;
-				float f9 = f3 * f5;
-				double range = 5D;
-				Vec3d vec3d1 =  vec3.addVector((double)f7*range, (double)f8*range, (double)f9*range);
-				RayTraceResult movingbjectposition = worldIn.rayTraceBlocks(vec3, vec3d1,true);
+				RayTraceResult movingbjectposition = this.rayTrace(worldIn, playerIn,true);
 
 				if (movingbjectposition == null){
 					return new ActionResult(EnumActionResult.FAIL, stack);
 				}
 
 				// 目の前に溶岩がある状態で右クリックをすると、黒曜石を生成する
-				if (movingbjectposition.typeOfHit == RayTraceResult.Type.BLOCK){
+				if (movingbjectposition.type == RayTraceResult.Type.BLOCK){
 					BlockPos blockpos = movingbjectposition.getBlockPos();
 					if (worldIn.getBlockState(blockpos).getMaterial() == Material.LAVA){
-						worldIn.setBlockState(blockpos, Blocks.MAGMA.getDefaultState());
-					}else if (worldIn.getBlockState(blockpos).getBlock() == Blocks.MAGMA){
+						worldIn.setBlockState(blockpos, Blocks.MAGMA_BLOCK.getDefaultState());
+					}else if (worldIn.getBlockState(blockpos).getBlock() == Blocks.MAGMA_BLOCK){
 						worldIn.setBlockState(blockpos, Blocks.OBSIDIAN.getDefaultState());
 					}
 				}
@@ -138,12 +125,10 @@ public class ItemKatanaGenbu extends ItemKatana {
     }
 
 	 @Override
-	 public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-	 {
-		    if (this.isInCreativeTab(tab))
-		    {
-		        items.add(getDefaultStack());
-		    }
+	 public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		 if (this.isInGroup(group)) {
+			 items.add(getDefaultStack());
+		 }
 	 }
 
 	 public static ItemStack getDefaultStack(){

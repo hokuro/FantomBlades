@@ -1,6 +1,5 @@
 package mod.fbd.entity.ai;
 
-import com.google.common.base.Predicates;
 
 import mod.fbd.entity.mob.EntityBladeSmith;
 import net.minecraft.entity.Entity;
@@ -32,11 +31,12 @@ public class EntityAIWatchClosestSmith extends EntityAIWatchClosest {
 
         if (this.watchedClass == EntityPlayer.class)
         {
-            this.closestEntity = this.entity.world.getClosestPlayer(this.entity.posX, this.entity.posY, this.entity.posZ, (double)this.maxDistanceForPlayer, Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.notRiding(this.entity)));
+            this.closestEntity = this.entity.world.getClosestPlayer(this.entity.posX, this.entity.posY, this.entity.posZ, (double)this.maxDistance,
+            		EntitySelectors.NOT_SPECTATING.and(EntitySelectors.notRiding(this.entity)));
         }
         else
         {
-            this.closestEntity = this.entity.world.findNearestEntityWithinAABB(this.watchedClass, this.entity.getEntityBoundingBox().grow((double)this.maxDistanceForPlayer, 3.0D, (double)this.maxDistanceForPlayer), this.entity);
+            this.closestEntity = this.entity.world.findNearestEntityWithinAABB(this.watchedClass, this.entity.getBoundingBox().grow((double)this.maxDistance, 3.0D, (double)this.maxDistance), this.entity);
         }
 
         return this.closestEntity != null;
@@ -47,11 +47,11 @@ public class EntityAIWatchClosestSmith extends EntityAIWatchClosest {
      */
     public boolean shouldContinueExecuting()
     {
-        if (!this.closestEntity.isEntityAlive())
+        if (!this.closestEntity.isAlive())
         {
             return false;
         }
-        else if (this.entity.getDistanceSq(this.closestEntity) > (double)(this.maxDistanceForPlayer * this.maxDistanceForPlayer))
+        else if (this.entity.getDistanceSq(this.closestEntity) > (double)(this.maxDistance * this.maxDistance))
         {
             return false;
         }

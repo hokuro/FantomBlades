@@ -17,9 +17,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ContainerGunCustomizer extends Container {
     /** Here comes out item you merged and/or renamed. */
@@ -34,7 +35,7 @@ public class ContainerGunCustomizer extends Container {
 		world = worldIn;
 		player = playerIn;//
 	    this.outputSlot = new InventoryGunCustomize();
-	    this.inputSlot = new InventoryBasic("Repair", true, 2)
+	    this.inputSlot = new InventoryBasic(new TextComponentTranslation("Repair"), 2)
 	    {
 	        /**
 	         * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't
@@ -48,7 +49,7 @@ public class ContainerGunCustomizer extends Container {
 	    };
 
 
-		this.addSlotToContainer(new Slot(inputSlot, 0, 44, 17){
+		this.addSlot(new Slot(inputSlot, 0, 44, 17){
 			@Override
 	          public boolean isItemValid(ItemStack stack)
 	          {
@@ -56,46 +57,14 @@ public class ContainerGunCustomizer extends Container {
 	          }
 		});
 
-		this.addSlotToContainer(new Slot(inputSlot, 1, 44, 52){
+		this.addSlot(new Slot(inputSlot, 1, 44, 52){
 			@Override
 	          public boolean isItemValid(ItemStack stack)
 	          {
 	              return (stack.getItem() instanceof ItemBurret);
 	          }
 		});
-//		this.addSlotToContainer(new Slot(inputSlot, 2, 98, 35)
-//		{
-//			/**
-//             * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace fuel.
-//             */
-//            public boolean isItemValid(ItemStack stack)
-//            {
-//                return false;
-//            }
-//            /**
-//             * Return whether this slot's stack can be taken from this slot.
-//             */
-//            public boolean canTakeStack(EntityPlayer playerIn)
-//            {
-//                return this.getHasStack();
-//            }
-//
-//            public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack)
-//            {
-//
-//            	for (int i = 0; i < 2; i++){
-//            		ItemStack stack0 = ContainerGunCustomizer.this.inputSlot.getStackInSlot(i);
-//                	stack0.shrink(1);
-//                	if (stack0.getCount() != 0){
-//                		ContainerGunCustomizer.this.inputSlot.setInventorySlotContents(i, stack0);
-//                	}else{
-//                		ContainerGunCustomizer.this.inputSlot.setInventorySlotContents(i, ItemStack.EMPTY);
-//                	}
-//            	}
-//                return stack;
-//            }
-//		});
-		this.addSlotToContainer(new Slot(outputSlot, 2, 98, 35)
+		this.addSlot(new Slot(outputSlot, 2, 98, 35)
 		{
 			/**
              * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace fuel.
@@ -133,13 +102,13 @@ public class ContainerGunCustomizer extends Container {
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlot(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(player.inventory, k, 8 + k * 18, 142));
+            this.addSlot(new Slot(player.inventory, k, 8 + k * 18, 142));
         }
 	}
 
@@ -173,7 +142,7 @@ public class ContainerGunCustomizer extends Container {
         listener.sendWindowProperty(this, 0, 0);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void updateProgressBar(int id, int data)
     {
     }
@@ -326,7 +295,7 @@ public class ContainerGunCustomizer extends Container {
 					ret.setCount(1);
 					ItemBurret.addGunPowder(ret, 1);
 				}
-			}else if (stack0.getItem() == Items.POTIONITEM || stack0.getItem() == Items.SPLASH_POTION || stack0.getItem() == Items.LINGERING_POTION){
+			}else if (stack0.getItem() == Items.POTION || stack0.getItem() == Items.SPLASH_POTION || stack0.getItem() == Items.LINGERING_POTION){
 				if (stack1.getItem() == ItemCore.item_burret){
 					// 通常弾にポーション効果をつける
 					boolean fullmetal = ItemBurret.isFullMetal(stack1);
@@ -339,7 +308,7 @@ public class ContainerGunCustomizer extends Container {
 					ItemBurret.setCanWater(ret, inwater);
 					ItemBurret.addGunPowder(ret, powder);
 
-					if (stack0.getItem() == Items.POTIONITEM){
+					if (stack0.getItem() == Items.POTION){
 						ItemBurretPotion.setPotionType(ret, 1);
 					}else if(stack0.getItem() == Items.SPLASH_POTION){
 						ItemBurretPotion.setPotionType(ret, 2);
@@ -361,7 +330,7 @@ public class ContainerGunCustomizer extends Container {
 			new ItemStack(ItemCore.item_gunpowder_teleport),
 			new ItemStack(ItemCore.item_gunpowder_water),
 			new ItemStack(ItemCore.item_steel),
-			new ItemStack(Items.POTIONITEM),
+			new ItemStack(Items.POTION),
 			new ItemStack(Items.SPLASH_POTION),
 			new ItemStack(Items.LINGERING_POTION)};
 
@@ -374,7 +343,7 @@ public class ContainerGunCustomizer extends Container {
 				}
 			}
 			for (ItemStack valid : slot0Validate){
-				if (ModUtil.compareItemStacks(valid, stack, CompaierLevel.LEVEL_EQUAL_META)){
+				if (ModUtil.compareItemStacks(valid, stack, CompaierLevel.LEVEL_EQUAL_ITEM)){
 					return true;
 				}
 			}

@@ -1,16 +1,14 @@
 package mod.fbd.network;
 
-import io.netty.buffer.ByteBuf;
-import mod.fbd.core.Mod_FantomBlade;
+import java.util.function.Supplier;
+
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class Message_BladeStandChange implements IMessage, IMessageHandler<Message_BladeStandChange, IMessage> {
+public class Message_BladeStandChange{
 
 	private boolean isSet;
 	private BlockPos pos;
@@ -22,37 +20,41 @@ public class Message_BladeStandChange implements IMessage, IMessageHandler<Messa
 		pos =posIn;
 	}
 
+	public static void encode(Message_BladeStandChange pkt, PacketBuffer buf)
+	{
+		buf.writeBoolean(pkt.isSet);
+		buf.writeInt(pkt.pos.getX());
+		buf.writeInt(pkt.pos.getY());
+		buf.writeInt(pkt.pos.getZ());
+	}
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		isSet = buf.readBoolean();
-		pos = new BlockPos(
+	public static Message_BladeStandChange decode(PacketBuffer buf)
+	{
+		boolean isSet = buf.readBoolean();
+		BlockPos pos = new BlockPos(
 				buf.readInt(),
 				buf.readInt(),
 				buf.readInt()
 				);
-
+		return new Message_BladeStandChange(isSet,pos);
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeBoolean(isSet);
-		buf.writeInt(pos.getX());
-		buf.writeInt(pos.getY());
-		buf.writeInt(pos.getZ());
-	}
-
-	@Override
-	public IMessage onMessage(Message_BladeStandChange message, MessageContext ctx){
-		TileEntity ent = Minecraft.getMinecraft().world.getTileEntity(message.pos);
-		if (ent instanceof TileEntityBladeStand){
-			TileEntityBladeStand stand = ((TileEntityBladeStand)ent);
-			if (message.isSet){
-				stand.setKatana(Mod_FantomBlade.proxy.getEntityPlayerInstance().getHeldItemMainhand());
-			}else{
-				stand.getKatana();
-			}
+	public static class Handler
+	{
+		public static void handle(final Message_BladeStandChange pkt, Supplier<NetworkEvent.Context> ctx)
+		{
+			ctx.get().enqueueWork(() -> {
+				TileEntity ent = ctx.get().getSender().world.getTileEntity(pkt.pos);
+				if (ent instanceof TileEntityBladeStand){
+					TileEntityBladeStand stand = ((TileEntityBladeStand)ent);
+					if (pkt.isSet){
+						stand.setKatana(ctx.get().getSender().getHeldItemMainhand());
+					}else{
+						stand.getKatana();
+					}
+				}
+			});
+			ctx.get().setPacketHandled(true);
 		}
-		return null;
 	}
 }

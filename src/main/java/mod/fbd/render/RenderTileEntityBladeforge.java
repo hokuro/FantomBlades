@@ -10,17 +10,17 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderTileEntityBladeforge  extends TileEntitySpecialRenderer<TileEntityBladeforge> {
+public class RenderTileEntityBladeforge  extends TileEntityRenderer<TileEntityBladeforge> {
 	private static final ResourceLocation tex = new ResourceLocation("fbd:textures/entity/airpomp.png");
 
 	private ModelAirPomp mainModel = new ModelAirPomp();
 
 	@Override
-	public void render(TileEntityBladeforge te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(TileEntityBladeforge te, double x, double y, double z, float partialTicks, int destroyStagea) {
 		dorender((TileEntityBladeforge)te,x,y,z,64);
 
 	}
@@ -32,7 +32,7 @@ public class RenderTileEntityBladeforge  extends TileEntitySpecialRenderer<TileE
     protected void dorender(TileEntityBladeforge entityIn, double x, double y, double z, int maxDistance)
     {
     	if (!entityIn.isRun()){return;}
-		RenderManager manager = Minecraft.getMinecraft().getRenderManager();
+		RenderManager manager = Minecraft.getInstance().getRenderManager();
 		double d0 = entityIn.getDistanceSq(manager.renderViewEntity.posX,
      		   manager.renderViewEntity.posY,
      		   manager.renderViewEntity.posZ);
@@ -47,11 +47,11 @@ public class RenderTileEntityBladeforge  extends TileEntitySpecialRenderer<TileE
             BufferBuilder bufferbuilder;
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x+0.5F, y+f2, z);
-            GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(-f, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate((float)(flag1 ? -1 : 1) * f1, 1.0F, 0.0F, 0.0F);
-            GlStateManager.scale(-0.025F, -0.025F, 0.025F);
+            GlStateManager.translated(x+0.5F, y+f2, z);
+            GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
+            GlStateManager.rotatef(-f, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotatef((float)(flag1 ? -1 : 1) * f1, 1.0F, 0.0F, 0.0F);
+            GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
 //			GlStateManager.depthFunc(519);
 
 			// 下地
@@ -72,10 +72,10 @@ public class RenderTileEntityBladeforge  extends TileEntitySpecialRenderer<TileE
         GlStateManager.disableTexture2D();
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.disableAlpha();
+        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.disableAlphaTest();
         GlStateManager.shadeModel(7425);
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         tessellator = Tessellator.getInstance();
         bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
@@ -86,9 +86,9 @@ public class RenderTileEntityBladeforge  extends TileEntitySpecialRenderer<TileE
         tessellator.draw();
         GlStateManager.enableLighting();
 	    GlStateManager.disableBlend();
-	    GlStateManager.enableAlpha();
+	    GlStateManager.enableAlphaTest();
         GlStateManager.shadeModel(7424);
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         GlStateManager.enableTexture2D();
     }
 }

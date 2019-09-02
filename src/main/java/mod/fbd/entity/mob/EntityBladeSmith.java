@@ -11,13 +11,14 @@ import mod.fbd.block.BlockDummyAnvil;
 import mod.fbd.block.BlockDummyFurnce;
 import mod.fbd.config.ConfigValue;
 import mod.fbd.core.ModCommon;
-import mod.fbd.core.ModGui;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.SoundManager;
 import mod.fbd.core.log.ModLog;
 import mod.fbd.entity.ai.EntityAISmithTask;
 import mod.fbd.entity.ai.EntityAIWatchClosestSmith;
+import mod.fbd.intaractionobject.IntaractionObjectBladeSmith;
 import mod.fbd.inventory.InventorySmith;
+import mod.fbd.item.ItemBladePiece;
 import mod.fbd.item.ItemBladePiece.EnumBladePieceType;
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.ItemKatana;
@@ -27,10 +28,8 @@ import mod.fbd.item.ItemKatanaKirin;
 import mod.fbd.item.ItemKatanaNiji;
 import mod.fbd.item.ItemKatanaSeiryu;
 import mod.fbd.item.ItemKatanaSuzaku;
-import mod.fbd.item.ItemTamahagane.EnumTamahagane;
 import mod.fbd.resource.TextureInfo;
 import mod.fbd.util.ModUtil;
-import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
@@ -42,13 +41,16 @@ import net.minecraft.entity.INpc;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Particles;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.particles.BasicParticleType;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -57,17 +59,17 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class EntityBladeSmith extends EntitySmithBase implements INpc
 {
@@ -92,7 +94,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
     public EntityBladeSmith(World worldIn)
     {
-        super(worldIn);
+        super(Mod_FantomBlade.RegistryEvents.BLADESMITH, worldIn);
         this.smithInventory = new InventorySmith();
         this.setSize(0.6F, 1.95F);
     }
@@ -105,9 +107,9 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     }
 
     @Override
-    protected void applyEntityAttributes()
+    protected void registerAttributes()
     {
-        super.applyEntityAttributes();
+        super.registerAttributes();
     }
 
     private int soundCount = 100;
@@ -130,9 +132,9 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     }
 
     @Override
-    public void onUpdate()
+    public void tick()
     {
-    	super.onUpdate();
+    	super.tick();
 
     	BlockPos summonPos = Dw_SUMMONPOS();
     	if (!this.getPos().equals(summonPos)){
@@ -150,17 +152,21 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	if (!player.world.isRemote){
         	if (!Dw_ISWORK()){
         		ModLog.log().debug("open gui entity id:"+this.getEntityId());
-        		Mod_FantomBlade.proxy.setGuiTarget(this);
-        		player.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_BLADESMITH + this.getEntityId(), world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
+        		NetworkHooks.openGui((EntityPlayerMP)player,
+            			new IntaractionObjectBladeSmith(this.getEntityId()),
+            			(buf)->{
+    						buf.writeInt(this.getEntityId());
+    					});
+            	//player.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_BLADESMITH + this.getEntityId(), world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
         	}
     	}
     	return true;
     }
 
     @Override
-    protected void entityInit()
+    protected void registerData()
     {
-        super.entityInit();
+        super.registerData();
         this.dataManager.register(DW_TEXTURE,"");
         this.dataManager.register(DW_ISWORK,false);
         this.dataManager.register(DW_WORKTIMER,0);
@@ -186,9 +192,9 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound compound)
+    public void writeAdditional(NBTTagCompound compound)
     {
-        super.writeEntityToNBT(compound);
+        super.writeAdditional(compound);
 
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < this.smithInventory.getSizeInventory(); ++i)
@@ -199,8 +205,8 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
             {
 				NBTTagCompound nbttagcompound = new NBTTagCompound();
 				nbttagcompound.setByte("Slot", (byte)i);
-				itemstack.writeToNBT(nbttagcompound);
-				nbttaglist.appendTag(nbttagcompound);
+				itemstack.write(nbttagcompound);
+				nbttaglist.add(nbttagcompound);
             }
         }
         compound.setTag("InventorySmith", nbttaglist);
@@ -211,43 +217,43 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
         compound.setBoolean("isWork", Dw_ISWORK());
         if (Dw_ISWORK()){
-        	compound.setInteger("workTimer", Dw_WORKTIMER());
+        	compound.setInt("workTimer", Dw_WORKTIMER());
         }else{
-        	compound.setInteger("workTimer", 0);
+        	compound.setInt("workTimer", 0);
         }
-        compound.setInteger("nextExp", nextExp);
+        compound.setInt("nextExp", nextExp);
     }
 
 
 
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound compound)
+    public void readAdditional(NBTTagCompound compound)
     {
-        super.readEntityFromNBT(compound);
+        super.readAdditional(compound);
 
-        NBTTagList nbttaglist = compound.getTagList("InventorySmith", 10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+        NBTTagList nbttaglist = compound.getList("InventorySmith", 10);
+        for (int i = 0; i < nbttaglist.size(); ++i)
         {
-			NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+			NBTTagCompound nbttagcompound = nbttaglist.getCompound(i);
 			int j = nbttagcompound.getByte("Slot");
 
 			if (j >= 0 && j < this.smithInventory.getSizeInventory())
 			{
-				this.smithInventory.setInventorySlotContents(j, new ItemStack(nbttagcompound));
+				this.smithInventory.setInventorySlotContents(j, ItemStack.read(nbttagcompound));
 			}
         }
 
         if (compound.hasKey("texture")){
         	String file = compound.getString("texture");
-        	setCustomResourceLocation(Mod_FantomBlade.instance.TextureManager().getTexture(NAME, file));
+        	setCustomResourceLocation(Mod_FantomBlade.TextureManager().getTexture(NAME, file));
         }else{
-        	setCustomResourceLocation(Mod_FantomBlade.instance.TextureManager().getRandomTexture(NAME));
+        	setCustomResourceLocation(Mod_FantomBlade.TextureManager().getRandomTexture(NAME));
         }
 
         Dw_ISWORK(compound.getBoolean("isWork"));
-    	Dw_WORKTIMER(compound.getInteger("workTimer"));
-    	nextExp = compound.getInteger("nextExp");
+    	Dw_WORKTIMER(compound.getInt("workTimer"));
+    	nextExp = compound.getInt("nextExp");
     }
 
     public int getVerticalFaceSpeed()
@@ -268,7 +274,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
 
     @Override
-    protected boolean canDespawn()
+	public boolean canDespawn()
     {
         return false;
     }
@@ -331,11 +337,11 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     public ITextComponent getDisplayName()
     {
         Team team = this.getTeam();
-        String s = this.getCustomNameTag();
+        ITextComponent s = this.getCustomName();
 
-        if (s != null && !s.isEmpty())
+        if (s != null && !s.getFormattedText().isEmpty())
         {
-            TextComponentString textcomponentstring = new TextComponentString(ScorePlayerTeam.formatPlayerName(team, s));
+            ITextComponent textcomponentstring = ScorePlayerTeam.formatMemberName(team, s);
             textcomponentstring.getStyle().setHoverEvent(this.getHoverEvent());
             textcomponentstring.getStyle().setInsertion(this.getCachedUniqueIdString());
             return textcomponentstring;
@@ -350,20 +356,20 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void handleStatusUpdate(byte id)
     {
         if (id == 12)
         {
-            this.spawnParticles(EnumParticleTypes.HEART);
+            this.spawnParticles(Particles.HEART);
         }
         else if (id == 13)
         {
-            this.spawnParticles(EnumParticleTypes.VILLAGER_ANGRY);
+            this.spawnParticles(Particles.ANGRY_VILLAGER);
         }
         else if (id == 14)
         {
-            this.spawnParticles(EnumParticleTypes.VILLAGER_HAPPY);
+            this.spawnParticles(Particles.HAPPY_VILLAGER);
         }
         else
         {
@@ -371,8 +377,8 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    private void spawnParticles(EnumParticleTypes particleType)
+    @OnlyIn(Dist.CLIENT)
+    private void spawnParticles(BasicParticleType particleType)
     {
         for (int i = 0; i < 5; ++i)
         {
@@ -385,14 +391,13 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
     @Override
     @Nullable
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata)
-    {
-        return this.finalizeMobSpawn(difficulty, livingdata, true);
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData entityLivingData, @Nullable NBTTagCompound itemNbt) {
+        return this.finalizeMobSpawn(difficulty, entityLivingData, true, itemNbt);
     }
 
-    public IEntityLivingData finalizeMobSpawn(DifficultyInstance p_190672_1_, @Nullable IEntityLivingData p_190672_2_, boolean p_190672_3_)
+    public IEntityLivingData finalizeMobSpawn(DifficultyInstance p_190672_1_, @Nullable IEntityLivingData p_190672_2_, boolean p_190672_3_, @Nullable NBTTagCompound itemNbt)
     {
-        p_190672_2_ = super.onInitialSpawn(p_190672_1_, p_190672_2_);
+        p_190672_2_ = super.onInitialSpawn(p_190672_1_, p_190672_2_, itemNbt);
         return p_190672_2_;
     }
 
@@ -430,41 +435,41 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
     	IBlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
     	}else if (state.getBlock() == Blocks.FURNACE){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
     	}
 
     	pos1 = pos.offset(EnumFacing.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
     	}else if (state.getBlock() == Blocks.FURNACE){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
     	}
 
     	pos1 = pos.offset(EnumFacing.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
     	}else if (state.getBlock() == Blocks.FURNACE){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
     	}
 
     	pos1 = pos.offset(EnumFacing.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
     	}else if (state.getBlock() == Blocks.FURNACE){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
     	}
 
     	// パラメータを設定
@@ -488,18 +493,18 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
     	IBlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		if (state.getValue(BlockDummyAnvil.FACING) != EnumFacing.EAST){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.EAST));
+    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.EAST){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		if (state.getValue(BlockDummyFurnce.FACING) != EnumFacing.SOUTH){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.SOUTH){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.getValue(BlockCauldron.LEVEL) == 3){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE){
     		flag_crafting = true;
@@ -508,18 +513,18 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	pos1 = pos.offset(EnumFacing.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.getValue(BlockDummyAnvil.FACING) != EnumFacing.WEST){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.WEST));
+    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.WEST){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.getValue(BlockDummyFurnce.FACING) != EnumFacing.NORTH){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.NORTH){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.getValue(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
@@ -528,18 +533,18 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	pos1 = pos.offset(EnumFacing.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.getValue(BlockDummyAnvil.FACING) != EnumFacing.NORTH){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.NORTH){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.getValue(BlockDummyFurnce.FACING) != EnumFacing.WEST){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.WEST));
+    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.WEST){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.getValue(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
@@ -548,18 +553,18 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	pos1 = pos.offset(EnumFacing.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.getValue(BlockDummyAnvil.FACING) != EnumFacing.SOUTH){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.SOUTH){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.getValue(BlockDummyFurnce.FACING) != EnumFacing.EAST){
-        		world.setBlockToAir(pos1);
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.EAST));
+    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.EAST){
+        		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.getValue(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
@@ -575,52 +580,52 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
     	IBlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
     	}else if (state.getBlock() == Blocks.CAULDRON){
-    		world.setBlockToAir(pos1);
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
     	pos1 = pos.offset(EnumFacing.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
     	}else if (state.getBlock() == Blocks.CAULDRON){
-    		world.setBlockToAir(pos1);
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
     	pos1 = pos.offset(EnumFacing.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
     	}else if (state.getBlock() == Blocks.CAULDRON){
-    		world.setBlockToAir(pos1);
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
     	pos1 = pos.offset(EnumFacing.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().withProperty(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		world.setBlockToAir(pos1);
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().withProperty(BlockDummyFurnce.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
     	}else if (state.getBlock() == Blocks.CAULDRON){
-    		world.setBlockToAir(pos1);
+    		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
@@ -642,7 +647,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
 		// 作成に使ったアイテムをクリア
 		for (int i = 0; i < clear; i++){
-			if (this.smithInventory.getStackInSlot(i).getItem() == ItemCore.item_tamahagane && this.smithInventory.getStackInSlot(i).getMetadata() != 0){
+			if (this.smithInventory.getStackInSlot(i).getItem() == ItemCore.item_tamahagane){
 				// 玉鋼は最高等級以外刀の作成に使わない
 				continue;
 			}
@@ -652,9 +657,9 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 		// 使った道具を破損させる
 		for (int i = 3; i < this.smithInventory.getSizeInventory(); i++){
 			ItemStack stack = this.smithInventory.getStackInSlot(i);
-			if (stack.isItemStackDamageable()){
+			if (stack.isDamageable()){
 				stack.damageItem(1, this);
-				if (stack.getItemDamage() == 0){
+				if (stack.getDamage() == 0){
 					// 道具が壊れた
 					this.smithInventory.setInventorySlotContents(i, ItemStack.EMPTY);
 				}
@@ -686,16 +691,16 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 
 		IBlockState swap;
 		BlockPos furnace_pos = pos2;;
-		if ((state1.getBlock() == Blocks.ANVIL && state1.getValue(BlockAnvil.DAMAGE) == 0)){
+		if ((state1.getBlock() == Blocks.ANVIL)){
 			// 何もしない
-		}else if (state2.getBlock() == Blocks.ANVIL && state2.getValue(BlockAnvil.DAMAGE) == 0){
+		}else if (state2.getBlock() == Blocks.ANVIL){
 			swap = state1;
 			state1 = state2;
 			state2 = state3;
 			state3 = state4;
 			state4 = swap;
 			furnace_pos = pos3;
-		}else if (state3.getBlock() == Blocks.ANVIL && state3.getValue(BlockAnvil.DAMAGE) == 0){
+		}else if (state3.getBlock() == Blocks.ANVIL){
 			swap = state1;
 			state1 = state3;
 			state3 = swap;
@@ -703,7 +708,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 			state4 = state2;
 			state2 = swap;
 			furnace_pos = pos4;
-		}else if (state4.getBlock() == Blocks.ANVIL && state4.getValue(BlockAnvil.DAMAGE) == 0){
+		}else if (state4.getBlock() == Blocks.ANVIL){
 			swap = state1;
 			state1 = state4;
 			state4 = state3;
@@ -741,7 +746,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 			}catch(Exception ex){}
 
 			// 大釜に水が入っているか?
-			if (ret && state4.getValue(BlockCauldron.LEVEL) != 3){
+			if (ret && state4.get(BlockCauldron.LEVEL) != 3){
 				ret = false;
 			}
 
@@ -765,7 +770,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 	}
 
 	public TextureInfo getTexture(){
-		return Mod_FantomBlade.instance.TextureManager().getTexture(NAME, Dw_Texture());
+		return Mod_FantomBlade.TextureManager().getTexture(NAME, Dw_Texture());
 	}
 
 	public void setCustomResourceLocation(TextureInfo txture ){
@@ -852,7 +857,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 				// 特殊刀ができる確率を計算 最大70%
 				if (Math.min(level/10.0F*5.0F, 70.0F) >= ModUtil.random(101)){
 					exblade = true;
-					makeItem = EnumBladePieceType.getFromIndex(piece.getMetadata());
+					makeItem = EnumBladePieceType.getFromIndex(((ItemBladePiece)piece.getItem()).getPieceType().getIndex());
 
 				}
 			}
@@ -904,46 +909,46 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 			// 攻撃力補正(なし)
 			// 攻撃速度補正(なし)
 			// 玉鋼のランクによる力ランク補正
-			if (tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+//			if (tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
 				// スピード補正(速度を0.0~0.9の範囲で下げる)
 				attackSpeed = MathHelper.clamp(attackSpeed + ModUtil.random(10)/10, -3.0F, -0.5F);
 				// 耐久度補正(玉鋼の数の10倍の耐久力)
 				endurance = endurance + tamahagane.getCount() * 10;
 				// 耐久度補正(1.2倍)
 				endurance = endurance *1.2F;
-			}else if (tamahagane.getMetadata() == EnumTamahagane.SECOND_GRADE.getIndex()){
-				// セカンドランク
-				//　最大レベル補正(最大レベルを0～10の範囲で下げる)
-				maxLevel = Math.min(level - ModUtil.random(11), 1);
-				// 攻撃力補正
-				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.1F)/10.0F;
-				//　スピード補正(何もしない)
-				// 耐久度補正(何もしない)
-				// 耐久度補正(玉鋼の数の10倍の耐久力)
-				endurance = endurance + tamahagane.getCount() * 5;
-			}else if(tamahagane.getMetadata() == EnumTamahagane.THERD_GRADE.getIndex()){
-				//　最大レベル補正(最大レベルを10～30の範囲で下げる)
-				maxLevel = Math.min(level - ModUtil.random(31)+10, 1);
-				// 攻撃力補正
-				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.5F)/10.0F;
-				// スピード補正(速度を0.0~0.9の範囲で上げる)
-				attackSpeed = MathHelper.clamp(attackSpeed - ModUtil.random(10)/10, -3.0F, -0.5F);
-				// 耐久度補正(玉鋼の数の10倍の耐久力)
-				endurance = endurance + tamahagane.getCount() * 3;
-				// 耐久度補正(0.8倍)
-				endurance = endurance *0.8F;
-			}else{
-				//　最大レベル補正(レベル上げを不可にする)
-				maxLevel = 1;
-				// 攻撃力補正
-				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.7F)/10.0F;
-				// スピード補正(速度を1.0~1.9の範囲で上げる)
-				attackSpeed = MathHelper.clamp(attackSpeed -1.0F - ModUtil.random(10)/10, -3.0F, -0.5F);
-				// 耐久度補正(玉鋼の数の3倍の耐久力が減る)
-				endurance = endurance - tamahagane.getCount() * 3;
-				// 耐久度補正(0.5倍)
-				endurance = endurance *0.5F;
-			}
+//			}else if (tamahagane.getMetadata() == EnumTamahagane.SECOND_GRADE.getIndex()){
+//				// セカンドランク
+//				//　最大レベル補正(最大レベルを0～10の範囲で下げる)
+//				maxLevel = Math.min(level - ModUtil.random(11), 1);
+//				// 攻撃力補正
+//				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.1F)/10.0F;
+//				//　スピード補正(何もしない)
+//				// 耐久度補正(何もしない)
+//				// 耐久度補正(玉鋼の数の10倍の耐久力)
+//				endurance = endurance + tamahagane.getCount() * 5;
+//			}else if(tamahagane.getMetadata() == EnumTamahagane.THERD_GRADE.getIndex()){
+//				//　最大レベル補正(最大レベルを10～30の範囲で下げる)
+//				maxLevel = Math.min(level - ModUtil.random(31)+10, 1);
+//				// 攻撃力補正
+//				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.5F)/10.0F;
+//				// スピード補正(速度を0.0~0.9の範囲で上げる)
+//				attackSpeed = MathHelper.clamp(attackSpeed - ModUtil.random(10)/10, -3.0F, -0.5F);
+//				// 耐久度補正(玉鋼の数の10倍の耐久力)
+//				endurance = endurance + tamahagane.getCount() * 3;
+//				// 耐久度補正(0.8倍)
+//				endurance = endurance *0.8F;
+//			}else{
+//				//　最大レベル補正(レベル上げを不可にする)
+//				maxLevel = 1;
+//				// 攻撃力補正
+//				attackDamage = attackDamage - ((ModUtil.random(10)+1)*0.7F)/10.0F;
+//				// スピード補正(速度を1.0~1.9の範囲で上げる)
+//				attackSpeed = MathHelper.clamp(attackSpeed -1.0F - ModUtil.random(10)/10, -3.0F, -0.5F);
+//				// 耐久度補正(玉鋼の数の3倍の耐久力が減る)
+//				endurance = endurance - tamahagane.getCount() * 3;
+//				// 耐久度補正(0.5倍)
+//				endurance = endurance *0.5F;
+//			}
 			ret = new ItemStack(ItemCore.item_katana);
 			ItemKatana.setMaxLevel(ret,(int)maxLevel);
 			ItemKatana.setAttackDamage(ret,attackDamage);
@@ -953,15 +958,15 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
 			ItemKatana.setRustValue(ret, 0);
 
 			// ポーション効果とエンチャントは最上級玉鋼を使用した場合のみ付加する
-			if (level > 10 && tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+			if (level > 10){
 				setPotionEffect(ret,level,tamahagane.getCount());
 			}
-			if (level > 5 && tamahagane.getMetadata() == EnumTamahagane.FIRST_GRADE.getIndex()){
+			if (level > 5){
 				setEnchant(ret,level,tamahagane.getCount());
 			}
-			String bladeName = ConfigValue.General.getRandomName();
+			String bladeName = ConfigValue.GENERAL.getRandomName();
 			if (bladeName != null){
-				ret.setStackDisplayName(bladeName);
+				ret.setDisplayName(new TextComponentTranslation(bladeName));
 			}
 
 		}
@@ -1128,7 +1133,7 @@ public class EntityBladeSmith extends EntitySmithBase implements INpc
     	return katana;
     }
 
-    private static final ItemKatana dummyKatana = new ItemKatana().setEnchantable(true);
+    private static final ItemKatana dummyKatana = new ItemKatana(new Item.Properties());
     private static final ItemStack enchantedDummy = new ItemStack(dummyKatana);
     private ItemStack setEnchant(ItemStack katana, int level, int t1){
     	List<ItemStack> p = this.smithInventory.getPotions();

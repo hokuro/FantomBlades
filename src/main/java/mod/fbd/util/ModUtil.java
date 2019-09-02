@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 public class ModUtil {
 	public static enum CompaierLevel{
 		LEVEL_EQUAL_ITEM,
-		LEVEL_EQUAL_META,
 		LEVEL_EQUAL_COUNT,
 		LEVEL_EQUAL_ALL
 	};
@@ -21,7 +20,7 @@ public class ModUtil {
 		if (stack1 == null){return false;}
 		if (stack2 == null){return false;}
 		if (stack1.isEmpty() && stack2.isEmpty()){return true;}
-		return (stack2.getItem() == stack1.getItem() && (stack2.getMetadata() == 32767 || stack2.getMetadata() == stack1.getMetadata()));
+		return (stack2.getItem() == stack1.getItem() );
 	}
 
 	public static boolean compareItemStacks(ItemStack stack1, ItemStack stack2, CompaierLevel level){
@@ -33,7 +32,6 @@ public class ModUtil {
 		switch(level){
 		case LEVEL_EQUAL_ALL:
 			ret = ((stack1.getItem() == stack2.getItem()) &&
-					stack1.getMetadata() == stack2.getMetadata() &&
 					stack1.getCount() == stack2.getCount());
 			break;
 		case LEVEL_EQUAL_COUNT:
@@ -42,10 +40,6 @@ public class ModUtil {
 			break;
 		case LEVEL_EQUAL_ITEM:
 			ret = ((stack1.getItem() == stack2.getItem()));
-			break;
-		case LEVEL_EQUAL_META:
-			ret = ((stack1.getItem() == stack2.getItem()) &&
-					stack1.getMetadata() == stack2.getMetadata());
 			break;
 		default:
 			break;
@@ -79,7 +73,7 @@ public class ModUtil {
 
         while (!stack.isEmpty())
         {
-            EntityItem entityitem = new EntityItem(worldIn, x + (double)f, y + (double)f1, z + (double)f2, stack.splitStack(RANDOM.nextInt(21) + 10));
+            EntityItem entityitem = new EntityItem(worldIn, x + (double)f, y + (double)f1, z + (double)f2, stack.split(RANDOM.nextInt(21) + 10));
             float f3 = 0.05F;
             entityitem.motionX = RANDOM.nextGaussian() * 0.05000000074505806D;
             entityitem.motionY = RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D;
@@ -98,7 +92,7 @@ public class ModUtil {
 	 */
 	public static int random(int n) {
 		if (n == 0){return 0;}
-		Random rand = Mod_FantomBlade.instance.rnd;
+		Random rand = Mod_FantomBlade.rnd;
 		if ( rand == null){
 			rand = new Random();
 			rand.setSeed(System.currentTimeMillis() + Runtime.getRuntime().freeMemory());
@@ -127,12 +121,26 @@ public class ModUtil {
 	 * @return
 	 */
 	public static double randomD() {
-		Random rand = Mod_FantomBlade.instance.rnd;
+		Random rand = Mod_FantomBlade.rnd;
 		if ( rand == null){
 			rand = new Random();
 			rand.setSeed(System.currentTimeMillis() + Runtime.getRuntime().freeMemory());
 		}
 	    return rand.nextDouble();
+	}
+
+	/**
+	 * 0～n-1の範囲の乱数を取り出す
+	 * @param n
+	 * @return
+	 */
+	public static float randomF() {
+		Random rand = Mod_FantomBlade.rnd;
+		if ( rand == null){
+			rand = new Random();
+			rand.setSeed(System.currentTimeMillis() + Runtime.getRuntime().freeMemory());
+		}
+	    return rand.nextFloat();
 	}
 
 	/**
@@ -159,15 +167,12 @@ public class ModUtil {
 		return crlf;
 	}
 
-	public static <T, E> T getPrivateValue(Class<? super E> classToAccess, E instance, String ... fieldNames)
+	public static <T, E> T getPrivateValue(Class<? super E> classToAccess, E instance, String fieldNames)
     {
 		return ObfuscationReflectionHelper.getPrivateValue(classToAccess, instance, fieldNames);
     }
 
-	public static <E> void setPrivateValue(Class<? super E> classToAccess, E instance, Object value, String ... fieldNames){
+	public static <E> void setPrivateValue(Class<? super E> classToAccess, E instance, Object value, String fieldNames){
 		ObfuscationReflectionHelper.setPrivateValue(classToAccess, instance, value, fieldNames);
 	}
-
-
-
 }

@@ -4,31 +4,16 @@ import mod.fbd.core.ModCommon;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionType;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class PotionCore {
-	public static Potion seiryupotion;
-	public static PotionType seiryupotiontype;
+	public static Potion seiryupotion = new PotionSlipDamage().setRegistryName(ModCommon.MOD_ID, "slipdamage");
+	public static PotionType seiryupotiontype = new PotionType().setRegistryName(ModCommon.MOD_ID, "slipdamagetype");
 
-	private static void initPotion(){
-		seiryupotion = new PotionSlipDamage().setRegistryName(ModCommon.MOD_ID, "slipdamage");
-
-
-	}
-	private static void initPotionType(){
-		seiryupotiontype = new PotionType().setRegistryName(ModCommon.MOD_ID, "slipdamagetype");
-	}
-
-    @SubscribeEvent
-    protected static void registerPotions(RegistryEvent.Register<Potion> event){
-    	initPotion();
+    public static void registerPotion(RegistryEvent.Register<Potion> event){
     	event.getRegistry().register(seiryupotion);
     }
 
-
-    @SubscribeEvent
-    protected static void registerPotionTypes(RegistryEvent.Register<PotionType> event){
-    	initPotionType();
+    public static void registerType(RegistryEvent.Register<PotionType> event){
     	event.getRegistry().register(seiryupotiontype);
     }
 }

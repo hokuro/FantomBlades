@@ -3,7 +3,7 @@ package mod.fbd.world.village;
 import java.util.List;
 import java.util.Random;
 
-import mod.fbd.core.ModRegister;
+import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.util.ModUtil;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
@@ -11,39 +11,38 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.StructureVillagePieces;
-import net.minecraft.world.gen.structure.StructureVillagePieces.Village;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.VillagePieces;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 
-public class ComponentVillageGunSmithHouse extends Village {
+public class ComponentVillageGunSmithHouse extends VillagePieces.Village {
 	public ComponentVillageGunSmithHouse()
     {
     }
 
-    public ComponentVillageGunSmithHouse(StructureVillagePieces.Start start, int type, Random rand, StructureBoundingBox p_i45561_4_, EnumFacing facing)
+    public ComponentVillageGunSmithHouse(VillagePieces.Start start, int type, Random rand, MutableBoundingBox p_i45561_4_, EnumFacing facing)
     {
         super(start, type);
         this.setCoordBaseMode(facing);
         this.boundingBox = p_i45561_4_;
     }
 
-    public static ComponentVillageGunSmithHouse createPiece(StructureVillagePieces.Start start, List<StructureComponent> p_175849_1_, Random rand, int x, int y, int z, EnumFacing facing, int tp)
-    {
-    	StructureBoundingBox structureboundingbox = StructureBoundingBox.getComponentToAddBoundingBox(x, y, z, 0, 0, 0, 9, 7, 12, facing);
-        return canVillageGoDeeper(structureboundingbox) && StructureComponent.findIntersecting(p_175849_1_, structureboundingbox) == null ? new ComponentVillageGunSmithHouse(start, tp, rand, structureboundingbox, facing) : null;
+
+    public static ComponentVillageGunSmithHouse createPiece(VillagePieces.Start start, List<StructurePiece> p_175853_1_, Random rand, int x, int y, int z, EnumFacing facing, int tp) {
+        MutableBoundingBox structureboundingbox = MutableBoundingBox.getComponentToAddBoundingBox(x, y, z, 0, 0, 0, 9, 7, 12, facing);
+        return canVillageGoDeeper(structureboundingbox) && StructurePiece.findIntersecting(p_175853_1_, structureboundingbox) == null ? new ComponentVillageGunSmithHouse(start, tp, rand, structureboundingbox, facing) : null;
     }
 
-
     @Override
-    public void buildComponent(StructureComponent componentIn, List<StructureComponent> listIn, Random rand){
+    public void buildComponent(StructurePiece componentIn, List<StructurePiece> listIn, Random rand){
     	super.buildComponent(componentIn, listIn, rand);
     }
 
     @Override
-    public boolean addComponentParts(World worldIn, Random randomIn, StructureBoundingBox structureBoundingBoxIn)
+    public boolean addComponentParts(IWorld worldIn, Random randomIn, MutableBoundingBox structureBoundingBoxIn, ChunkPos p_74875_4_)
     {
         if (this.averageGroundLvl < 0)
         {
@@ -57,12 +56,12 @@ public class ComponentVillageGunSmithHouse extends Village {
             this.boundingBox.offset(0, this.averageGroundLvl - this.boundingBox.maxY + 7 - 1, 0);
         }
 
-        IBlockState iblockstate = this.getBiomeSpecificBlockState(Blocks.STONEBRICK.getDefaultState());
-        IBlockState iblockstate1 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH));
-        IBlockState iblockstate2 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH));
-        IBlockState iblockstate3 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST));
-        IBlockState iblockstate4 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST));
-        IBlockState iblockstate5 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK.getDefaultState());
+        IBlockState iblockstate = this.getBiomeSpecificBlockState(Blocks.STONE_BRICKS.getDefaultState());
+        IBlockState iblockstate1 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(BlockStairs.FACING, EnumFacing.NORTH));
+        IBlockState iblockstate2 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(BlockStairs.FACING, EnumFacing.SOUTH));
+        IBlockState iblockstate3 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(BlockStairs.FACING, EnumFacing.EAST));
+        IBlockState iblockstate4 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(BlockStairs.FACING, EnumFacing.WEST));
+        IBlockState iblockstate5 = this.getBiomeSpecificBlockState(Blocks.NETHER_BRICKS.getDefaultState());
         IBlockState iblockstate6 = this.getBiomeSpecificBlockState(Blocks.IRON_BARS.getDefaultState());
         this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 1, 1, 7, 4, 4, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
         this.fillWithBlocks(worldIn, structureBoundingBoxIn, 2, 1, 6, 8, 4, 10, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
@@ -130,7 +129,7 @@ public class ComponentVillageGunSmithHouse extends Village {
             }
         }
 
-        EnumDyeColor glassColor = EnumDyeColor.byMetadata(ModUtil.random(16));
+        EnumDyeColor glassColor = EnumDyeColor.byId(ModUtil.random(16));
         this.setBlockState(worldIn, iblockstate6, 0, 2, 1, structureBoundingBoxIn);
         this.setBlockState(worldIn, iblockstate6, 0, 2, 4, structureBoundingBoxIn);
         this.setBlockState(worldIn, Blocks.IRON_BARS.getDefaultState(), 0, 2, 2, structureBoundingBoxIn);
@@ -196,6 +195,6 @@ public class ComponentVillageGunSmithHouse extends Village {
     @Override
     protected int chooseProfession(int villagersSpawnedIn, int currentVillagerProfession)
     {
-        return VillagerRegistry.getId(ModRegister.gunSmith);
+        return VillagerRegistry.getId(Mod_FantomBlade.gunSmith);
     }
 }

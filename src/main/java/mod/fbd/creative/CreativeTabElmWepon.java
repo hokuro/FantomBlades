@@ -1,27 +1,16 @@
 package mod.fbd.creative;
 
-import net.minecraft.creativetab.CreativeTabs;
+import mod.fbd.item.ItemCore;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CreativeTabElmWepon  extends CreativeTabs {
+public class CreativeTabElmWepon  extends ItemGroup {
 	public CreativeTabElmWepon(String label){
 		super(label);
 	}
 
-	@SideOnly(Side.CLIENT)
-	public String getTranslatedTabLabel(){
-		return "factory box";
-	}
-
 	@Override
-	public ItemStack getTabIconItem() {
-		return new ItemStack(mod.fbd.block.BlockCore.block_bladealter);
-	}
-
-	@SideOnly(Side.CLIENT)
-	public int getIconItemDamage(){
-		return 8;
+	public ItemStack createIcon() {
+		return new ItemStack(ItemCore.item_katana);
 	}
 }

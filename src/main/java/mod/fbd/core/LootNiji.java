@@ -2,7 +2,6 @@ package mod.fbd.core;
 
 import java.util.Random;
 
-import mod.fbd.item.ItemBladePiece.EnumBladePieceType;
 import mod.fbd.item.ItemCore;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.storage.loot.LootContext;
@@ -20,6 +19,6 @@ public class LootNiji extends LootFunction {
 
     public ItemStack apply(ItemStack stack, Random rand, LootContext context)
     {
-        return new ItemStack(ItemCore.item_katana_niji,this.countRange.generateInt(rand), EnumBladePieceType.NIJI.getIndex());
+        return new ItemStack(ItemCore.item_katana_niji,this.countRange.generateInt(rand));
     }
 }

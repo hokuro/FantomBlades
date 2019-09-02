@@ -1,9 +1,9 @@
 {
     "variants": {
-        "facing=north": { "model": "fbd:bladestandt2"},
-        "facing=south": { "model": "fbd:bladestandt2", "y": 180 },
-        "facing=west":  { "model": "fbd:bladestandt2", "y": 270 },
-        "facing=east":  { "model": "fbd:bladestandt2", "y": 90 }
+        "facing=north": { "model": "fbd:block/bladestandt2"},
+        "facing=south": { "model": "fbd:block/bladestandt2", "y": 180 },
+        "facing=west":  { "model": "fbd:block/bladestandt2", "y": 270 },
+        "facing=east":  { "model": "fbd:block/bladestandt2", "y": 90 }
     }
 }
 
