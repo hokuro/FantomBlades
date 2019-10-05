@@ -1,13 +1,20 @@
 package mod.fbd.block;
 
-import mod.fbd.intaractionobject.IntaractionObjectGunCustomizer;
+import javax.annotation.Nullable;
+
+import mod.fbd.inventory.ContainerGunCustomizer;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -18,17 +25,27 @@ public class BlockGunCustomizer extends Block {
 	}
 
 	@Override
-	public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote){
 			// GUI表示
-    		NetworkHooks.openGui((EntityPlayerMP)playerIn,
-        			new IntaractionObjectGunCustomizer(),
+    		NetworkHooks.openGui((ServerPlayerEntity)playerIn,
+        			new INamedContainerProvider() {
+    					@Override
+    					@Nullable
+    					public Container createMenu(int id, PlayerInventory playerInv, PlayerEntity player) {
+    						return new ContainerGunCustomizer(id, playerInv);
+    					}
+
+    					@Override
+    					public ITextComponent getDisplayName() {
+    						return new TranslationTextComponent("container.bladeforge");
+    					}
+    				},
         			(buf)->{
 						buf.writeInt(pos.getX());
 						buf.writeInt(pos.getY());
 						buf.writeInt(pos.getZ());
 					});
-        	//playerIn.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_GUNCUSTOMAIZER, worldIn, (int)hitX, (int)hitY, (int)hitZ);
 		}
         return false;
     }

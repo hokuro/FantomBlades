@@ -14,63 +14,63 @@ package net.minecraft.src;
 public class ModelNew extends ModelBase
 {
   //fields
-    ModelRenderer bottom;
-    ModelRenderer front;
-    ModelRenderer back;
-    ModelRenderer side1;
-    ModelRenderer side2;
-    ModelRenderer top;
-    ModelRenderer pomp1;
-    ModelRenderer pomp2;
+    RendererModel bottom;
+    RendererModel front;
+    RendererModel back;
+    RendererModel side1;
+    RendererModel side2;
+    RendererModel top;
+    RendererModel pomp1;
+    RendererModel pomp2;
   
   public ModelNew()
   {
     textureWidth = 128;
     textureHeight = 64;
     
-      bottom = new ModelRenderer(this, 49, 0);
+      bottom = new RendererModel(this, 49, 0);
       bottom.addBox(-3F, 0F, -7F, 10, 1, 14);
       bottom.setRotationPoint(0F, 0F, 0F);
       bottom.setTextureSize(128, 64);
       bottom.mirror = true;
       setRotation(bottom, 0F, 0F, 0F);
-      front = new ModelRenderer(this, 0, 42);
+      front = new RendererModel(this, 0, 42);
       front.addBox(-3F, -8F, -8F, 10, 9, 1);
       front.setRotationPoint(0F, 0F, 0F);
       front.setTextureSize(128, 64);
       front.mirror = true;
       setRotation(front, 0F, 0F, 0F);
-      back = new ModelRenderer(this, 23, 42);
+      back = new RendererModel(this, 23, 42);
       back.addBox(-3F, -8F, 7F, 10, 9, 1);
       back.setRotationPoint(0F, 0F, 0F);
       back.setTextureSize(128, 64);
       back.mirror = true;
       setRotation(back, 0F, 0F, 0F);
-      side1 = new ModelRenderer(this, 0, 16);
+      side1 = new RendererModel(this, 0, 16);
       side1.addBox(7F, -8F, -8F, 1, 9, 16);
       side1.setRotationPoint(0F, 0F, 0F);
       side1.setTextureSize(128, 64);
       side1.mirror = true;
       setRotation(side1, 0F, 0F, 0F);
-      side2 = new ModelRenderer(this, 35, 16);
+      side2 = new RendererModel(this, 35, 16);
       side2.addBox(-4F, -8F, -8F, 1, 9, 16);
       side2.setRotationPoint(0F, 0F, 0F);
       side2.setTextureSize(128, 64);
       side2.mirror = true;
       setRotation(side2, 0F, 0F, 0F);
-      top = new ModelRenderer(this, 0, 0);
+      top = new RendererModel(this, 0, 0);
       top.addBox(-3F, 0F, -7F, 10, 1, 14);
       top.setRotationPoint(0F, -7F, 0F);
       top.setTextureSize(128, 64);
       top.mirror = true;
       setRotation(top, 0F, 0F, 0F);
-      pomp1 = new ModelRenderer(this, 46, 42);
+      pomp1 = new RendererModel(this, 46, 42);
       pomp1.addBox(-6F, -1F, -1F, 2, 2, 3);
       pomp1.setRotationPoint(0F, 0F, 0F);
       pomp1.setTextureSize(128, 64);
       pomp1.mirror = true;
       setRotation(pomp1, 0F, 0F, 0F);
-      pomp2 = new ModelRenderer(this, 46, 48);
+      pomp2 = new RendererModel(this, 46, 48);
       pomp2.addBox(-7F, 0F, 0F, 1, 1, 1);
       pomp2.setRotationPoint(0F, 0F, 0F);
       pomp2.setTextureSize(128, 64);
@@ -92,7 +92,7 @@ public class ModelNew extends ModelBase
     pomp2.render(f5);
   }
   
-  private void setRotation(ModelRenderer model, float x, float y, float z)
+  private void setRotation(RendererModel model, float x, float y, float z)
   {
     model.rotateAngleX = x;
     model.rotateAngleY = y;

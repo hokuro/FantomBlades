@@ -1,16 +1,18 @@
 package mod.fbd.entity.mob;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
-public abstract class EntityElmBase extends EntityCreature{
+public abstract class EntityElmBase extends CreatureEntity {
 
 	/**************************************************************/
 	/** DataWatcher                                              **/
@@ -35,18 +37,14 @@ public abstract class EntityElmBase extends EntityCreature{
 	public int Dw_Exp(){
 		return this.dataManager.get(DW_EXP);
 	}
-
-
     private int homeWorld;
 
-    public EntityElmBase(EntityType<?> etype, World worldIn)
-    {
+    public EntityElmBase(EntityType<? extends CreatureEntity> etype, World worldIn) {
         super(etype, worldIn);
     }
 
     @Override
-    protected void registerData()
-    {
+    protected void registerData(){
         super.registerData();
         this.dataManager.register(DW_SUMMONPOS, new BlockPos(0,-1,0));
 		this.dataManager.register(DW_EXP,0);
@@ -54,35 +52,32 @@ public abstract class EntityElmBase extends EntityCreature{
 
 
     @Override
-    public void writeAdditional(NBTTagCompound compound)
+    public void writeAdditional(CompoundNBT compound)
     {
         super.writeAdditional(compound);
-        NBTTagList nbttaglist = new NBTTagList();
+        ListNBT ListNBT = new ListNBT();
 		// HomePosition
-        compound.setInt("HOMEX", getPosition().getX());
-        compound.setInt("HOMEY", getPosition().getY());
-        compound.setInt("HOMEZ", getPosition().getZ());
-        compound.setInt("HOMEWORLD", homeWorld);
+        compound.putInt("HOMEX", getPosition().getX());
+        compound.putInt("HOMEY", getPosition().getY());
+        compound.putInt("HOMEZ", getPosition().getZ());
+        compound.putInt("HOMEWORLD", homeWorld);
 		writeDWData(compound);
     }
 
-    private void writeDWData(NBTTagCompound tagCompound){
+    private void writeDWData(CompoundNBT tagCompound){
 
-    	NBTTagCompound dwtag = new NBTTagCompound();
+    	CompoundNBT dwtag = new CompoundNBT();
         BlockPos summonPos = this.Dw_SUMMONPOS();
-        dwtag.setInt("summonPosX", summonPos.getX());
-        dwtag.setInt("summonPosY", summonPos.getY());
-        dwtag.setInt("summonPosZ", summonPos.getZ());
-        dwtag.setInt("level",getLevel());
-        dwtag.setInt("exp", Dw_Exp());
-        tagCompound.setTag("dwData", dwtag);
+        dwtag.putInt("summonPosX", summonPos.getX());
+        dwtag.putInt("summonPosY", summonPos.getY());
+        dwtag.putInt("summonPosZ", summonPos.getZ());
+        dwtag.putInt("level",getLevel());
+        dwtag.putInt("exp", Dw_Exp());
+        tagCompound.put("dwData", dwtag);
     }
 
-
-
     @Override
-    public void readAdditional(NBTTagCompound compound)
-    {
+    public void readAdditional(CompoundNBT compound){
         super.readAdditional(compound);
 		// HomePosition
 		int lhx = compound.getInt("HOMEX");
@@ -91,13 +86,10 @@ public abstract class EntityElmBase extends EntityCreature{
 		setHomePosAndDistance(new BlockPos(lhx, lhy, lhz),(int)getMaximumHomeDistance());
 		homeWorld = compound.getInt("HOEMWORLD");
 		readDWData(compound);
-
     }
 
-
-    private void readDWData(NBTTagCompound compound)
-    {
-    	NBTTagCompound dwtag = (NBTTagCompound)compound.getTag("dwData");
+    private void readDWData(CompoundNBT compound){
+    	CompoundNBT dwtag = (CompoundNBT)compound.get("dwData");
 
         this.Dw_SUMMONPOS(new BlockPos(
         		dwtag.getInt("summonPosX"),
@@ -107,13 +99,16 @@ public abstract class EntityElmBase extends EntityCreature{
         Dw_Exp(dwtag.getInt("exp"));
     }
 
-    public World getWorld()
-    {
+    public World getWorld() {
         return this.world;
     }
 
-    public BlockPos getPos()
-    {
+    public BlockPos getPos() {
         return new BlockPos(this);
     }
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		return NetworkHooks.getEntitySpawningPacket(this);
+	}
 }

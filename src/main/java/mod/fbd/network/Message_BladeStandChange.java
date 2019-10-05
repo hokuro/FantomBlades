@@ -8,7 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class Message_BladeStandChange{
+public class Message_BladeStandChange {
 
 	private boolean isSet;
 	private BlockPos pos;

@@ -1,10 +1,11 @@
 package mod.fbd.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import mod.fbd.model.ModelBladeStand1;
 import mod.fbd.model.ModelBladeStand2;
 import mod.fbd.model.ModelBlaseStandBase;
 import mod.fbd.tileentity.TileEntityBladeStand;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 

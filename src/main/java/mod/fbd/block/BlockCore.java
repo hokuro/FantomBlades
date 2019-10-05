@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mod.fbd.block.BlockBladeStand.EnumBladeStand;
+import mod.fbd.block.item.BlockItemDummy;
 import mod.fbd.core.Mod_FantomBlade;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 
-public class BlockCore{
-
+public class BlockCore {
 	public static final String NAME_BLADEFORGE = "bladeforge";
 	public static final String NAME_BLADEALTAR = "bladealter";
 	public static final String NAME_BLADESTANDT1 = "bladestandt1";
@@ -36,14 +36,14 @@ public class BlockCore{
 			NAME_GUNCUSTOMIZER,
 	};
 
-	public static Block block_bladeforge = new BlockBladeforge(Block.Properties.create(Material.GROUND).hardnessAndResistance(0.8F).sound(SoundType.STONE)).setRegistryName(NAME_BLADEFORGE);
+	public static Block block_bladeforge = new BlockBladeforge(Block.Properties.create(Material.EARTH).hardnessAndResistance(0.8F).sound(SoundType.STONE)).setRegistryName(NAME_BLADEFORGE);
 	public static Block block_bladealter = new BlockBladeAlter(Block.Properties.create(Material.WOOD).hardnessAndResistance(0.5F).sound(SoundType.WOOD)).setRegistryName(NAME_BLADEALTAR);
 	public static Block block_bladestandtype1 = new BlockBladeStand(Block.Properties.create(Material.GOURD).hardnessAndResistance(1.0F,3.0F).sound(SoundType.WOOD), EnumBladeStand.STAND1).setRegistryName(NAME_BLADESTANDT1);
 	public static Block block_bladestandtype2 = new BlockBladeStand(Block.Properties.create(Material.GOURD).hardnessAndResistance(1.0F,3.0F).sound(SoundType.WOOD), EnumBladeStand.STAND2).setRegistryName(NAME_BLADESTANDT2);
 	public static Block block_furncedummy = new BlockDummyFurnce(Block.Properties.create(Material.ROCK).hardnessAndResistance(3.5F).lightValue(13)).setRegistryName(NAME_FURNCEDUMMY);
 	public static Block block_anvildummy = new BlockDummyAnvil(Block.Properties.create(Material.ANVIL, MaterialColor.IRON).hardnessAndResistance(5.0F, 1200.0F).sound(SoundType.ANVIL)).setRegistryName(NAME_ANVILEDUMMY);
-	public static Block block_airpomp = new BlockAirPomp(Block.Properties.create(Material.GROUND).hardnessAndResistance(0.5F).sound(SoundType.WOOD)).setRegistryName(NAME_AIRPOMP);
-	public static Block block_guncustomizer = new BlockGunCustomizer(Block.Properties.create(Material.GROUND).hardnessAndResistance(1.5F,10.0F).sound(SoundType.WOOD)).setRegistryName(NAME_GUNCUSTOMIZER);
+	public static Block block_airpomp = new BlockAirPomp(Block.Properties.create(Material.EARTH).hardnessAndResistance(0.5F).sound(SoundType.WOOD)).setRegistryName(NAME_AIRPOMP);
+	public static Block block_guncustomizer = new BlockGunCustomizer(Block.Properties.create(Material.EARTH).hardnessAndResistance(1.5F,10.0F).sound(SoundType.WOOD)).setRegistryName(NAME_GUNCUSTOMIZER);
 
 
 	private static Map<String,Block> blockMap;
@@ -63,14 +63,14 @@ public class BlockCore{
 		};
 
 		itemMap = new HashMap<String,Item>(){
-			{put(NAME_BLADEFORGE,(new ItemBlock(block_bladeforge,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADEFORGE));}
-			{put(NAME_BLADEALTAR,(new ItemBlock(block_bladealter,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADEALTAR));}
-			{put(NAME_BLADESTANDT1,(new ItemBlock(block_bladestandtype1,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADESTANDT1));}
-			{put(NAME_BLADESTANDT2,(new ItemBlock(block_bladestandtype2,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADESTANDT2));}
-			{put(NAME_AIRPOMP,(new ItemBlock(block_airpomp,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_AIRPOMP));}
-			{put(NAME_FURNCEDUMMY,(new ItemBlockDummy(block_furncedummy,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_FURNCEDUMMY));}
-			{put(NAME_ANVILEDUMMY,(new ItemBlockDummy(block_anvildummy,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_ANVILEDUMMY));}
-			{put(NAME_GUNCUSTOMIZER,(new ItemBlock(block_guncustomizer,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_GUNCUSTOMIZER));}
+			{put(NAME_BLADEFORGE,(new BlockItem(block_bladeforge,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADEFORGE));}
+			{put(NAME_BLADEALTAR,(new BlockItem(block_bladealter,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADEALTAR));}
+			{put(NAME_BLADESTANDT1,(new BlockItem(block_bladestandtype1,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADESTANDT1));}
+			{put(NAME_BLADESTANDT2,(new BlockItem(block_bladestandtype2,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_BLADESTANDT2));}
+			{put(NAME_AIRPOMP,(new BlockItem(block_airpomp,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_AIRPOMP));}
+			{put(NAME_FURNCEDUMMY,(new BlockItemDummy(block_furncedummy,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_FURNCEDUMMY));}
+			{put(NAME_ANVILEDUMMY,(new BlockItemDummy(block_anvildummy,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_ANVILEDUMMY));}
+			{put(NAME_GUNCUSTOMIZER,(new BlockItem(block_guncustomizer,new Item.Properties().group(Mod_FantomBlade.tabElmWepon))).setRegistryName(NAME_GUNCUSTOMIZER));}
 		};
 	}
 
@@ -83,7 +83,7 @@ public class BlockCore{
 		}
 	}
 
-	public static void registerItemBlock(final RegistryEvent.Register<Item> event){
+	public static void registerBlockItem(final RegistryEvent.Register<Item> event){
 		for (String name : NAME_LIST){
 			if (itemMap.containsKey(name)) {
 				event.getRegistry().register(itemMap.get(name));

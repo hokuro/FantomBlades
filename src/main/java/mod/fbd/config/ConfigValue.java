@@ -9,7 +9,6 @@ public class ConfigValue{
 	public static final General GENERAL = new General(BUILDER);
 	public static final ForgeConfigSpec spec = BUILDER.build();
 
-
 	public static class General{
 		public final ForgeConfigSpec.ConfigValue<String> bladeNames;
 		public final ForgeConfigSpec.ConfigValue<Boolean> gunGuiAutoOpen;;
@@ -28,7 +27,6 @@ public class ConfigValue{
 		public Boolean GunGuiAutoOpen() {
 			return gunGuiAutoOpen.get();
 		}
-
 
 		public String getRandomName() {
 			String ret = "刀";

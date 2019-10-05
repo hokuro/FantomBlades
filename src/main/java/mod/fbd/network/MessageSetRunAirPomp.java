@@ -3,14 +3,13 @@ package mod.fbd.network;
 import java.util.function.Supplier;
 
 import mod.fbd.tileentity.TileEntityAirPomp;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MessageSetRunAirPomp {
-
-
 	BlockPos ownPos;
 	BlockPos targetPos;
 	int facing;
@@ -53,7 +52,12 @@ public class MessageSetRunAirPomp {
 		public static void handle(final MessageSetRunAirPomp pkt, Supplier<NetworkEvent.Context> ctx)
 		{
 			ctx.get().enqueueWork(() -> {
-				TileEntity te = ctx.get().getSender().world.getTileEntity(pkt.ownPos);
+				TileEntity te;
+				if (ctx.get().getSender() == null) {
+					te = Minecraft.getInstance().world.getTileEntity(pkt.ownPos);
+				}else {
+					te = ctx.get().getSender().world.getTileEntity(pkt.ownPos);
+				}
 				if (te instanceof TileEntityAirPomp){
 					((TileEntityAirPomp)te).setRun(pkt.targetPos);
 				}

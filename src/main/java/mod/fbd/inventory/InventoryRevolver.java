@@ -3,15 +3,13 @@ package mod.fbd.inventory;
 import java.util.ArrayList;
 import java.util.List;
 
-import mod.fbd.item.ItemBurret;
-import mod.fbd.item.ItemRevolver;
-import net.minecraft.entity.player.EntityPlayer;
+import mod.fbd.item.guns.ItemBurret;
+import mod.fbd.item.guns.ItemRevolver;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryRevolver implements IInventory {
 	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(6,ItemStack.EMPTY);
@@ -23,16 +21,6 @@ public class InventoryRevolver implements IInventory {
 		for (int i = 0; i < burrets.size(); i++){
 			stacks.set(i, burrets.get(i).copy());
 		}
-	}
-
-	@Override
-	public ITextComponent getName() {
-		return new TextComponentTranslation("inventory.revolver");
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override
@@ -62,7 +50,7 @@ public class InventoryRevolver implements IInventory {
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		 return ItemStackHelper.getAndSplit(this.stacks, index, count);
+		return ItemStackHelper.getAndSplit(this.stacks, index, count);
 	}
 
 	@Override
@@ -85,16 +73,16 @@ public class InventoryRevolver implements IInventory {
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		List<ItemStack> burrets = new ArrayList<ItemStack>();
 		for (ItemStack burret : stacks){
 			if (!stacks.isEmpty()){
@@ -110,33 +98,7 @@ public class InventoryRevolver implements IInventory {
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		stacks.clear();
-	}
-
-	@Override
-	public ITextComponent getDisplayName() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public ITextComponent getCustomName() {
-		// TODO 自動生成されたメソッド・スタブ
-		return this.getName();
 	}
 }

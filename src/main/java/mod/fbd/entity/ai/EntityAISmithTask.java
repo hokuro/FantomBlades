@@ -3,11 +3,11 @@ package mod.fbd.entity.ai;
 import mod.fbd.block.BlockCore;
 import mod.fbd.entity.mob.EntitySmithBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
-public class EntityAISmithTask extends EntityAIBase {
+public class EntityAISmithTask extends Goal {
 
     protected EntitySmithBase entity;
     /** The closest entity which is being watched by this one. */
@@ -22,54 +22,54 @@ public class EntityAISmithTask extends EntityAIBase {
 		entity = entityIn;
 	}
 
-	   /**
+	/**
      * Returns whether the EntityAIBase should begin execution.
      */
-    public boolean shouldExecute()
-    {
+	@Override
+    public boolean shouldExecute() {
     	return ((EntitySmithBase)entity).Dw_ISWORK();
     }
 
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean shouldContinueExecuting()
-    {
+	@Override
+    public boolean shouldContinueExecuting() {
     	return ((EntitySmithBase)entity).Dw_ISWORK();
     }
 
     /**
      * Execute a one shot task or start executing a continuous task
      */
-    public void startExecuting()
-    {
+	@Override
+    public void startExecuting(){
 
     }
 
     /**
      * Reset the task's internal state. Called when this task is interrupted by another one
      */
-    public void resetTask()
-    {
+	@Override
+    public void resetTask() {
     }
 
     /**
      * Keep ticking a continuous task that has already been started
      */
-    public void updateTask()
-    {
+	@Override
+    public void tick() {
     	if (entity.checkWork(entity.world, entity.getPos())){
         	BlockPos pos = entity.getPosition();
-        	if (entity.world.getBlockState(pos.offset(EnumFacing.NORTH)).getBlock() == BlockCore.block_anvildummy){
-        		pos = pos.offset(EnumFacing.NORTH);
-        	}else if (entity.world.getBlockState(pos.offset(EnumFacing.SOUTH)).getBlock() == BlockCore.block_anvildummy){
-        		pos = pos.offset(EnumFacing.SOUTH);
-        	}else if (entity.world.getBlockState(pos.offset(EnumFacing.EAST)).getBlock() == BlockCore.block_anvildummy){
-        		pos = pos.offset(EnumFacing.EAST);
-        	}else if (entity.world.getBlockState(pos.offset(EnumFacing.WEST)).getBlock() == BlockCore.block_anvildummy){
-        		pos = pos.offset(EnumFacing.WEST);
+        	if (entity.world.getBlockState(pos.offset(Direction.NORTH)).getBlock() == BlockCore.block_anvildummy){
+        		pos = pos.offset(Direction.NORTH);
+        	}else if (entity.world.getBlockState(pos.offset(Direction.SOUTH)).getBlock() == BlockCore.block_anvildummy){
+        		pos = pos.offset(Direction.SOUTH);
+        	}else if (entity.world.getBlockState(pos.offset(Direction.EAST)).getBlock() == BlockCore.block_anvildummy){
+        		pos = pos.offset(Direction.EAST);
+        	}else if (entity.world.getBlockState(pos.offset(Direction.WEST)).getBlock() == BlockCore.block_anvildummy){
+        		pos = pos.offset(Direction.WEST);
         	}
-            this.entity.getLookHelper().setLookPosition(pos.getX(), pos.getY(), pos.getZ(), (float)this.entity.getHorizontalFaceSpeed(), (float)this.entity.getVerticalFaceSpeed());
+            this.entity.getLookController().setLookPosition(pos.getX(), pos.getY(), pos.getZ(), (float)this.entity.getHorizontalFaceSpeed(), (float)this.entity.getVerticalFaceSpeed());
             this.entity.addWorkTimeValue(-1);
             this.entity.addSwingValue(1);
 

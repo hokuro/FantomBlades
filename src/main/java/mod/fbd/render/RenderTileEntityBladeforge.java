@@ -2,40 +2,35 @@ package mod.fbd.render;
 
 import java.nio.FloatBuffer;
 
-import mod.fbd.model.ModelAirPomp;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import mod.fbd.tileentity.TileEntityBladeforge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.Entity;
 
-public class RenderTileEntityBladeforge  extends TileEntityRenderer<TileEntityBladeforge> {
-	private static final ResourceLocation tex = new ResourceLocation("fbd:textures/entity/airpomp.png");
-
-	private ModelAirPomp mainModel = new ModelAirPomp();
-
+public class RenderTileEntityBladeforge extends TileEntityRenderer<TileEntityBladeforge> {
 	@Override
 	public void render(TileEntityBladeforge te, double x, double y, double z, float partialTicks, int destroyStagea) {
 		dorender((TileEntityBladeforge)te,x,y,z,64);
 
 	}
 
-
     public static final FloatBuffer DEPTH = GLAllocation.createDirectFloatBuffer(32);
     public static final FloatBuffer BLEND = GLAllocation.createDirectFloatBuffer(32);
 
-    protected void dorender(TileEntityBladeforge entityIn, double x, double y, double z, int maxDistance)
-    {
+    protected void dorender(TileEntityBladeforge entityIn, double x, double y, double z, int maxDistance) {
     	if (!entityIn.isRun()){return;}
-		RenderManager manager = Minecraft.getInstance().getRenderManager();
-		double d0 = entityIn.getDistanceSq(manager.renderViewEntity.posX,
-     		   manager.renderViewEntity.posY,
-     		   manager.renderViewEntity.posZ);
+		EntityRendererManager manager = Minecraft.getInstance().getRenderManager();
+		Entity viewer = Minecraft.getInstance().getRenderViewEntity();
+		double d0 = entityIn.getDistanceSq(viewer.posX,
+				viewer.posY,
+				viewer.posZ);
 
         if (d0 <= (double)(maxDistance*maxDistance))
         {
@@ -54,10 +49,10 @@ public class RenderTileEntityBladeforge  extends TileEntityRenderer<TileEntityBl
             GlStateManager.scalef(-0.025F, -0.025F, 0.025F);
 //			GlStateManager.depthFunc(519);
 
-			// 下地
+			// i下地
             renderRectangle(-25,25,-1,8,0.0F,0.0F,0.0F,0.25F);
 
-            // 進捗バー
+            // i進捗バー
             int bar =(int)(48.0F * ((float)(TileEntityBladeforge.SMELTING_FINISH-entityIn.getField(TileEntityBladeforge.FIELD_COUNT))/(float)TileEntityBladeforge.SMELTING_FINISH));
             renderRectangle(-24,bar-24,0,7, 0.0F, 24.0F,0.0F,0.6F);
 //            GlStateManager.disableDepth();
@@ -69,7 +64,7 @@ public class RenderTileEntityBladeforge  extends TileEntityRenderer<TileEntityBl
     public void renderRectangle(double left, double right, double top, double bottom, float red, float green, float blue, float alpha){
         Tessellator tessellator;
         BufferBuilder bufferbuilder;
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFuncSeparate(770, 771, 1, 0);
@@ -85,10 +80,10 @@ public class RenderTileEntityBladeforge  extends TileEntityRenderer<TileEntityBl
         bufferbuilder.pos((double)(right), (double)(top), 0.0D).color(red, green, blue, alpha).endVertex();
         tessellator.draw();
         GlStateManager.enableLighting();
-	    GlStateManager.disableBlend();
-	    GlStateManager.enableAlphaTest();
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlphaTest();
         GlStateManager.shadeModel(7424);
         GlStateManager.enableDepthTest();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
     }
 }

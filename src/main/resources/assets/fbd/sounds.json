@@ -1,5 +1,5 @@
 {
-  "entity.fbd.bladesmithhart":{
+  "entity.fbd.smithhart":{
     "category":"voice",
     "sounds":[
       {
@@ -25,7 +25,7 @@
       }
     ]
   },
-  "entity.fbd.bladesmithdamage":{
+  "entity.fbd.smithdamage":{
     "category":"voice",
     "sounds":[
       {
@@ -51,7 +51,7 @@
       }
     ]
   },
-  "entity.fbd.bladesmithwork":{
+  "entity.fbd.smithwork":{
     "category":"voice",
     "sounds":[
       {

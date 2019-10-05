@@ -1,5 +1,7 @@
 package mod.fbd.core;
 
+import net.minecraft.util.math.Vec3i;
+
 public final class ModCommon {
 	// デバッグモードかどうか
 	public static boolean isDebug = false;
@@ -8,43 +10,11 @@ public final class ModCommon {
 
 	// モッドID
 	public static final String MOD_ID = "fbd";
-	// モッド名
+	// iモッド名
 	public static final String MOD_NAME = "FantomBlads";
-	public static final String MOD_PACKAGE = "mod.fbd";
-	public static final String MOD_CLIENT_SIDE = ".client.ClientProxy";
-	public static final String MOD_SERVER_SIDE = ".core.CommonProxy";
-	public static final String MOD_FACTRY = ".client.config.FantomBladsFactory";
-    // 前に読み込まれるべき前提MODをバージョン込みで指定
-    public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.9-12.16.0.1853,)";
-    // 起動出来るMinecraft本体のバージョン。記法はMavenのVersion Range Specificationを検索すること。
-    public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.12]";
-	// モッドバージョン
-	public static final String MOD_VERSION = "1.12.0";
-	// コンフィグファイル名
-	public static final String MOD_CONFIG_FILE = "";
-	// コンフィグ
-	public static final String MOD_CONFIG_LANG = "";
-	// コンフィグリロード間隔
-	public static final long MOD_CONFIG_RELOAD = 500L;
 
-	// コンフィグ カテゴリー general
-	public static final String MOD_CONFIG_CAT_GENELAL = "general";
-	public static final String MOD_CHANEL ="Mod_Channel_FantomBlads";
-
-	// MessageID
-	public static final int MESID_BLADEFORGESTARTSMELTING = 0;
-	public static final int MESID_SETRUNAIRPOMP = 1;
-	public static final int MESID_SETRUNBLADEFORGE = 2;
-	public static final int MESID_CREATEBLADE = 3;
-	public static final int MESID_REPAIREBLADE = 4;
-	public static final int MESID_BLADESTANDUPDATE = 5;
-	public static final int MESID_BLADELEVELUPDATE = 6;
-
-	public static final int MESID_CREATEARMOR = 7;
-
-	public static final int MESID_REPAIREARMOR = 8;
-
-
+	// iコンフィグ カテゴリー general
+	public static final String MOD_CHANEL ="mod_channel_fantomblads";
 	public static final String GUI_ID_BLADEFORGE = "gui_bladeforge";
 	public static final String GUI_ID_BLADESMITH = "gui_bladesmith";
 	public static final String GUI_ID_BLADEALTER = "gui_bladealter";
@@ -53,6 +23,253 @@ public final class ModCommon {
 	public static final String GUI_ID_CARTRIDGE = "gui_cartridge";
 	public static final String GUI_ID_GUNCUSTOMAIZER = "gui_guncustomizer";
 	public static final String GUI_ID_ARMORSMITH = "gui_aromorsmith";
+
+	// iエンチャント
+	public static final String ENCHANTMENT_BLADEGENBU="enc_bladegenbu";
+	public static final String ENCHANTMENT_BLADESEIRYU="enc_bladeseiryu";
+	public static final String ENCHANTMENT_BLADESUZAKU="enc_bladesuzaku";
+	public static final String ENCHANTMENT_BLADEBYAKO="enc_bladebyako";
+	public static final String ENCHANTMENT_BLADEKIRIN="enc_bladekirin";
+	public static final String ENCHANTMENT_BLADENIJI = "enc_bladeniji";
+
+	// Container ID
+	public static final String MOD_CONTAINERID_REVOLVER = "container_revolver";
+	public static final String MOD_CONTAINERID_AUTOMATIC = "container_automatic";
+	public static final String MOD_CONTAINERID_CARTRIDGE = "container_cartridge";
+	public static final String MOD_CONTAINERID_BLADEFORGE = "container_bladeforge";
+	public static final String MOD_CONTAINERID_BLADEALTER = "container_bladealter";
+	public static final String MOD_CONTAINERID_GUNCUSTOMIZER = "container_guncustomizer";
+	public static final String MOD_CONTAINERID_BLADESMITH = "container_bladesmith";
+	public static final String MOD_CONTAINERID_ARMORSMITH = "container_armorsmith";
+
+	public static final Vec3i[] SearchBlock11to11 =new Vec3i[] {
+			new Vec3i(-5, -5, -5), new Vec3i(-4, -5, -5), new Vec3i(-3, -5, -5), new Vec3i(-2, -5, -5), new Vec3i(-1, -5, -5), new Vec3i(0, -5, -5), new Vec3i(1, -5, -5), new Vec3i(2, -5, -5), new Vec3i(3, -5, -5), new Vec3i(4, -5, -5), new Vec3i(5, -5, -5),
+			new Vec3i(-5, -4, -5), new Vec3i(-4, -4, -5), new Vec3i(-3, -4, -5), new Vec3i(-2, -4, -5), new Vec3i(-1, -4, -5), new Vec3i(0, -4, -5), new Vec3i(1, -4, -5), new Vec3i(2, -4, -5), new Vec3i(3, -4, -5), new Vec3i(4, -4, -5), new Vec3i(5, -4, -5),
+			new Vec3i(-5, -3, -5), new Vec3i(-4, -3, -5), new Vec3i(-3, -3, -5), new Vec3i(-2, -3, -5), new Vec3i(-1, -3, -5), new Vec3i(0, -3, -5), new Vec3i(1, -3, -5), new Vec3i(2, -3, -5), new Vec3i(3, -3, -5), new Vec3i(4, -3, -5), new Vec3i(5, -3, -5),
+			new Vec3i(-5, -2, -5), new Vec3i(-4, -2, -5), new Vec3i(-3, -2, -5), new Vec3i(-2, -2, -5), new Vec3i(-1, -2, -5), new Vec3i(0, -2, -5), new Vec3i(1, -2, -5), new Vec3i(2, -2, -5), new Vec3i(3, -2, -5), new Vec3i(4, -2, -5), new Vec3i(5, -2, -5),
+			new Vec3i(-5, -1, -5), new Vec3i(-4, -1, -5), new Vec3i(-3, -1, -5), new Vec3i(-2, -1, -5), new Vec3i(-1, -1, -5), new Vec3i(0, -1, -5), new Vec3i(1, -1, -5), new Vec3i(2, -1, -5), new Vec3i(3, -1, -5), new Vec3i(4, -1, -5), new Vec3i(5, -1, -5),
+			new Vec3i(-5,  0, -5), new Vec3i(-4,  0, -5), new Vec3i(-3,  0, -5), new Vec3i(-2,  0, -5), new Vec3i(-1,  0, -5), new Vec3i(0,  0, -5), new Vec3i(1,  0, -5), new Vec3i(2,  0, -5), new Vec3i(3,  0, -5), new Vec3i(4,  0, -5), new Vec3i(5,  0, -5),
+			new Vec3i(-5,  1, -5), new Vec3i(-4,  1, -5), new Vec3i(-3,  1, -5), new Vec3i(-2,  1, -5), new Vec3i(-1,  1, -5), new Vec3i(0,  1, -5), new Vec3i(1,  1, -5), new Vec3i(2,  1, -5), new Vec3i(3,  1, -5), new Vec3i(4,  1, -5), new Vec3i(5,  1, -5),
+			new Vec3i(-5,  2, -5), new Vec3i(-4,  2, -5), new Vec3i(-3,  2, -5), new Vec3i(-2,  2, -5), new Vec3i(-1,  2, -5), new Vec3i(0,  2, -5), new Vec3i(1,  2, -5), new Vec3i(2,  2, -5), new Vec3i(3,  2, -5), new Vec3i(4,  2, -5), new Vec3i(5,  2, -5),
+			new Vec3i(-5,  3, -5), new Vec3i(-4,  3, -5), new Vec3i(-3,  3, -5), new Vec3i(-2,  3, -5), new Vec3i(-1,  3, -5), new Vec3i(0,  3, -5), new Vec3i(1,  3, -5), new Vec3i(2,  3, -5), new Vec3i(3,  3, -5), new Vec3i(4,  3, -5), new Vec3i(5,  3, -5),
+			new Vec3i(-5,  4, -5), new Vec3i(-4,  4, -5), new Vec3i(-3,  4, -5), new Vec3i(-2,  4, -5), new Vec3i(-1,  4, -5), new Vec3i(0,  4, -5), new Vec3i(1,  4, -5), new Vec3i(2,  4, -5), new Vec3i(3,  4, -5), new Vec3i(4,  4, -5), new Vec3i(5,  4, -5),
+			new Vec3i(-5,  5, -5), new Vec3i(-4,  5, -5), new Vec3i(-3,  5, -5), new Vec3i(-2,  5, -5), new Vec3i(-1,  5, -5), new Vec3i(0,  5, -5), new Vec3i(1,  5, -5), new Vec3i(2,  5, -5), new Vec3i(3,  5, -5), new Vec3i(4,  5, -5), new Vec3i(5,  5, -5),
+			new Vec3i(-5, -5, -4), new Vec3i(-4, -5, -4), new Vec3i(-3, -5, -4), new Vec3i(-2, -5, -4), new Vec3i(-1, -5, -4), new Vec3i(0, -5, -4), new Vec3i(1, -5, -4), new Vec3i(2, -5, -4), new Vec3i(3, -5, -4), new Vec3i(4, -5, -4), new Vec3i(5, -5, -4),
+			new Vec3i(-5, -4, -4), new Vec3i(-4, -4, -4), new Vec3i(-3, -4, -4), new Vec3i(-2, -4, -4), new Vec3i(-1, -4, -4), new Vec3i(0, -4, -4), new Vec3i(1, -4, -4), new Vec3i(2, -4, -4), new Vec3i(3, -4, -4), new Vec3i(4, -4, -4), new Vec3i(5, -4, -4),
+			new Vec3i(-5, -3, -4), new Vec3i(-4, -3, -4), new Vec3i(-3, -3, -4), new Vec3i(-2, -3, -4), new Vec3i(-1, -3, -4), new Vec3i(0, -3, -4), new Vec3i(1, -3, -4), new Vec3i(2, -3, -4), new Vec3i(3, -3, -4), new Vec3i(4, -3, -4), new Vec3i(5, -3, -4),
+			new Vec3i(-5, -2, -4), new Vec3i(-4, -2, -4), new Vec3i(-3, -2, -4), new Vec3i(-2, -2, -4), new Vec3i(-1, -2, -4), new Vec3i(0, -2, -4), new Vec3i(1, -2, -4), new Vec3i(2, -2, -4), new Vec3i(3, -2, -4), new Vec3i(4, -2, -4), new Vec3i(5, -2, -4),
+			new Vec3i(-5, -1, -4), new Vec3i(-4, -1, -4), new Vec3i(-3, -1, -4), new Vec3i(-2, -1, -4), new Vec3i(-1, -1, -4), new Vec3i(0, -1, -4), new Vec3i(1, -1, -4), new Vec3i(2, -1, -4), new Vec3i(3, -1, -4), new Vec3i(4, -1, -4), new Vec3i(5, -1, -4),
+			new Vec3i(-5,  0, -4), new Vec3i(-4,  0, -4), new Vec3i(-3,  0, -4), new Vec3i(-2,  0, -4), new Vec3i(-1,  0, -4), new Vec3i(0,  0, -4), new Vec3i(1,  0, -4), new Vec3i(2,  0, -4), new Vec3i(3,  0, -4), new Vec3i(4,  0, -4), new Vec3i(5,  0, -4),
+			new Vec3i(-5,  1, -4), new Vec3i(-4,  1, -4), new Vec3i(-3,  1, -4), new Vec3i(-2,  1, -4), new Vec3i(-1,  1, -4), new Vec3i(0,  1, -4), new Vec3i(1,  1, -4), new Vec3i(2,  1, -4), new Vec3i(3,  1, -4), new Vec3i(4,  1, -4), new Vec3i(5,  1, -4),
+			new Vec3i(-5,  2, -4), new Vec3i(-4,  2, -4), new Vec3i(-3,  2, -4), new Vec3i(-2,  2, -4), new Vec3i(-1,  2, -4), new Vec3i(0,  2, -4), new Vec3i(1,  2, -4), new Vec3i(2,  2, -4), new Vec3i(3,  2, -4), new Vec3i(4,  2, -4), new Vec3i(5,  2, -4),
+			new Vec3i(-5,  3, -4), new Vec3i(-4,  3, -4), new Vec3i(-3,  3, -4), new Vec3i(-2,  3, -4), new Vec3i(-1,  3, -4), new Vec3i(0,  3, -4), new Vec3i(1,  3, -4), new Vec3i(2,  3, -4), new Vec3i(3,  3, -4), new Vec3i(4,  3, -4), new Vec3i(5,  3, -4),
+			new Vec3i(-5,  4, -4), new Vec3i(-4,  4, -4), new Vec3i(-3,  4, -4), new Vec3i(-2,  4, -4), new Vec3i(-1,  4, -4), new Vec3i(0,  4, -4), new Vec3i(1,  4, -4), new Vec3i(2,  4, -4), new Vec3i(3,  4, -4), new Vec3i(4,  4, -4), new Vec3i(5,  4, -4),
+			new Vec3i(-5,  5, -4), new Vec3i(-4,  5, -4), new Vec3i(-3,  5, -4), new Vec3i(-2,  5, -4), new Vec3i(-1,  5, -4), new Vec3i(0,  5, -4), new Vec3i(1,  5, -4), new Vec3i(2,  5, -4), new Vec3i(3,  5, -4), new Vec3i(4,  5, -4), new Vec3i(5,  5, -4),
+			new Vec3i(-5, -5, -3), new Vec3i(-4, -5, -3), new Vec3i(-3, -5, -3), new Vec3i(-2, -5, -3), new Vec3i(-1, -5, -3), new Vec3i(0, -5, -3), new Vec3i(1, -5, -3), new Vec3i(2, -5, -3), new Vec3i(3, -5, -3), new Vec3i(4, -5, -3), new Vec3i(5, -5, -3),
+			new Vec3i(-5, -4, -3), new Vec3i(-4, -4, -3), new Vec3i(-3, -4, -3), new Vec3i(-2, -4, -3), new Vec3i(-1, -4, -3), new Vec3i(0, -4, -3), new Vec3i(1, -4, -3), new Vec3i(2, -4, -3), new Vec3i(3, -4, -3), new Vec3i(4, -4, -3), new Vec3i(5, -4, -3),
+			new Vec3i(-5, -3, -3), new Vec3i(-4, -3, -3), new Vec3i(-3, -3, -3), new Vec3i(-2, -3, -3), new Vec3i(-1, -3, -3), new Vec3i(0, -3, -3), new Vec3i(1, -3, -3), new Vec3i(2, -3, -3), new Vec3i(3, -3, -3), new Vec3i(4, -3, -3), new Vec3i(5, -3, -3),
+			new Vec3i(-5, -2, -3), new Vec3i(-4, -2, -3), new Vec3i(-3, -2, -3), new Vec3i(-2, -2, -3), new Vec3i(-1, -2, -3), new Vec3i(0, -2, -3), new Vec3i(1, -2, -3), new Vec3i(2, -2, -3), new Vec3i(3, -2, -3), new Vec3i(4, -2, -3), new Vec3i(5, -2, -3),
+			new Vec3i(-5, -1, -3), new Vec3i(-4, -1, -3), new Vec3i(-3, -1, -3), new Vec3i(-2, -1, -3), new Vec3i(-1, -1, -3), new Vec3i(0, -1, -3), new Vec3i(1, -1, -3), new Vec3i(2, -1, -3), new Vec3i(3, -1, -3), new Vec3i(4, -1, -3), new Vec3i(5, -1, -3),
+			new Vec3i(-5,  0, -3), new Vec3i(-4,  0, -3), new Vec3i(-3,  0, -3), new Vec3i(-2,  0, -3), new Vec3i(-1,  0, -3), new Vec3i(0,  0, -3), new Vec3i(1,  0, -3), new Vec3i(2,  0, -3), new Vec3i(3,  0, -3), new Vec3i(4,  0, -3), new Vec3i(5,  0, -3),
+			new Vec3i(-5,  1, -3), new Vec3i(-4,  1, -3), new Vec3i(-3,  1, -3), new Vec3i(-2,  1, -3), new Vec3i(-1,  1, -3), new Vec3i(0,  1, -3), new Vec3i(1,  1, -3), new Vec3i(2,  1, -3), new Vec3i(3,  1, -3), new Vec3i(4,  1, -3), new Vec3i(5,  1, -3),
+			new Vec3i(-5,  2, -3), new Vec3i(-4,  2, -3), new Vec3i(-3,  2, -3), new Vec3i(-2,  2, -3), new Vec3i(-1,  2, -3), new Vec3i(0,  2, -3), new Vec3i(1,  2, -3), new Vec3i(2,  2, -3), new Vec3i(3,  2, -3), new Vec3i(4,  2, -3), new Vec3i(5,  2, -3),
+			new Vec3i(-5,  3, -3), new Vec3i(-4,  3, -3), new Vec3i(-3,  3, -3), new Vec3i(-2,  3, -3), new Vec3i(-1,  3, -3), new Vec3i(0,  3, -3), new Vec3i(1,  3, -3), new Vec3i(2,  3, -3), new Vec3i(3,  3, -3), new Vec3i(4,  3, -3), new Vec3i(5,  3, -3),
+			new Vec3i(-5,  4, -3), new Vec3i(-4,  4, -3), new Vec3i(-3,  4, -3), new Vec3i(-2,  4, -3), new Vec3i(-1,  4, -3), new Vec3i(0,  4, -3), new Vec3i(1,  4, -3), new Vec3i(2,  4, -3), new Vec3i(3,  4, -3), new Vec3i(4,  4, -3), new Vec3i(5,  4, -3),
+			new Vec3i(-5,  5, -3), new Vec3i(-4,  5, -3), new Vec3i(-3,  5, -3), new Vec3i(-2,  5, -3), new Vec3i(-1,  5, -3), new Vec3i(0,  5, -3), new Vec3i(1,  5, -3), new Vec3i(2,  5, -3), new Vec3i(3,  5, -3), new Vec3i(4,  5, -3), new Vec3i(5,  5, -3),
+			new Vec3i(-5, -5, -2), new Vec3i(-4, -5, -2), new Vec3i(-3, -5, -2), new Vec3i(-2, -5, -2), new Vec3i(-1, -5, -2), new Vec3i(0, -5, -2), new Vec3i(1, -5, -2), new Vec3i(2, -5, -2), new Vec3i(3, -5, -2), new Vec3i(4, -5, -2), new Vec3i(5, -5, -2),
+			new Vec3i(-5, -4, -2), new Vec3i(-4, -4, -2), new Vec3i(-3, -4, -2), new Vec3i(-2, -4, -2), new Vec3i(-1, -4, -2), new Vec3i(0, -4, -2), new Vec3i(1, -4, -2), new Vec3i(2, -4, -2), new Vec3i(3, -4, -2), new Vec3i(4, -4, -2), new Vec3i(5, -4, -2),
+			new Vec3i(-5, -3, -2), new Vec3i(-4, -3, -2), new Vec3i(-3, -3, -2), new Vec3i(-2, -3, -2), new Vec3i(-1, -3, -2), new Vec3i(0, -3, -2), new Vec3i(1, -3, -2), new Vec3i(2, -3, -2), new Vec3i(3, -3, -2), new Vec3i(4, -3, -2), new Vec3i(5, -3, -2),
+			new Vec3i(-5, -2, -2), new Vec3i(-4, -2, -2), new Vec3i(-3, -2, -2), new Vec3i(-2, -2, -2), new Vec3i(-1, -2, -2), new Vec3i(0, -2, -2), new Vec3i(1, -2, -2), new Vec3i(2, -2, -2), new Vec3i(3, -2, -2), new Vec3i(4, -2, -2), new Vec3i(5, -2, -2),
+			new Vec3i(-5, -1, -2), new Vec3i(-4, -1, -2), new Vec3i(-3, -1, -2), new Vec3i(-2, -1, -2), new Vec3i(-1, -1, -2), new Vec3i(0, -1, -2), new Vec3i(1, -1, -2), new Vec3i(2, -1, -2), new Vec3i(3, -1, -2), new Vec3i(4, -1, -2), new Vec3i(5, -1, -2),
+			new Vec3i(-5,  0, -2), new Vec3i(-4,  0, -2), new Vec3i(-3,  0, -2), new Vec3i(-2,  0, -2), new Vec3i(-1,  0, -2), new Vec3i(0,  0, -2), new Vec3i(1,  0, -2), new Vec3i(2,  0, -2), new Vec3i(3,  0, -2), new Vec3i(4,  0, -2), new Vec3i(5,  0, -2),
+			new Vec3i(-5,  1, -2), new Vec3i(-4,  1, -2), new Vec3i(-3,  1, -2), new Vec3i(-2,  1, -2), new Vec3i(-1,  1, -2), new Vec3i(0,  1, -2), new Vec3i(1,  1, -2), new Vec3i(2,  1, -2), new Vec3i(3,  1, -2), new Vec3i(4,  1, -2), new Vec3i(5,  1, -2),
+			new Vec3i(-5,  2, -2), new Vec3i(-4,  2, -2), new Vec3i(-3,  2, -2), new Vec3i(-2,  2, -2), new Vec3i(-1,  2, -2), new Vec3i(0,  2, -2), new Vec3i(1,  2, -2), new Vec3i(2,  2, -2), new Vec3i(3,  2, -2), new Vec3i(4,  2, -2), new Vec3i(5,  2, -2),
+			new Vec3i(-5,  3, -2), new Vec3i(-4,  3, -2), new Vec3i(-3,  3, -2), new Vec3i(-2,  3, -2), new Vec3i(-1,  3, -2), new Vec3i(0,  3, -2), new Vec3i(1,  3, -2), new Vec3i(2,  3, -2), new Vec3i(3,  3, -2), new Vec3i(4,  3, -2), new Vec3i(5,  3, -2),
+			new Vec3i(-5,  4, -2), new Vec3i(-4,  4, -2), new Vec3i(-3,  4, -2), new Vec3i(-2,  4, -2), new Vec3i(-1,  4, -2), new Vec3i(0,  4, -2), new Vec3i(1,  4, -2), new Vec3i(2,  4, -2), new Vec3i(3,  4, -2), new Vec3i(4,  4, -2), new Vec3i(5,  4, -2),
+			new Vec3i(-5,  5, -2), new Vec3i(-4,  5, -2), new Vec3i(-3,  5, -2), new Vec3i(-2,  5, -2), new Vec3i(-1,  5, -2), new Vec3i(0,  5, -2), new Vec3i(1,  5, -2), new Vec3i(2,  5, -2), new Vec3i(3,  5, -2), new Vec3i(4,  5, -2), new Vec3i(5,  5, -2),
+			new Vec3i(-5, -5, -1), new Vec3i(-4, -5, -1), new Vec3i(-3, -5, -1), new Vec3i(-2, -5, -1), new Vec3i(-1, -5, -1), new Vec3i(0, -5, -1), new Vec3i(1, -5, -1), new Vec3i(2, -5, -1), new Vec3i(3, -5, -1), new Vec3i(4, -5, -1), new Vec3i(5, -5, -1),
+			new Vec3i(-5, -4, -1), new Vec3i(-4, -4, -1), new Vec3i(-3, -4, -1), new Vec3i(-2, -4, -1), new Vec3i(-1, -4, -1), new Vec3i(0, -4, -1), new Vec3i(1, -4, -1), new Vec3i(2, -4, -1), new Vec3i(3, -4, -1), new Vec3i(4, -4, -1), new Vec3i(5, -4, -1),
+			new Vec3i(-5, -3, -1), new Vec3i(-4, -3, -1), new Vec3i(-3, -3, -1), new Vec3i(-2, -3, -1), new Vec3i(-1, -3, -1), new Vec3i(0, -3, -1), new Vec3i(1, -3, -1), new Vec3i(2, -3, -1), new Vec3i(3, -3, -1), new Vec3i(4, -3, -1), new Vec3i(5, -3, -1),
+			new Vec3i(-5, -2, -1), new Vec3i(-4, -2, -1), new Vec3i(-3, -2, -1), new Vec3i(-2, -2, -1), new Vec3i(-1, -2, -1), new Vec3i(0, -2, -1), new Vec3i(1, -2, -1), new Vec3i(2, -2, -1), new Vec3i(3, -2, -1), new Vec3i(4, -2, -1), new Vec3i(5, -2, -1),
+			new Vec3i(-5, -1, -1), new Vec3i(-4, -1, -1), new Vec3i(-3, -1, -1), new Vec3i(-2, -1, -1), new Vec3i(-1, -1, -1), new Vec3i(0, -1, -1), new Vec3i(1, -1, -1), new Vec3i(2, -1, -1), new Vec3i(3, -1, -1), new Vec3i(4, -1, -1), new Vec3i(5, -1, -1),
+			new Vec3i(-5,  0, -1), new Vec3i(-4,  0, -1), new Vec3i(-3,  0, -1), new Vec3i(-2,  0, -1), new Vec3i(-1,  0, -1), new Vec3i(0,  0, -1), new Vec3i(1,  0, -1), new Vec3i(2,  0, -1), new Vec3i(3,  0, -1), new Vec3i(4,  0, -1), new Vec3i(5,  0, -1),
+			new Vec3i(-5,  1, -1), new Vec3i(-4,  1, -1), new Vec3i(-3,  1, -1), new Vec3i(-2,  1, -1), new Vec3i(-1,  1, -1), new Vec3i(0,  1, -1), new Vec3i(1,  1, -1), new Vec3i(2,  1, -1), new Vec3i(3,  1, -1), new Vec3i(4,  1, -1), new Vec3i(5,  1, -1),
+			new Vec3i(-5,  2, -1), new Vec3i(-4,  2, -1), new Vec3i(-3,  2, -1), new Vec3i(-2,  2, -1), new Vec3i(-1,  2, -1), new Vec3i(0,  2, -1), new Vec3i(1,  2, -1), new Vec3i(2,  2, -1), new Vec3i(3,  2, -1), new Vec3i(4,  2, -1), new Vec3i(5,  2, -1),
+			new Vec3i(-5,  3, -1), new Vec3i(-4,  3, -1), new Vec3i(-3,  3, -1), new Vec3i(-2,  3, -1), new Vec3i(-1,  3, -1), new Vec3i(0,  3, -1), new Vec3i(1,  3, -1), new Vec3i(2,  3, -1), new Vec3i(3,  3, -1), new Vec3i(4,  3, -1), new Vec3i(5,  3, -1),
+			new Vec3i(-5,  4, -1), new Vec3i(-4,  4, -1), new Vec3i(-3,  4, -1), new Vec3i(-2,  4, -1), new Vec3i(-1,  4, -1), new Vec3i(0,  4, -1), new Vec3i(1,  4, -1), new Vec3i(2,  4, -1), new Vec3i(3,  4, -1), new Vec3i(4,  4, -1), new Vec3i(5,  4, -1),
+			new Vec3i(-5,  5, -1), new Vec3i(-4,  5, -1), new Vec3i(-3,  5, -1), new Vec3i(-2,  5, -1), new Vec3i(-1,  5, -1), new Vec3i(0,  5, -1), new Vec3i(1,  5, -1), new Vec3i(2,  5, -1), new Vec3i(3,  5, -1), new Vec3i(4,  5, -1), new Vec3i(5,  5, -1),
+			new Vec3i(-5, -5,  0), new Vec3i(-4, -5,  0), new Vec3i(-3, -5,  0), new Vec3i(-2, -5,  0), new Vec3i(-1, -5,  0), new Vec3i(0, -5,  0), new Vec3i(1, -5,  0), new Vec3i(2, -5,  0), new Vec3i(3, -5,  0), new Vec3i(4, -5,  0), new Vec3i(5, -5,  0),
+			new Vec3i(-5, -4,  0), new Vec3i(-4, -4,  0), new Vec3i(-3, -4,  0), new Vec3i(-2, -4,  0), new Vec3i(-1, -4,  0), new Vec3i(0, -4,  0), new Vec3i(1, -4,  0), new Vec3i(2, -4,  0), new Vec3i(3, -4,  0), new Vec3i(4, -4,  0), new Vec3i(5, -4,  0),
+			new Vec3i(-5, -3,  0), new Vec3i(-4, -3,  0), new Vec3i(-3, -3,  0), new Vec3i(-2, -3,  0), new Vec3i(-1, -3,  0), new Vec3i(0, -3,  0), new Vec3i(1, -3,  0), new Vec3i(2, -3,  0), new Vec3i(3, -3,  0), new Vec3i(4, -3,  0), new Vec3i(5, -3,  0),
+			new Vec3i(-5, -2,  0), new Vec3i(-4, -2,  0), new Vec3i(-3, -2,  0), new Vec3i(-2, -2,  0), new Vec3i(-1, -2,  0), new Vec3i(0, -2,  0), new Vec3i(1, -2,  0), new Vec3i(2, -2,  0), new Vec3i(3, -2,  0), new Vec3i(4, -2,  0), new Vec3i(5, -2,  0),
+			new Vec3i(-5, -1,  0), new Vec3i(-4, -1,  0), new Vec3i(-3, -1,  0), new Vec3i(-2, -1,  0), new Vec3i(-1, -1,  0), new Vec3i(0, -1,  0), new Vec3i(1, -1,  0), new Vec3i(2, -1,  0), new Vec3i(3, -1,  0), new Vec3i(4, -1,  0), new Vec3i(5, -1,  0),
+			new Vec3i(-5,  0,  0), new Vec3i(-4,  0,  0), new Vec3i(-3,  0,  0), new Vec3i(-2,  0,  0), new Vec3i(-1,  0,  0), new Vec3i(0,  0,  0), new Vec3i(1,  0,  0), new Vec3i(2,  0,  0), new Vec3i(3,  0,  0), new Vec3i(4,  0,  0), new Vec3i(5,  0,  0),
+			new Vec3i(-5,  1,  0), new Vec3i(-4,  1,  0), new Vec3i(-3,  1,  0), new Vec3i(-2,  1,  0), new Vec3i(-1,  1,  0), new Vec3i(0,  1,  0), new Vec3i(1,  1,  0), new Vec3i(2,  1,  0), new Vec3i(3,  1,  0), new Vec3i(4,  1,  0), new Vec3i(5,  1,  0),
+			new Vec3i(-5,  2,  0), new Vec3i(-4,  2,  0), new Vec3i(-3,  2,  0), new Vec3i(-2,  2,  0), new Vec3i(-1,  2,  0), new Vec3i(0,  2,  0), new Vec3i(1,  2,  0), new Vec3i(2,  2,  0), new Vec3i(3,  2,  0), new Vec3i(4,  2,  0), new Vec3i(5,  2,  0),
+			new Vec3i(-5,  3,  0), new Vec3i(-4,  3,  0), new Vec3i(-3,  3,  0), new Vec3i(-2,  3,  0), new Vec3i(-1,  3,  0), new Vec3i(0,  3,  0), new Vec3i(1,  3,  0), new Vec3i(2,  3,  0), new Vec3i(3,  3,  0), new Vec3i(4,  3,  0), new Vec3i(5,  3,  0),
+			new Vec3i(-5,  4,  0), new Vec3i(-4,  4,  0), new Vec3i(-3,  4,  0), new Vec3i(-2,  4,  0), new Vec3i(-1,  4,  0), new Vec3i(0,  4,  0), new Vec3i(1,  4,  0), new Vec3i(2,  4,  0), new Vec3i(3,  4,  0), new Vec3i(4,  4,  0), new Vec3i(5,  4,  0),
+			new Vec3i(-5,  5,  0), new Vec3i(-4,  5,  0), new Vec3i(-3,  5,  0), new Vec3i(-2,  5,  0), new Vec3i(-1,  5,  0), new Vec3i(0,  5,  0), new Vec3i(1,  5,  0), new Vec3i(2,  5,  0), new Vec3i(3,  5,  0), new Vec3i(4,  5,  0), new Vec3i(5,  5,  0),
+			new Vec3i(-5, -5,  1), new Vec3i(-4, -5,  1), new Vec3i(-3, -5,  1), new Vec3i(-2, -5,  1), new Vec3i(-1, -5,  1), new Vec3i(0, -5,  1), new Vec3i(1, -5,  1), new Vec3i(2, -5,  1), new Vec3i(3, -5,  1), new Vec3i(4, -5,  1), new Vec3i(5, -5,  1),
+			new Vec3i(-5, -4,  1), new Vec3i(-4, -4,  1), new Vec3i(-3, -4,  1), new Vec3i(-2, -4,  1), new Vec3i(-1, -4,  1), new Vec3i(0, -4,  1), new Vec3i(1, -4,  1), new Vec3i(2, -4,  1), new Vec3i(3, -4,  1), new Vec3i(4, -4,  1), new Vec3i(5, -4,  1),
+			new Vec3i(-5, -3,  1), new Vec3i(-4, -3,  1), new Vec3i(-3, -3,  1), new Vec3i(-2, -3,  1), new Vec3i(-1, -3,  1), new Vec3i(0, -3,  1), new Vec3i(1, -3,  1), new Vec3i(2, -3,  1), new Vec3i(3, -3,  1), new Vec3i(4, -3,  1), new Vec3i(5, -3,  1),
+			new Vec3i(-5, -2,  1), new Vec3i(-4, -2,  1), new Vec3i(-3, -2,  1), new Vec3i(-2, -2,  1), new Vec3i(-1, -2,  1), new Vec3i(0, -2,  1), new Vec3i(1, -2,  1), new Vec3i(2, -2,  1), new Vec3i(3, -2,  1), new Vec3i(4, -2,  1), new Vec3i(5, -2,  1),
+			new Vec3i(-5, -1,  1), new Vec3i(-4, -1,  1), new Vec3i(-3, -1,  1), new Vec3i(-2, -1,  1), new Vec3i(-1, -1,  1), new Vec3i(0, -1,  1), new Vec3i(1, -1,  1), new Vec3i(2, -1,  1), new Vec3i(3, -1,  1), new Vec3i(4, -1,  1), new Vec3i(5, -1,  1),
+			new Vec3i(-5,  0,  1), new Vec3i(-4,  0,  1), new Vec3i(-3,  0,  1), new Vec3i(-2,  0,  1), new Vec3i(-1,  0,  1), new Vec3i(0,  0,  1), new Vec3i(1,  0,  1), new Vec3i(2,  0,  1), new Vec3i(3,  0,  1), new Vec3i(4,  0,  1), new Vec3i(5,  0,  1),
+			new Vec3i(-5,  1,  1), new Vec3i(-4,  1,  1), new Vec3i(-3,  1,  1), new Vec3i(-2,  1,  1), new Vec3i(-1,  1,  1), new Vec3i(0,  1,  1), new Vec3i(1,  1,  1), new Vec3i(2,  1,  1), new Vec3i(3,  1,  1), new Vec3i(4,  1,  1), new Vec3i(5,  1,  1),
+			new Vec3i(-5,  2,  1), new Vec3i(-4,  2,  1), new Vec3i(-3,  2,  1), new Vec3i(-2,  2,  1), new Vec3i(-1,  2,  1), new Vec3i(0,  2,  1), new Vec3i(1,  2,  1), new Vec3i(2,  2,  1), new Vec3i(3,  2,  1), new Vec3i(4,  2,  1), new Vec3i(5,  2,  1),
+			new Vec3i(-5,  3,  1), new Vec3i(-4,  3,  1), new Vec3i(-3,  3,  1), new Vec3i(-2,  3,  1), new Vec3i(-1,  3,  1), new Vec3i(0,  3,  1), new Vec3i(1,  3,  1), new Vec3i(2,  3,  1), new Vec3i(3,  3,  1), new Vec3i(4,  3,  1), new Vec3i(5,  3,  1),
+			new Vec3i(-5,  4,  1), new Vec3i(-4,  4,  1), new Vec3i(-3,  4,  1), new Vec3i(-2,  4,  1), new Vec3i(-1,  4,  1), new Vec3i(0,  4,  1), new Vec3i(1,  4,  1), new Vec3i(2,  4,  1), new Vec3i(3,  4,  1), new Vec3i(4,  4,  1), new Vec3i(5,  4,  1),
+			new Vec3i(-5,  5,  1), new Vec3i(-4,  5,  1), new Vec3i(-3,  5,  1), new Vec3i(-2,  5,  1), new Vec3i(-1,  5,  1), new Vec3i(0,  5,  1), new Vec3i(1,  5,  1), new Vec3i(2,  5,  1), new Vec3i(3,  5,  1), new Vec3i(4,  5,  1), new Vec3i(5,  5,  1),
+			new Vec3i(-5, -5,  2), new Vec3i(-4, -5,  2), new Vec3i(-3, -5,  2), new Vec3i(-2, -5,  2), new Vec3i(-1, -5,  2), new Vec3i(0, -5,  2), new Vec3i(1, -5,  2), new Vec3i(2, -5,  2), new Vec3i(3, -5,  2), new Vec3i(4, -5,  2), new Vec3i(5, -5,  2),
+			new Vec3i(-5, -4,  2), new Vec3i(-4, -4,  2), new Vec3i(-3, -4,  2), new Vec3i(-2, -4,  2), new Vec3i(-1, -4,  2), new Vec3i(0, -4,  2), new Vec3i(1, -4,  2), new Vec3i(2, -4,  2), new Vec3i(3, -4,  2), new Vec3i(4, -4,  2), new Vec3i(5, -4,  2),
+			new Vec3i(-5, -3,  2), new Vec3i(-4, -3,  2), new Vec3i(-3, -3,  2), new Vec3i(-2, -3,  2), new Vec3i(-1, -3,  2), new Vec3i(0, -3,  2), new Vec3i(1, -3,  2), new Vec3i(2, -3,  2), new Vec3i(3, -3,  2), new Vec3i(4, -3,  2), new Vec3i(5, -3,  2),
+			new Vec3i(-5, -2,  2), new Vec3i(-4, -2,  2), new Vec3i(-3, -2,  2), new Vec3i(-2, -2,  2), new Vec3i(-1, -2,  2), new Vec3i(0, -2,  2), new Vec3i(1, -2,  2), new Vec3i(2, -2,  2), new Vec3i(3, -2,  2), new Vec3i(4, -2,  2), new Vec3i(5, -2,  2),
+			new Vec3i(-5, -1,  2), new Vec3i(-4, -1,  2), new Vec3i(-3, -1,  2), new Vec3i(-2, -1,  2), new Vec3i(-1, -1,  2), new Vec3i(0, -1,  2), new Vec3i(1, -1,  2), new Vec3i(2, -1,  2), new Vec3i(3, -1,  2), new Vec3i(4, -1,  2), new Vec3i(5, -1,  2),
+			new Vec3i(-5,  0,  2), new Vec3i(-4,  0,  2), new Vec3i(-3,  0,  2), new Vec3i(-2,  0,  2), new Vec3i(-1,  0,  2), new Vec3i(0,  0,  2), new Vec3i(1,  0,  2), new Vec3i(2,  0,  2), new Vec3i(3,  0,  2), new Vec3i(4,  0,  2), new Vec3i(5,  0,  2),
+			new Vec3i(-5,  1,  2), new Vec3i(-4,  1,  2), new Vec3i(-3,  1,  2), new Vec3i(-2,  1,  2), new Vec3i(-1,  1,  2), new Vec3i(0,  1,  2), new Vec3i(1,  1,  2), new Vec3i(2,  1,  2), new Vec3i(3,  1,  2), new Vec3i(4,  1,  2), new Vec3i(5,  1,  2),
+			new Vec3i(-5,  2,  2), new Vec3i(-4,  2,  2), new Vec3i(-3,  2,  2), new Vec3i(-2,  2,  2), new Vec3i(-1,  2,  2), new Vec3i(0,  2,  2), new Vec3i(1,  2,  2), new Vec3i(2,  2,  2), new Vec3i(3,  2,  2), new Vec3i(4,  2,  2), new Vec3i(5,  2,  2),
+			new Vec3i(-5,  3,  2), new Vec3i(-4,  3,  2), new Vec3i(-3,  3,  2), new Vec3i(-2,  3,  2), new Vec3i(-1,  3,  2), new Vec3i(0,  3,  2), new Vec3i(1,  3,  2), new Vec3i(2,  3,  2), new Vec3i(3,  3,  2), new Vec3i(4,  3,  2), new Vec3i(5,  3,  2),
+			new Vec3i(-5,  4,  2), new Vec3i(-4,  4,  2), new Vec3i(-3,  4,  2), new Vec3i(-2,  4,  2), new Vec3i(-1,  4,  2), new Vec3i(0,  4,  2), new Vec3i(1,  4,  2), new Vec3i(2,  4,  2), new Vec3i(3,  4,  2), new Vec3i(4,  4,  2), new Vec3i(5,  4,  2),
+			new Vec3i(-5,  5,  2), new Vec3i(-4,  5,  2), new Vec3i(-3,  5,  2), new Vec3i(-2,  5,  2), new Vec3i(-1,  5,  2), new Vec3i(0,  5,  2), new Vec3i(1,  5,  2), new Vec3i(2,  5,  2), new Vec3i(3,  5,  2), new Vec3i(4,  5,  2), new Vec3i(5,  5,  2),
+			new Vec3i(-5, -5,  3), new Vec3i(-4, -5,  3), new Vec3i(-3, -5,  3), new Vec3i(-2, -5,  3), new Vec3i(-1, -5,  3), new Vec3i(0, -5,  3), new Vec3i(1, -5,  3), new Vec3i(2, -5,  3), new Vec3i(3, -5,  3), new Vec3i(4, -5,  3), new Vec3i(5, -5,  3),
+			new Vec3i(-5, -4,  3), new Vec3i(-4, -4,  3), new Vec3i(-3, -4,  3), new Vec3i(-2, -4,  3), new Vec3i(-1, -4,  3), new Vec3i(0, -4,  3), new Vec3i(1, -4,  3), new Vec3i(2, -4,  3), new Vec3i(3, -4,  3), new Vec3i(4, -4,  3), new Vec3i(5, -4,  3),
+			new Vec3i(-5, -3,  3), new Vec3i(-4, -3,  3), new Vec3i(-3, -3,  3), new Vec3i(-2, -3,  3), new Vec3i(-1, -3,  3), new Vec3i(0, -3,  3), new Vec3i(1, -3,  3), new Vec3i(2, -3,  3), new Vec3i(3, -3,  3), new Vec3i(4, -3,  3), new Vec3i(5, -3,  3),
+			new Vec3i(-5, -2,  3), new Vec3i(-4, -2,  3), new Vec3i(-3, -2,  3), new Vec3i(-2, -2,  3), new Vec3i(-1, -2,  3), new Vec3i(0, -2,  3), new Vec3i(1, -2,  3), new Vec3i(2, -2,  3), new Vec3i(3, -2,  3), new Vec3i(4, -2,  3), new Vec3i(5, -2,  3),
+			new Vec3i(-5, -1,  3), new Vec3i(-4, -1,  3), new Vec3i(-3, -1,  3), new Vec3i(-2, -1,  3), new Vec3i(-1, -1,  3), new Vec3i(0, -1,  3), new Vec3i(1, -1,  3), new Vec3i(2, -1,  3), new Vec3i(3, -1,  3), new Vec3i(4, -1,  3), new Vec3i(5, -1,  3),
+			new Vec3i(-5,  0,  3), new Vec3i(-4,  0,  3), new Vec3i(-3,  0,  3), new Vec3i(-2,  0,  3), new Vec3i(-1,  0,  3), new Vec3i(0,  0,  3), new Vec3i(1,  0,  3), new Vec3i(2,  0,  3), new Vec3i(3,  0,  3), new Vec3i(4,  0,  3), new Vec3i(5,  0,  3),
+			new Vec3i(-5,  1,  3), new Vec3i(-4,  1,  3), new Vec3i(-3,  1,  3), new Vec3i(-2,  1,  3), new Vec3i(-1,  1,  3), new Vec3i(0,  1,  3), new Vec3i(1,  1,  3), new Vec3i(2,  1,  3), new Vec3i(3,  1,  3), new Vec3i(4,  1,  3), new Vec3i(5,  1,  3),
+			new Vec3i(-5,  2,  3), new Vec3i(-4,  2,  3), new Vec3i(-3,  2,  3), new Vec3i(-2,  2,  3), new Vec3i(-1,  2,  3), new Vec3i(0,  2,  3), new Vec3i(1,  2,  3), new Vec3i(2,  2,  3), new Vec3i(3,  2,  3), new Vec3i(4,  2,  3), new Vec3i(5,  2,  3),
+			new Vec3i(-5,  3,  3), new Vec3i(-4,  3,  3), new Vec3i(-3,  3,  3), new Vec3i(-2,  3,  3), new Vec3i(-1,  3,  3), new Vec3i(0,  3,  3), new Vec3i(1,  3,  3), new Vec3i(2,  3,  3), new Vec3i(3,  3,  3), new Vec3i(4,  3,  3), new Vec3i(5,  3,  3),
+			new Vec3i(-5,  4,  3), new Vec3i(-4,  4,  3), new Vec3i(-3,  4,  3), new Vec3i(-2,  4,  3), new Vec3i(-1,  4,  3), new Vec3i(0,  4,  3), new Vec3i(1,  4,  3), new Vec3i(2,  4,  3), new Vec3i(3,  4,  3), new Vec3i(4,  4,  3), new Vec3i(5,  4,  3),
+			new Vec3i(-5,  5,  3), new Vec3i(-4,  5,  3), new Vec3i(-3,  5,  3), new Vec3i(-2,  5,  3), new Vec3i(-1,  5,  3), new Vec3i(0,  5,  3), new Vec3i(1,  5,  3), new Vec3i(2,  5,  3), new Vec3i(3,  5,  3), new Vec3i(4,  5,  3), new Vec3i(5,  5,  3),
+			new Vec3i(-5, -5,  4), new Vec3i(-4, -5,  4), new Vec3i(-3, -5,  4), new Vec3i(-2, -5,  4), new Vec3i(-1, -5,  4), new Vec3i(0, -5,  4), new Vec3i(1, -5,  4), new Vec3i(2, -5,  4), new Vec3i(3, -5,  4), new Vec3i(4, -5,  4), new Vec3i(5, -5,  4),
+			new Vec3i(-5, -4,  4), new Vec3i(-4, -4,  4), new Vec3i(-3, -4,  4), new Vec3i(-2, -4,  4), new Vec3i(-1, -4,  4), new Vec3i(0, -4,  4), new Vec3i(1, -4,  4), new Vec3i(2, -4,  4), new Vec3i(3, -4,  4), new Vec3i(4, -4,  4), new Vec3i(5, -4,  4),
+			new Vec3i(-5, -3,  4), new Vec3i(-4, -3,  4), new Vec3i(-3, -3,  4), new Vec3i(-2, -3,  4), new Vec3i(-1, -3,  4), new Vec3i(0, -3,  4), new Vec3i(1, -3,  4), new Vec3i(2, -3,  4), new Vec3i(3, -3,  4), new Vec3i(4, -3,  4), new Vec3i(5, -3,  4),
+			new Vec3i(-5, -2,  4), new Vec3i(-4, -2,  4), new Vec3i(-3, -2,  4), new Vec3i(-2, -2,  4), new Vec3i(-1, -2,  4), new Vec3i(0, -2,  4), new Vec3i(1, -2,  4), new Vec3i(2, -2,  4), new Vec3i(3, -2,  4), new Vec3i(4, -2,  4), new Vec3i(5, -2,  4),
+			new Vec3i(-5, -1,  4), new Vec3i(-4, -1,  4), new Vec3i(-3, -1,  4), new Vec3i(-2, -1,  4), new Vec3i(-1, -1,  4), new Vec3i(0, -1,  4), new Vec3i(1, -1,  4), new Vec3i(2, -1,  4), new Vec3i(3, -1,  4), new Vec3i(4, -1,  4), new Vec3i(5, -1,  4),
+			new Vec3i(-5,  0,  4), new Vec3i(-4,  0,  4), new Vec3i(-3,  0,  4), new Vec3i(-2,  0,  4), new Vec3i(-1,  0,  4), new Vec3i(0,  0,  4), new Vec3i(1,  0,  4), new Vec3i(2,  0,  4), new Vec3i(3,  0,  4), new Vec3i(4,  0,  4), new Vec3i(5,  0,  4),
+			new Vec3i(-5,  1,  4), new Vec3i(-4,  1,  4), new Vec3i(-3,  1,  4), new Vec3i(-2,  1,  4), new Vec3i(-1,  1,  4), new Vec3i(0,  1,  4), new Vec3i(1,  1,  4), new Vec3i(2,  1,  4), new Vec3i(3,  1,  4), new Vec3i(4,  1,  4), new Vec3i(5,  1,  4),
+			new Vec3i(-5,  2,  4), new Vec3i(-4,  2,  4), new Vec3i(-3,  2,  4), new Vec3i(-2,  2,  4), new Vec3i(-1,  2,  4), new Vec3i(0,  2,  4), new Vec3i(1,  2,  4), new Vec3i(2,  2,  4), new Vec3i(3,  2,  4), new Vec3i(4,  2,  4), new Vec3i(5,  2,  4),
+			new Vec3i(-5,  3,  4), new Vec3i(-4,  3,  4), new Vec3i(-3,  3,  4), new Vec3i(-2,  3,  4), new Vec3i(-1,  3,  4), new Vec3i(0,  3,  4), new Vec3i(1,  3,  4), new Vec3i(2,  3,  4), new Vec3i(3,  3,  4), new Vec3i(4,  3,  4), new Vec3i(5,  3,  4),
+			new Vec3i(-5,  4,  4), new Vec3i(-4,  4,  4), new Vec3i(-3,  4,  4), new Vec3i(-2,  4,  4), new Vec3i(-1,  4,  4), new Vec3i(0,  4,  4), new Vec3i(1,  4,  4), new Vec3i(2,  4,  4), new Vec3i(3,  4,  4), new Vec3i(4,  4,  4), new Vec3i(5,  4,  4),
+			new Vec3i(-5,  5,  4), new Vec3i(-4,  5,  4), new Vec3i(-3,  5,  4), new Vec3i(-2,  5,  4), new Vec3i(-1,  5,  4), new Vec3i(0,  5,  4), new Vec3i(1,  5,  4), new Vec3i(2,  5,  4), new Vec3i(3,  5,  4), new Vec3i(4,  5,  4), new Vec3i(5,  5,  4),
+			new Vec3i(-5, -5,  5), new Vec3i(-4, -5,  5), new Vec3i(-3, -5,  5), new Vec3i(-2, -5,  5), new Vec3i(-1, -5,  5), new Vec3i(0, -5,  5), new Vec3i(1, -5,  5), new Vec3i(2, -5,  5), new Vec3i(3, -5,  5), new Vec3i(4, -5,  5), new Vec3i(5, -5,  5),
+			new Vec3i(-5, -4,  5), new Vec3i(-4, -4,  5), new Vec3i(-3, -4,  5), new Vec3i(-2, -4,  5), new Vec3i(-1, -4,  5), new Vec3i(0, -4,  5), new Vec3i(1, -4,  5), new Vec3i(2, -4,  5), new Vec3i(3, -4,  5), new Vec3i(4, -4,  5), new Vec3i(5, -4,  5),
+			new Vec3i(-5, -3,  5), new Vec3i(-4, -3,  5), new Vec3i(-3, -3,  5), new Vec3i(-2, -3,  5), new Vec3i(-1, -3,  5), new Vec3i(0, -3,  5), new Vec3i(1, -3,  5), new Vec3i(2, -3,  5), new Vec3i(3, -3,  5), new Vec3i(4, -3,  5), new Vec3i(5, -3,  5),
+			new Vec3i(-5, -2,  5), new Vec3i(-4, -2,  5), new Vec3i(-3, -2,  5), new Vec3i(-2, -2,  5), new Vec3i(-1, -2,  5), new Vec3i(0, -2,  5), new Vec3i(1, -2,  5), new Vec3i(2, -2,  5), new Vec3i(3, -2,  5), new Vec3i(4, -2,  5), new Vec3i(5, -2,  5),
+			new Vec3i(-5, -1,  5), new Vec3i(-4, -1,  5), new Vec3i(-3, -1,  5), new Vec3i(-2, -1,  5), new Vec3i(-1, -1,  5), new Vec3i(0, -1,  5), new Vec3i(1, -1,  5), new Vec3i(2, -1,  5), new Vec3i(3, -1,  5), new Vec3i(4, -1,  5), new Vec3i(5, -1,  5),
+			new Vec3i(-5,  0,  5), new Vec3i(-4,  0,  5), new Vec3i(-3,  0,  5), new Vec3i(-2,  0,  5), new Vec3i(-1,  0,  5), new Vec3i(0,  0,  5), new Vec3i(1,  0,  5), new Vec3i(2,  0,  5), new Vec3i(3,  0,  5), new Vec3i(4,  0,  5), new Vec3i(5,  0,  5),
+			new Vec3i(-5,  1,  5), new Vec3i(-4,  1,  5), new Vec3i(-3,  1,  5), new Vec3i(-2,  1,  5), new Vec3i(-1,  1,  5), new Vec3i(0,  1,  5), new Vec3i(1,  1,  5), new Vec3i(2,  1,  5), new Vec3i(3,  1,  5), new Vec3i(4,  1,  5), new Vec3i(5,  1,  5),
+			new Vec3i(-5,  2,  5), new Vec3i(-4,  2,  5), new Vec3i(-3,  2,  5), new Vec3i(-2,  2,  5), new Vec3i(-1,  2,  5), new Vec3i(0,  2,  5), new Vec3i(1,  2,  5), new Vec3i(2,  2,  5), new Vec3i(3,  2,  5), new Vec3i(4,  2,  5), new Vec3i(5,  2,  5),
+			new Vec3i(-5,  3,  5), new Vec3i(-4,  3,  5), new Vec3i(-3,  3,  5), new Vec3i(-2,  3,  5), new Vec3i(-1,  3,  5), new Vec3i(0,  3,  5), new Vec3i(1,  3,  5), new Vec3i(2,  3,  5), new Vec3i(3,  3,  5), new Vec3i(4,  3,  5), new Vec3i(5,  3,  5),
+			new Vec3i(-5,  4,  5), new Vec3i(-4,  4,  5), new Vec3i(-3,  4,  5), new Vec3i(-2,  4,  5), new Vec3i(-1,  4,  5), new Vec3i(0,  4,  5), new Vec3i(1,  4,  5), new Vec3i(2,  4,  5), new Vec3i(3,  4,  5), new Vec3i(4,  4,  5), new Vec3i(5,  4,  5),
+			new Vec3i(-5,  5,  5), new Vec3i(-4,  5,  5), new Vec3i(-3,  5,  5), new Vec3i(-2,  5,  5), new Vec3i(-1,  5,  5), new Vec3i(0,  5,  5), new Vec3i(1,  5,  5), new Vec3i(2,  5,  5), new Vec3i(3,  5,  5), new Vec3i(4,  5,  5), new Vec3i(5,  5,  5)
+	};
+
+	public static final Vec3i[] SearchBlock7to7 =new Vec3i[] {
+			new Vec3i(-3, -3, -3), new Vec3i(-2, -3, -3), new Vec3i(-1, -3, -3), new Vec3i(0, -3, -3), new Vec3i(1, -3, -3), new Vec3i(2, -3, -3), new Vec3i(3, -3, -3),
+			new Vec3i(-3, -2, -3), new Vec3i(-2, -2, -3), new Vec3i(-1, -2, -3), new Vec3i(0, -2, -3), new Vec3i(1, -2, -3), new Vec3i(2, -2, -3), new Vec3i(3, -2, -3),
+			new Vec3i(-3, -1, -3), new Vec3i(-2, -1, -3), new Vec3i(-1, -1, -3), new Vec3i(0, -1, -3), new Vec3i(1, -1, -3), new Vec3i(2, -1, -3), new Vec3i(3, -1, -3),
+			new Vec3i(-3,  0, -3), new Vec3i(-2,  0, -3), new Vec3i(-1,  0, -3), new Vec3i(0,  0, -3), new Vec3i(1,  0, -3), new Vec3i(2,  0, -3), new Vec3i(3,  0, -3),
+			new Vec3i(-3,  1, -3), new Vec3i(-2,  1, -3), new Vec3i(-1,  1, -3), new Vec3i(0,  1, -3), new Vec3i(1,  1, -3), new Vec3i(2,  1, -3), new Vec3i(3,  1, -3),
+			new Vec3i(-3,  2, -3), new Vec3i(-2,  2, -3), new Vec3i(-1,  2, -3), new Vec3i(0,  2, -3), new Vec3i(1,  2, -3), new Vec3i(2,  2, -3), new Vec3i(3,  2, -3),
+			new Vec3i(-3,  3, -3), new Vec3i(-2,  3, -3), new Vec3i(-1,  3, -3), new Vec3i(0,  3, -3), new Vec3i(1,  3, -3), new Vec3i(2,  3, -3), new Vec3i(3,  3, -3),
+			new Vec3i(-3, -3, -2), new Vec3i(-2, -3, -2), new Vec3i(-1, -3, -2), new Vec3i(0, -3, -2), new Vec3i(1, -3, -2), new Vec3i(2, -3, -2), new Vec3i(3, -3, -2),
+			new Vec3i(-3, -2, -2), new Vec3i(-2, -2, -2), new Vec3i(-1, -2, -2), new Vec3i(0, -2, -2), new Vec3i(1, -2, -2), new Vec3i(2, -2, -2), new Vec3i(3, -2, -2),
+			new Vec3i(-3, -1, -2), new Vec3i(-2, -1, -2), new Vec3i(-1, -1, -2), new Vec3i(0, -1, -2), new Vec3i(1, -1, -2), new Vec3i(2, -1, -2), new Vec3i(3, -1, -2),
+			new Vec3i(-3,  0, -2), new Vec3i(-2,  0, -2), new Vec3i(-1,  0, -2), new Vec3i(0,  0, -2), new Vec3i(1,  0, -2), new Vec3i(2,  0, -2), new Vec3i(3,  0, -2),
+			new Vec3i(-3,  1, -2), new Vec3i(-2,  1, -2), new Vec3i(-1,  1, -2), new Vec3i(0,  1, -2), new Vec3i(1,  1, -2), new Vec3i(2,  1, -2), new Vec3i(3,  1, -2),
+			new Vec3i(-3,  2, -2), new Vec3i(-2,  2, -2), new Vec3i(-1,  2, -2), new Vec3i(0,  2, -2), new Vec3i(1,  2, -2), new Vec3i(2,  2, -2), new Vec3i(3,  2, -2),
+			new Vec3i(-3,  3, -2), new Vec3i(-2,  3, -2), new Vec3i(-1,  3, -2), new Vec3i(0,  3, -2), new Vec3i(1,  3, -2), new Vec3i(2,  3, -2), new Vec3i(3,  3, -2),
+			new Vec3i(-3, -3, -1), new Vec3i(-2, -3, -1), new Vec3i(-1, -3, -1), new Vec3i(0, -3, -1), new Vec3i(1, -3, -1), new Vec3i(2, -3, -1), new Vec3i(3, -3, -1),
+			new Vec3i(-3, -2, -1), new Vec3i(-2, -2, -1), new Vec3i(-1, -2, -1), new Vec3i(0, -2, -1), new Vec3i(1, -2, -1), new Vec3i(2, -2, -1), new Vec3i(3, -2, -1),
+			new Vec3i(-3, -1, -1), new Vec3i(-2, -1, -1), new Vec3i(-1, -1, -1), new Vec3i(0, -1, -1), new Vec3i(1, -1, -1), new Vec3i(2, -1, -1), new Vec3i(3, -1, -1),
+			new Vec3i(-3,  0, -1), new Vec3i(-2,  0, -1), new Vec3i(-1,  0, -1), new Vec3i(0,  0, -1), new Vec3i(1,  0, -1), new Vec3i(2,  0, -1), new Vec3i(3,  0, -1),
+			new Vec3i(-3,  1, -1), new Vec3i(-2,  1, -1), new Vec3i(-1,  1, -1), new Vec3i(0,  1, -1), new Vec3i(1,  1, -1), new Vec3i(2,  1, -1), new Vec3i(3,  1, -1),
+			new Vec3i(-3,  2, -1), new Vec3i(-2,  2, -1), new Vec3i(-1,  2, -1), new Vec3i(0,  2, -1), new Vec3i(1,  2, -1), new Vec3i(2,  2, -1), new Vec3i(3,  2, -1),
+			new Vec3i(-3,  3, -1), new Vec3i(-2,  3, -1), new Vec3i(-1,  3, -1), new Vec3i(0,  3, -1), new Vec3i(1,  3, -1), new Vec3i(2,  3, -1), new Vec3i(3,  3, -1),
+			new Vec3i(-3, -3,  0), new Vec3i(-2, -3,  0), new Vec3i(-1, -3,  0), new Vec3i(0, -3,  0), new Vec3i(1, -3,  0), new Vec3i(2, -3,  0), new Vec3i(3, -3,  0),
+			new Vec3i(-3, -2,  0), new Vec3i(-2, -2,  0), new Vec3i(-1, -2,  0), new Vec3i(0, -2,  0), new Vec3i(1, -2,  0), new Vec3i(2, -2,  0), new Vec3i(3, -2,  0),
+			new Vec3i(-3, -1,  0), new Vec3i(-2, -1,  0), new Vec3i(-1, -1,  0), new Vec3i(0, -1,  0), new Vec3i(1, -1,  0), new Vec3i(2, -1,  0), new Vec3i(3, -1,  0),
+			new Vec3i(-3,  0,  0), new Vec3i(-2,  0,  0), new Vec3i(-1,  0,  0), new Vec3i(0,  0,  0), new Vec3i(1,  0,  0), new Vec3i(2,  0,  0), new Vec3i(3,  0,  0),
+			new Vec3i(-3,  1,  0), new Vec3i(-2,  1,  0), new Vec3i(-1,  1,  0), new Vec3i(0,  1,  0), new Vec3i(1,  1,  0), new Vec3i(2,  1,  0), new Vec3i(3,  1,  0),
+			new Vec3i(-3,  2,  0), new Vec3i(-2,  2,  0), new Vec3i(-1,  2,  0), new Vec3i(0,  2,  0), new Vec3i(1,  2,  0), new Vec3i(2,  2,  0), new Vec3i(3,  2,  0),
+			new Vec3i(-3,  3,  0), new Vec3i(-2,  3,  0), new Vec3i(-1,  3,  0), new Vec3i(0,  3,  0), new Vec3i(1,  3,  0), new Vec3i(2,  3,  0), new Vec3i(3,  3,  0),
+			new Vec3i(-3, -3,  1), new Vec3i(-2, -3,  1), new Vec3i(-1, -3,  1), new Vec3i(0, -3,  1), new Vec3i(1, -3,  1), new Vec3i(2, -3,  1), new Vec3i(3, -3,  1),
+			new Vec3i(-3, -2,  1), new Vec3i(-2, -2,  1), new Vec3i(-1, -2,  1), new Vec3i(0, -2,  1), new Vec3i(1, -2,  1), new Vec3i(2, -2,  1), new Vec3i(3, -2,  1),
+			new Vec3i(-3, -1,  1), new Vec3i(-2, -1,  1), new Vec3i(-1, -1,  1), new Vec3i(0, -1,  1), new Vec3i(1, -1,  1), new Vec3i(2, -1,  1), new Vec3i(3, -1,  1),
+			new Vec3i(-3,  0,  1), new Vec3i(-2,  0,  1), new Vec3i(-1,  0,  1), new Vec3i(0,  0,  1), new Vec3i(1,  0,  1), new Vec3i(2,  0,  1), new Vec3i(3,  0,  1),
+			new Vec3i(-3,  1,  1), new Vec3i(-2,  1,  1), new Vec3i(-1,  1,  1), new Vec3i(0,  1,  1), new Vec3i(1,  1,  1), new Vec3i(2,  1,  1), new Vec3i(3,  1,  1),
+			new Vec3i(-3,  2,  1), new Vec3i(-2,  2,  1), new Vec3i(-1,  2,  1), new Vec3i(0,  2,  1), new Vec3i(1,  2,  1), new Vec3i(2,  2,  1), new Vec3i(3,  2,  1),
+			new Vec3i(-3,  3,  1), new Vec3i(-2,  3,  1), new Vec3i(-1,  3,  1), new Vec3i(0,  3,  1), new Vec3i(1,  3,  1), new Vec3i(2,  3,  1), new Vec3i(3,  3,  1),
+			new Vec3i(-3, -3,  2), new Vec3i(-2, -3,  2), new Vec3i(-1, -3,  2), new Vec3i(0, -3,  2), new Vec3i(1, -3,  2), new Vec3i(2, -3,  2), new Vec3i(3, -3,  2),
+			new Vec3i(-3, -2,  2), new Vec3i(-2, -2,  2), new Vec3i(-1, -2,  2), new Vec3i(0, -2,  2), new Vec3i(1, -2,  2), new Vec3i(2, -2,  2), new Vec3i(3, -2,  2),
+			new Vec3i(-3, -1,  2), new Vec3i(-2, -1,  2), new Vec3i(-1, -1,  2), new Vec3i(0, -1,  2), new Vec3i(1, -1,  2), new Vec3i(2, -1,  2), new Vec3i(3, -1,  2),
+			new Vec3i(-3,  0,  2), new Vec3i(-2,  0,  2), new Vec3i(-1,  0,  2), new Vec3i(0,  0,  2), new Vec3i(1,  0,  2), new Vec3i(2,  0,  2), new Vec3i(3,  0,  2),
+			new Vec3i(-3,  1,  2), new Vec3i(-2,  1,  2), new Vec3i(-1,  1,  2), new Vec3i(0,  1,  2), new Vec3i(1,  1,  2), new Vec3i(2,  1,  2), new Vec3i(3,  1,  2),
+			new Vec3i(-3,  2,  2), new Vec3i(-2,  2,  2), new Vec3i(-1,  2,  2), new Vec3i(0,  2,  2), new Vec3i(1,  2,  2), new Vec3i(2,  2,  2), new Vec3i(3,  2,  2),
+			new Vec3i(-3,  3,  2), new Vec3i(-2,  3,  2), new Vec3i(-1,  3,  2), new Vec3i(0,  3,  2), new Vec3i(1,  3,  2), new Vec3i(2,  3,  2), new Vec3i(3,  3,  2),
+			new Vec3i(-3, -3,  3), new Vec3i(-2, -3,  3), new Vec3i(-1, -3,  3), new Vec3i(0, -3,  3), new Vec3i(1, -3,  3), new Vec3i(2, -3,  3), new Vec3i(3, -3,  3),
+			new Vec3i(-3, -2,  3), new Vec3i(-2, -2,  3), new Vec3i(-1, -2,  3), new Vec3i(0, -2,  3), new Vec3i(1, -2,  3), new Vec3i(2, -2,  3), new Vec3i(3, -2,  3),
+			new Vec3i(-3, -1,  3), new Vec3i(-2, -1,  3), new Vec3i(-1, -1,  3), new Vec3i(0, -1,  3), new Vec3i(1, -1,  3), new Vec3i(2, -1,  3), new Vec3i(3, -1,  3),
+			new Vec3i(-3,  0,  3), new Vec3i(-2,  0,  3), new Vec3i(-1,  0,  3), new Vec3i(0,  0,  3), new Vec3i(1,  0,  3), new Vec3i(2,  0,  3), new Vec3i(3,  0,  3),
+			new Vec3i(-3,  1,  3), new Vec3i(-2,  1,  3), new Vec3i(-1,  1,  3), new Vec3i(0,  1,  3), new Vec3i(1,  1,  3), new Vec3i(2,  1,  3), new Vec3i(3,  1,  3),
+			new Vec3i(-3,  2,  3), new Vec3i(-2,  2,  3), new Vec3i(-1,  2,  3), new Vec3i(0,  2,  3), new Vec3i(1,  2,  3), new Vec3i(2,  2,  3), new Vec3i(3,  2,  3),
+			new Vec3i(-3,  3,  3), new Vec3i(-2,  3,  3), new Vec3i(-1,  3,  3), new Vec3i(0,  3,  3), new Vec3i(1,  3,  3), new Vec3i(2,  3,  3), new Vec3i(3,  3,  3),
+	};
+
+
+	public static final Vec3i[] SearchBlock5to5 =new Vec3i[] {
+			new Vec3i(-2, -2, -2), new Vec3i(-1, -2, -2), new Vec3i(0, -2, -2), new Vec3i(1, -2, -2), new Vec3i(2, -2, -2),
+			new Vec3i(-2, -1, -2), new Vec3i(-1, -1, -2), new Vec3i(0, -1, -2), new Vec3i(1, -1, -2), new Vec3i(2, -1, -2),
+			new Vec3i(-2,  0, -2), new Vec3i(-1,  0, -2), new Vec3i(0,  0, -2), new Vec3i(1,  0, -2), new Vec3i(2,  0, -2),
+			new Vec3i(-2,  1, -2), new Vec3i(-1,  1, -2), new Vec3i(0,  1, -2), new Vec3i(1,  1, -2), new Vec3i(2,  1, -2),
+			new Vec3i(-2,  2, -2), new Vec3i(-1,  2, -2), new Vec3i(0,  2, -2), new Vec3i(1,  2, -2), new Vec3i(2,  2, -2),
+			new Vec3i(-2, -2, -1), new Vec3i(-1, -2, -1), new Vec3i(0, -2, -1), new Vec3i(1, -2, -1), new Vec3i(2, -2, -1),
+			new Vec3i(-2, -1, -1), new Vec3i(-1, -1, -1), new Vec3i(0, -1, -1), new Vec3i(1, -1, -1), new Vec3i(2, -1, -1),
+			new Vec3i(-2,  0, -1), new Vec3i(-1,  0, -1), new Vec3i(0,  0, -1), new Vec3i(1,  0, -1), new Vec3i(2,  0, -1),
+			new Vec3i(-2,  1, -1), new Vec3i(-1,  1, -1), new Vec3i(0,  1, -1), new Vec3i(1,  1, -1), new Vec3i(2,  1, -1),
+			new Vec3i(-2,  2, -1), new Vec3i(-1,  2, -1), new Vec3i(0,  2, -1), new Vec3i(1,  2, -1), new Vec3i(2,  2, -1),
+			new Vec3i(-2, -2,  0), new Vec3i(-1, -2,  0), new Vec3i(0, -2,  0), new Vec3i(1, -2,  0), new Vec3i(2, -2,  0),
+			new Vec3i(-2, -1,  0), new Vec3i(-1, -1,  0), new Vec3i(0, -1,  0), new Vec3i(1, -1,  0), new Vec3i(2, -1,  0),
+			new Vec3i(-2,  0,  0), new Vec3i(-1,  0,  0), new Vec3i(0,  0,  0), new Vec3i(1,  0,  0), new Vec3i(2,  0,  0),
+			new Vec3i(-2,  1,  0), new Vec3i(-1,  1,  0), new Vec3i(0,  1,  0), new Vec3i(1,  1,  0), new Vec3i(2,  1,  0),
+			new Vec3i(-2,  2,  0), new Vec3i(-1,  2,  0), new Vec3i(0,  2,  0), new Vec3i(1,  2,  0), new Vec3i(2,  2,  0),
+			new Vec3i(-2, -2,  1), new Vec3i(-1, -2,  1), new Vec3i(0, -2,  1), new Vec3i(1, -2,  1), new Vec3i(2, -2,  1),
+			new Vec3i(-2, -1,  1), new Vec3i(-1, -1,  1), new Vec3i(0, -1,  1), new Vec3i(1, -1,  1), new Vec3i(2, -1,  1),
+			new Vec3i(-2,  0,  1), new Vec3i(-1,  0,  1), new Vec3i(0,  0,  1), new Vec3i(1,  0,  1), new Vec3i(2,  0,  1),
+			new Vec3i(-2,  1,  1), new Vec3i(-1,  1,  1), new Vec3i(0,  1,  1), new Vec3i(1,  1,  1), new Vec3i(2,  1,  1),
+			new Vec3i(-2,  2,  1), new Vec3i(-1,  2,  1), new Vec3i(0,  2,  1), new Vec3i(1,  2,  1), new Vec3i(2,  2,  1),
+			new Vec3i(-2, -2,  2), new Vec3i(-1, -2,  2), new Vec3i(0, -2,  2), new Vec3i(1, -2,  2), new Vec3i(2, -2,  2),
+			new Vec3i(-2, -1,  2), new Vec3i(-1, -1,  2), new Vec3i(0, -1,  2), new Vec3i(1, -1,  2), new Vec3i(2, -1,  2),
+			new Vec3i(-2,  0,  2), new Vec3i(-1,  0,  2), new Vec3i(0,  0,  2), new Vec3i(1,  0,  2), new Vec3i(2,  0,  2),
+			new Vec3i(-2,  1,  2), new Vec3i(-1,  1,  2), new Vec3i(0,  1,  2), new Vec3i(1,  1,  2), new Vec3i(2,  1,  2),
+			new Vec3i(-2,  2,  2), new Vec3i(-1,  2,  2), new Vec3i(0,  2,  2), new Vec3i(1,  2,  2), new Vec3i(2,  2,  2),
+	};
+
+	public static final Vec3i[] SearchBlock3to3 =new Vec3i[] {
+			new Vec3i(-1, -1, -2), new Vec3i(0, -1, -2), new Vec3i(1, -1, -2),
+			new Vec3i(-1,  0, -2), new Vec3i(0,  0, -2), new Vec3i(1,  0, -2),
+			new Vec3i(-1,  1, -2), new Vec3i(0,  1, -2), new Vec3i(1,  1, -2),
+			new Vec3i(-1, -1, -1), new Vec3i(0, -1, -1), new Vec3i(1, -1, -1),
+			new Vec3i(-1,  0, -1), new Vec3i(0,  0, -1), new Vec3i(1,  0, -1),
+			new Vec3i(-1,  1, -1), new Vec3i(0,  1, -1), new Vec3i(1,  1, -1),
+			new Vec3i(-1, -1,  0), new Vec3i(0, -1,  0), new Vec3i(1, -1,  0),
+			new Vec3i(-1,  0,  0), new Vec3i(0,  0,  0), new Vec3i(1,  0,  0),
+			new Vec3i(-1,  1,  0), new Vec3i(0,  1,  0), new Vec3i(1,  1,  0),
+			new Vec3i(-1, -1,  1), new Vec3i(0, -1,  1), new Vec3i(1, -1,  1),
+			new Vec3i(-1,  0,  1), new Vec3i(0,  0,  1), new Vec3i(1,  0,  1),
+			new Vec3i(-1,  1,  1), new Vec3i(0,  1,  1), new Vec3i(1,  1,  1),
+			new Vec3i(-1, -1,  2), new Vec3i(0, -1,  2), new Vec3i(1, -1,  2),
+			new Vec3i(-1,  0,  2), new Vec3i(0,  0,  2), new Vec3i(1,  0,  2),
+			new Vec3i(-1,  1,  2), new Vec3i(0,  1,  2), new Vec3i(1,  1,  2),
+	};
+
+
+
+
+
+
 
 
 

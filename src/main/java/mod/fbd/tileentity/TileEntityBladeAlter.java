@@ -4,104 +4,94 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import mod.fbd.block.BlockCore;
 import mod.fbd.block.BlockHorizontalContainer;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.log.ModLog;
 import mod.fbd.item.ItemCore;
-import mod.fbd.item.ItemKatana;
-import mod.fbd.item.ItemKatanaMugen;
+import mod.fbd.item.katana.AbstractItemKatana;
 import mod.fbd.util.Enchant;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.registry.Registry;
 
 public class TileEntityBladeAlter extends TileEntity implements IInventory {
 	public static final String NAME = "bladealter";
 	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(1,ItemStack.EMPTY);
-	private EnumFacing facing;
+	private Direction facing;
 
 	public TileEntityBladeAlter(){
-		this(EnumFacing.NORTH);
+		this(BlockCore.block_bladealter.getDefaultState());
 	}
 
-	public TileEntityBladeAlter(IBlockState face){
-		this();
+	public TileEntityBladeAlter(BlockState face){
+		super(Mod_FantomBlade.RegistryEvents.BLADEALTER);
 		facing = face.get(BlockHorizontalContainer.FACING);
 	}
 
 	@Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
+    public void read(CompoundNBT compound) {
+        super.read(compound);
 
-        NBTTagList nbttaglist = compound.getTagList("Stacks", 10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
+        ListNBT ListNBT = compound.getList("Stacks", 10);
+        for (int i = 0; i < ListNBT.size(); ++i) {
+            ItemStack itemstack = ItemStack.read((CompoundNBT)ListNBT.get(i));
 
-            if (!itemstack.isEmpty())
-            {
+            if (!itemstack.isEmpty()) {
                 this.stacks.set(i,itemstack);
             }
         }
-        facing = EnumFacing.getHorizontal(compound.getInteger("face"));
+        facing = Direction.byHorizontalIndex(compound.getInt("face"));
     }
 
 	@Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public CompoundNBT write(CompoundNBT compound)
     {
-        compound = super.writeToNBT(compound);
-        NBTTagList nbttaglist = new NBTTagList();
-        for (int i = 0; i < this.stacks.size(); ++i)
-        {
+        compound = super.write(compound);
+        ListNBT ListNBT = new ListNBT();
+        for (int i = 0; i < this.stacks.size(); ++i) {
             ItemStack itemstack = this.stacks.get(i);
 
-            if (!itemstack.isEmpty())
-            {
-                nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
+            if (!itemstack.isEmpty()) {
+                ListNBT.add(itemstack.write(new CompoundNBT()));
             }
         }
-        compound.setTag("Stacks", nbttaglist);
-        compound.setInteger("face", facing.getHorizontalIndex());
+        compound.put("Stacks", ListNBT);
+        compound.putInt("face", facing.getHorizontalIndex());
         return compound;
     }
 
 	@Override
-    public NBTTagCompound getUpdateTag()
-    {
-        NBTTagCompound cp = super.getUpdateTag();
-        return this.writeToNBT(cp);
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT cp = super.getUpdateTag();
+        return this.write(cp);
     }
 
 	@Override
-    public void handleUpdateTag(NBTTagCompound tag)
-    {
+    public void handleUpdateTag(CompoundNBT tag) {
 		super.handleUpdateTag(tag);
-		this.readFromNBT(tag);
+		this.read(tag);
     }
 
 	@Override
-	public String getName() {
-		return "inventory.bladealter";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
+	public SUpdateTileEntityPacket getUpdatePacket() {
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        return new SUpdateTileEntityPacket(this.pos, 1,  this.write(CompoundNBT));
+    }
 
 	@Override
 	public int getSizeInventory() {
@@ -120,7 +110,7 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
         return true;
 	}
 
-	public EnumFacing getFace(){
+	public Direction getFace(){
 		return this.facing;
 	}
 
@@ -132,7 +122,7 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		 return ItemStackHelper.getAndSplit(this.stacks, index, count);
+		return ItemStackHelper.getAndSplit(this.stacks, index, count);
 	}
 
 	@Override
@@ -156,35 +146,32 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 
 	private void makePotionList(ItemStack stack){
 		if (stack.getItem() == ItemCore.item_katana_niji || stack.getItem() == ItemCore.item_katana_mugen){
-			List<PotionEffect> work_pot = ((ItemKatana)stack.getItem()).getPotionEffects(stack);
-			pot_list = new ArrayList<PotionEffect>();
-			IRegistry.field_212631_t.forEach(potion->{
+			List<EffectInstance> work_pot = AbstractItemKatana.getPotionEffects(stack);
+			pot_list = new ArrayList<EffectInstance>();
+			Registry.EFFECTS.forEach(eft->{
 				boolean flg = true;
-				for (PotionEffect effect : work_pot){
-					if (effect.getPotion() == potion){
-						pot_list.add(new PotionEffect(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
+				for (EffectInstance effect : work_pot){
+					if (effect.getPotion() == eft){
+						pot_list.add(new EffectInstance(effect.getPotion(),effect.getDuration(),effect.getAmplifier()));
 						flg = false;
 						break;
 					}
 				}
-//				if (flg){
-//					pot_list.add(new PotionEffect(potion,potion.,potion.getAmplifier()));
-//				}
+				if (flg) {
+					pot_list.add(new EffectInstance(eft,1,0));
+				}
 			});
 		}
 	}
 
 	private void makeEnchantList(ItemStack stack){
-		if (Mod_FantomBlade.swordEnchantments.size() == 0) {
-			Mod_FantomBlade.createSwordEnchant();
-		}
-		Enchantment[] ignore = ((ItemKatana)stack.getItem()).ignoreEnchantments();
+		Enchantment[] ignore = ((AbstractItemKatana)stack.getItem()).ignoreEnchantments();
 		Map<Enchantment,Integer> enchants = EnchantmentHelper.getEnchantments(stack);
-		for (Enchantment enc : Mod_FantomBlade.swordEnchantments){
-			if (!enchants.containsKey(enc)){
+		Registry.ENCHANTMENT.forEach(enc->{
+			if (!enchants.containsKey(enc)) {
 				enchants.put(enc, 0);
 			}
-		}
+		});
 		enc_list = new ArrayList<Enchant>();
 		for (Enchantment enc : enchants.keySet()){
 			enc_list.add(new Enchant(enc, enchants.get(enc)));
@@ -202,28 +189,27 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return (stack.getItem() instanceof ItemKatana);
+		return (stack.getItem() instanceof AbstractItemKatana);
 	}
 
-	@Override
 	public int getField(int id) {
 		int ret = 0;
 		switch(id){
@@ -234,16 +220,14 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 		return ret;
 	}
 
-	@Override
 	public void setField(int id, int value) {
 		switch(id){
 		case 0:
-			facing = EnumFacing.getHorizontal(value);
+			facing = Direction.byHorizontalIndex(value);
 			break;
 		}
 	}
 
-	@Override
 	public int getFieldCount() {
 		return 1;
 	}
@@ -275,11 +259,11 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 		if (index < 0 && stacks.size() <= index){
 			return null;
 		}
-		return ((ItemKatana)stacks.get(index).getItem()).getBladeTexture();
+		return ((AbstractItemKatana)stacks.get(index).getItem()).getBladeTexture();
 	}
 
 
-	private List<PotionEffect> pot_list = null;
+	private List<EffectInstance> pot_list = null;
 	private List<Enchant> enc_list = null;
 	private int enc_index = 0;
 	private int pot_index = 0;
@@ -321,8 +305,8 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 	public String getStrPotion(){
 		if (pot_list != null && pot_list.size() > 0){
 			addPotionIndex(0);
-			PotionEffect effect = pot_list.get(pot_index);
-			String ret = I18n.translateToLocal(effect.getEffectName()) + "/" + effect.getAmplifier() + " " + (effect.getDuration()/20)+"sec";
+			EffectInstance effect = pot_list.get(pot_index);
+			String ret = I18n.format(effect.getEffectName()) + "/" + effect.getAmplifier() + " " + (effect.getDuration()/20)+"sec";
 
 			return ret;
 		}
@@ -337,7 +321,7 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 		return "";
 	}
 
-	public PotionEffect getPotion(){
+	public EffectInstance getPotion(){
 		if (pot_list != null && pot_list.size() > 0){
 			addPotionIndex(0);
 			return pot_list.get(pot_index);
@@ -355,20 +339,20 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 
 	public void BladeLevelUp() {
 		ItemStack stack = this.getKatana();
-		ItemKatana katana = ((ItemKatana)stack.getItem());
-		int exp = ItemKatana.getExp(stack);
+		AbstractItemKatana katana = ((AbstractItemKatana)stack.getItem());
+		int exp = AbstractItemKatana.getExp(stack);
 		int next = katana.getLevelUpExp();
 		if (next <= exp){
 			katana.setLevel(stack, katana.getLevel(stack)+1);
-			ItemKatana.setExp(stack, exp - next);
+			AbstractItemKatana.setExp(stack, exp - next);
 		}
 		this.setInventorySlotContents(0, stack);
 	}
 
 	public void BladeEnchantUpdate(int index, int value) {
 		ItemStack stack = this.getKatana();
-		ItemKatana katana = ((ItemKatana)stack.getItem());
-		int exp = ItemKatana.getExp(stack);
+		AbstractItemKatana katana = ((AbstractItemKatana)stack.getItem());
+		int exp = AbstractItemKatana.getExp(stack);
 		int next = katana.getEnchantLevelUpExp();
 		if (next <= exp){
 			if (index < 0 || index >= enc_list.size()){
@@ -378,105 +362,105 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 			Map<Enchantment,Integer> encmap = EnchantmentHelper.getEnchantments(stack);
 			if (encmap.containsKey(enc.Enchantment())){
 				if (value == 0){
-					// エンチャント削除
+					// iエンチャント削除
 					encmap.remove(enc.Enchantment());
 				}else{
-					// 既存エンチャントのレベル設定
+					// i既存エンチャントのレベル設定
 					Integer lv = encmap.get(enc.Enchantment()) + value;
 					if (lv <= 0){
-						// レベルが0になるようならなんかばぐってる
+						// iレベルが0になるようならなんかばぐってる
 						ModLog.log().info("エンチャントレベルがおかしいよ："+lv);
 						return;
 					}
 					encmap.replace(enc.Enchantment(), lv);
 				}
 			}else{
-				// 新規エンチャントを追加
+				// i新規エンチャントを追加
 				encmap.put(enc.Enchantment(), 1);
 			}
-			// エンチャントを更新
+			// iエンチャントを更新
 			EnchantmentHelper.setEnchantments(encmap, stack);
 			// Expを更新
-			//ItemKatana.setExp(stack, exp-next);
-			// アイテムを再設定
+			//AbstractItemKatana.setExp(stack, exp-next);
+			// iアイテムを再設定
 			this.setInventorySlotContents(0, stack);
 		}
 	}
 
 	public void BladePotionUpdate(int index, int value) {
 		ItemStack stack = this.getKatana();
-		ItemKatana katana = ((ItemKatana)stack.getItem());
-		int exp = ItemKatana.getExp(stack);
+		AbstractItemKatana katana = ((AbstractItemKatana)stack.getItem());
+		int exp = AbstractItemKatana.getExp(stack);
 		int next = katana.getPotionEffectUpExp();
 		if (next <= exp){
 			if (index < 0 || index >= pot_list.size()){
 				return;
 			}
-			PotionEffect pot = pot_list.get(index);
-			List<PotionEffect> effects = ItemKatana.getPotionEffects(stack);
+			EffectInstance pot = pot_list.get(index);
+			List<EffectInstance> effects = AbstractItemKatana.getPotionEffects(stack);
 			boolean find = false;
 			int maxlp = effects.size();
 			for (int i = 0; i < maxlp; i++){
 				if (effects.get(i).getPotion() == pot.getPotion()){
 					find = true;
 					if (value == 0){
-						// ポーション効果削除
+						// iポーション効果削除
 						effects.remove(i);
 					}else{
-						// ポーション強度更新
+						// iポーション強度更新
 						int amp = effects.get(i).getAmplifier() + value;
 						if (amp<0){
 							ModLog.log().info("ポーチョンがおかしいよ："+amp);
 							return;
 						}
-						PotionEffect e = effects.get(i);
-						effects.set(i, new PotionEffect(e.getPotion(),e.getDuration(),amp));
+						EffectInstance e = effects.get(i);
+						effects.set(i, new EffectInstance(e.getPotion(),e.getDuration(),amp));
 					}
 					break;
 				}
 			}
 			if (!find){
-				// 新規ポーション追加
-				effects.add(new PotionEffect(pot.getPotion(),(pot.getPotion().isInstant()?0:600),0));
+				// i新規ポーション追加
+				effects.add(new EffectInstance(pot.getPotion(),(pot.getPotion().isInstant()?0:600),0));
 			}
-			// ポーション効果を更新
-			ItemKatana.setPotionEffects(stack, effects);
+			// iポーション効果を更新
+			AbstractItemKatana.setPotionEffects(stack, effects);
 			// Expを更新
-			//ItemKatana.setExp(stack, exp - next);
-			// アイテムを再設定
+			//AbstractItemKatana.setExp(stack, exp - next);
+			// iアイテムを再設定
 			this.setInventorySlotContents(0, stack);
 		}
 	}
 
 	public void BladePotionDurationUpdate(int index, int value) {
 		ItemStack stack = this.getKatana();
-		ItemKatana katana = ((ItemKatana)stack.getItem());
-		int exp = ItemKatana.getExp(stack);
+		AbstractItemKatana katana = ((AbstractItemKatana)stack.getItem());
+		int exp = AbstractItemKatana.getExp(stack);
 		int next = katana.getPotionEffectUpExp();
 		if (next <= exp){
 			if (index < 0 || index >= pot_list.size()){
 				return;
 			}
-			PotionEffect pot = pot_list.get(index);
+			EffectInstance pot = pot_list.get(index);
 			if (pot.getPotion().isInstant()){
 				ModLog.log().info("即効性のポーションなんだけど・・・・:"+pot.toString());
 				return;
 			}
-			List<PotionEffect> effects = ItemKatana.getPotionEffects(stack);
+			List<EffectInstance> effects = AbstractItemKatana.getPotionEffects(stack);
 			boolean find = false;
 			int maxlp = effects.size();
 			for (int i = 0; i < maxlp; i++){
 				if (effects.get(i).getPotion() == pot.getPotion()){
 					find = true;
 
-					// ポーション時間更新
+					// iポーション時間更新
 					int duration = effects.get(i).getDuration() + (value*600);
 					if (duration<=0){
 						ModLog.log().info("ポーチョン時間がおかしいよ："+duration);
 						return;
 					}
-					PotionEffect e = effects.get(i);
-					effects.set(i, new PotionEffect(e.getPotion(),duration,e.getAmplifier()));
+					EffectInstance e = effects.get(i);
+					effects.set(i, new EffectInstance(e.getPotion(),duration,e.getAmplifier()));
 					break;
 				}
 			}
@@ -484,17 +468,17 @@ public class TileEntityBladeAlter extends TileEntity implements IInventory {
 				ModLog.log().info("こんな効果知らないわ:"+pot.toString());
 				return;
 			}
-			// ポーション効果を更新
-			ItemKatana.setPotionEffects(stack, effects);
+			// iポーション効果を更新
+			AbstractItemKatana.setPotionEffects(stack, effects);
 			// Expを更新
-			//ItemKatana.setExp(stack, exp - next);
-			// アイテムを再設定
+			//AbstractItemKatana.setExp(stack, exp - next);
+			// iアイテムを再設定
 			this.setInventorySlotContents(0, stack);
 		}
 	}
 
 	public void BladeUpdateMugen() {
-		// 夢幻に更新
-		this.setInventorySlotContents(0, ItemKatanaMugen.getDefaultStack());
+		// i夢幻に更新
+		this.setInventorySlotContents(0, AbstractItemKatana.getDefaultStack((AbstractItemKatana)ItemCore.item_katana_mugen));
 	}
 }

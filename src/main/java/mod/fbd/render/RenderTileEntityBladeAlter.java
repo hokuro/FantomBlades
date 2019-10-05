@@ -1,8 +1,10 @@
 package mod.fbd.render;
 
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import mod.fbd.model.ModelBladeAlter;
 import mod.fbd.tileentity.TileEntityBladeAlter;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 
@@ -40,7 +42,10 @@ public class RenderTileEntityBladeAlter extends TileEntityRenderer<TileEntityBla
 		GlStateManager.rotatef(180,0F,0F,1F);
 		int idx = te.getFace().getHorizontalIndex();
 		GlStateManager.rotatef(90F * (idx+2),0F,1F,0F);
+		GlStateManager.disableLighting();
+		GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, 15 * 16, 15 * 16);
 		this.mainModel.render(te,1.0F);
+		GlStateManager.enableLighting();
 		GlStateManager.popMatrix();
 
 

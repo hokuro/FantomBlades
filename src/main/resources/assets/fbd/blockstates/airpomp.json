@@ -1,6 +1,6 @@
 {
     "variants": {
-        "normal": { "model": "fbd:block/airpomp"}
+        "": { "model": "fbd:block/airpomp"}
     }
 }
 

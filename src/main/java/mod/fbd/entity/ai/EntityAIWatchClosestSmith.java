@@ -1,88 +1,60 @@
 package mod.fbd.entity.ai;
 
-
 import mod.fbd.entity.mob.EntityBladeSmith;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.player.PlayerEntity;
 
-public class EntityAIWatchClosestSmith extends EntityAIWatchClosest {
+public class EntityAIWatchClosestSmith extends LookAtGoal {
 
-	public EntityAIWatchClosestSmith(EntityLiving entityIn, Class<? extends Entity> watchTargetClass, float maxDistance) {
+	public EntityAIWatchClosestSmith(MobEntity entityIn, Class<? extends LivingEntity> watchTargetClass, float maxDistance) {
 		super(entityIn, watchTargetClass, maxDistance);
 	}
 
-	   /**
-     * Returns whether the EntityAIBase should begin execution.
-     */
-    public boolean shouldExecute()
-    {
+	@Override
+    public boolean shouldExecute() {
     	if (entity instanceof EntityBladeSmith){
     		if (((EntityBladeSmith)entity).Dw_ISWORK()){
     			return false;
     		}
     	}
-        if (this.entity.getAttackTarget() != null)
-        {
+
+        if (this.entity.getAttackTarget() != null) {
             this.closestEntity = this.entity.getAttackTarget();
         }
 
-        if (this.watchedClass == EntityPlayer.class)
-        {
-            this.closestEntity = this.entity.world.getClosestPlayer(this.entity.posX, this.entity.posY, this.entity.posZ, (double)this.maxDistance,
-            		EntitySelectors.NOT_SPECTATING.and(EntitySelectors.notRiding(this.entity)));
-        }
-        else
-        {
-            this.closestEntity = this.entity.world.findNearestEntityWithinAABB(this.watchedClass, this.entity.getBoundingBox().grow((double)this.maxDistance, 3.0D, (double)this.maxDistance), this.entity);
+        if (this.watchedClass == PlayerEntity.class) {
+        	this.closestEntity = this.entity.world.getClosestPlayer(this.field_220716_e, this.entity, this.entity.posX, this.entity.posY + (double)this.entity.getEyeHeight(), this.entity.posZ);
+        } else {
+        	this.closestEntity = this.entity.world.func_225318_b(this.watchedClass, this.field_220716_e, this.entity, this.entity.posX, this.entity.posY + (double)this.entity.getEyeHeight(), this.entity.posZ, this.entity.getBoundingBox().grow((double)this.maxDistance, 3.0D, (double)this.maxDistance));
         }
 
         return this.closestEntity != null;
-    }
+	}
 
-    /**
-     * Returns whether an in-progress EntityAIBase should continue executing
-     */
-    public boolean shouldContinueExecuting()
-    {
-        if (!this.closestEntity.isAlive())
-        {
+	@Override
+    public boolean shouldContinueExecuting() {
+        if (!this.closestEntity.isAlive()) {
             return false;
-        }
-        else if (this.entity.getDistanceSq(this.closestEntity) > (double)(this.maxDistance * this.maxDistance))
-        {
+        } else if (this.entity.getDistanceSq(this.closestEntity) > (double)(this.maxDistance * this.maxDistance)) {
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
 
-    /**
-     * Execute a one shot task or start executing a continuous task
-     */
-    public void startExecuting()
-    {
-
+	@Override
+    public void startExecuting()  {
+    	super.startExecuting();
     }
 
-    /**
-     * Reset the task's internal state. Called when this task is interrupted by another one
-     */
-    public void resetTask()
-    {
-        this.closestEntity = null;
+    public void resetTask() {
+        super.resetTask();
     }
 
-    /**
-     * Keep ticking a continuous task that has already been started
-     */
-    public void updateTask()
-    {
-        this.entity.getLookHelper().setLookPosition(this.closestEntity.posX, this.closestEntity.posY + (double)this.closestEntity.getEyeHeight(), this.closestEntity.posZ, (float)this.entity.getHorizontalFaceSpeed(), (float)this.entity.getVerticalFaceSpeed());
+    @Override
+    public void tick()  {
+    	this.entity.getLookController().func_220679_a(this.closestEntity.posX, this.closestEntity.posY + (double)this.closestEntity.getEyeHeight(), this.closestEntity.posZ);
     }
-
 }

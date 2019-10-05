@@ -1,19 +1,21 @@
 package mod.fbd.tileentity;
 
 import mod.fbd.block.BlockBladeStand.EnumBladeStand;
+import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.item.ItemCore;
-import mod.fbd.item.ItemKatana;
+import mod.fbd.item.katana.AbstractItemKatana;
 import mod.fbd.resource.TextureInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
@@ -23,85 +25,90 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 	private ResourceLocation[] resource;
 
 	private EnumBladeStand standType;
-	private EnumFacing facing;
+	private Direction facing;
+	private boolean needMake = true;
 
 	public TileEntityBladeStand(){
+		super(Mod_FantomBlade.RegistryEvents.BLADESTAND);
 		stacks = NonNullList.<ItemStack>withSize(0,ItemStack.EMPTY);
 	}
 
-	public TileEntityBladeStand(EnumBladeStand stand, EnumFacing face){
+	public TileEntityBladeStand(EnumBladeStand stand, Direction face){
+		this();
 		standType = stand;
-		stacks = NonNullList.<ItemStack>withSize(stand.getInventorySize(),ItemStack.EMPTY);
-		resource = new ResourceLocation[stand.getInventorySize()];
+		makeInventory(stand);
 		for (int i = 0; i < resource.length; i++){
 			resource[i] = null;
 		}
 		facing = face;
 	}
 
+	public void makeInventory(EnumBladeStand stand) {
+		if (needMake) {
+			standType = stand;
+			stacks = NonNullList.<ItemStack>withSize(stand.getInventorySize(),ItemStack.EMPTY);
+			resource = new ResourceLocation[stand.getInventorySize()];
+			needMake = false;
+		}
+	}
+
 	@Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-        standType = EnumBladeStand.getFromIndex(compound.getInteger("standType"));
+    public void read(CompoundNBT compound) {
+        super.read(compound);
+        standType = EnumBladeStand.getFromIndex(compound.getInt("standType"));
+        makeInventory(standType);
         stacks = NonNullList.<ItemStack>withSize(standType.getInventorySize(),ItemStack.EMPTY);
 
-        NBTTagList nbttaglist = compound.getTagList("Stacks", 10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
+        ListNBT nbttaglist = compound.getList("Stacks", 10);
+        for (int i = 0; i < nbttaglist.size(); ++i) {
+            ItemStack itemstack = ItemStack.read((CompoundNBT)nbttaglist.get(i));
 
             if (!itemstack.isEmpty())
             {
                 this.stacks.set(i,itemstack);
             }
         }
-        facing = EnumFacing.getHorizontal(compound.getInteger("face"));
+        facing = Direction.byHorizontalIndex(compound.getInt("face"));
     }
 
 	@Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        compound = super.writeToNBT(compound);
-        NBTTagList nbttaglist = new NBTTagList();
+    public CompoundNBT write(CompoundNBT compound) {
+        compound = super.write(compound);
+        ListNBT nbttaglist = new ListNBT();
         for (int i = 0; i < this.stacks.size(); ++i)
         {
             ItemStack itemstack = this.stacks.get(i);
 
             if (!itemstack.isEmpty())
             {
-                nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
+                nbttaglist.add(itemstack.write(new CompoundNBT()));
             }
         }
-        compound.setTag("Stacks", nbttaglist);
-        compound.setInteger("standType",standType.getIndex());
-        compound.setInteger("face", facing.getHorizontalIndex());
+        compound.put("Stacks", nbttaglist);
+        compound.putInt("standType",standType.getIndex());
+        compound.putInt("face", facing.getHorizontalIndex());
         return compound;
     }
 
 	@Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound cp = super.getUpdateTag();
-        return this.writeToNBT(cp);
+        CompoundNBT cp = super.getUpdateTag();
+        return this.write(cp);
     }
 
 	@Override
-    public void handleUpdateTag(NBTTagCompound tag)
+    public void handleUpdateTag(CompoundNBT tag)
     {
 		super.handleUpdateTag(tag);
-		this.readFromNBT(tag);
+		this.read(tag);
     }
 
 	@Override
-	public String getName() {
-		return "inventory.bladestand";
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
+	public SUpdateTileEntityPacket getUpdatePacket() {
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        return new SUpdateTileEntityPacket(this.pos, 1,  this.write(CompoundNBT));
+    }
 
 	@Override
 	public int getSizeInventory() {
@@ -120,7 +127,7 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
         return true;
 	}
 
-	public EnumFacing getFace(){
+	public Direction getFace(){
 		return this.facing;
 	}
 
@@ -131,7 +138,7 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		 return ItemStackHelper.getAndSplit(this.stacks, index, count);
+		return ItemStackHelper.getAndSplit(this.stacks, index, count);
 	}
 
 	@Override
@@ -142,6 +149,9 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) {
 		stacks.set(index, stack);
+//		if (resource== null) {
+//			resource = new ResourceLocation[standType.getInventorySize()];
+//		}
 		resource[index] = null;
 	}
 
@@ -151,50 +161,53 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return (stack.getItem() instanceof ItemKatana);
+		return (stack.getItem() instanceof AbstractItemKatana);
 	}
 
-	@Override
 	public int getField(int id) {
 		int ret = 0;
 		switch(id){
 		case 0:
 			ret = facing.getHorizontalIndex();
 			break;
+		case 1:
+			ret = standType.getIndex();
+			break;
 		}
 		return ret;
 	}
 
-	@Override
 	public void setField(int id, int value) {
 		switch(id){
 		case 0:
-			facing = EnumFacing.getHorizontal(value);
+			facing = Direction.byHorizontalIndex(value);
+			break;
+		case 1:
+			standType = EnumBladeStand.getFromIndex(value);
 			break;
 		}
 	}
 
-	@Override
 	public int getFieldCount() {
-		return 1;
+		return 2;
 	}
 
 	@Override
@@ -245,12 +258,12 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 		if (stacks.get(index).getItem() == ItemCore.item_katana){
 			if (resource[index] == null){
 				resource[index] = makeDynamicTexture(index,
-						((ItemKatana)stacks.get(index).getItem()).getModelTexture(stacks.get(index)),
+						((AbstractItemKatana)stacks.get(index).getItem()).getModelTexture(stacks.get(index)),
 						stacks.get(index));
 			}
 			return resource[index];
 		}else{
-			return ((ItemKatana)stacks.get(index).getItem()).getBladeTexture();
+			return ((AbstractItemKatana)stacks.get(index).getItem()).getBladeTexture();
 		}
 	}
 
@@ -272,12 +285,12 @@ public class TileEntityBladeStand extends TileEntity implements IInventory {
 		if (texture != null){
 			try {
 				// 特製テクスチャを読み込む
-				ret = Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation(standType.toString() + "_"+index+"_texture",new DynamicTexture(texture.Image()));;
+				ret = Minecraft.getInstance().getTextureManager().getDynamicTextureLocation(standType.toString() + "_"+index+"_texture",new DynamicTexture(texture.Image()));;
 			} catch (Exception e) {
 				// 読み込めない場合デフォルトテクスチャを使用する
 				ret = null;
 			}
 		}
-		return ret!=null?ret:((ItemKatana)stack.getItem()).getBladeTexture();
+		return ret!=null?ret:((AbstractItemKatana)stack.getItem()).getBladeTexture();
 	}
 }

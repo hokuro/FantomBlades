@@ -1,108 +1,96 @@
 package mod.fbd.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public abstract class BlockHorizontalContainer extends BlockContainer {
-
+public abstract class BlockHorizontalContainer extends ContainerBlock {
 
 	public static final DirectionProperty FACING =  BlockStateProperties.FACING;
+
 	protected BlockHorizontalContainer(Block.Properties property) {
 		super(property);
-        this.setDefaultState(this.stateContainer.getBaseState().with(FACING, EnumFacing.NORTH));
+		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
 	}
 
 	@Override
-    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder)
-    {
-		builder.add(FACING);
-    }
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return null;
 	}
 
-    @Override
-    public void onBlockAdded(IBlockState state, World worldIn, BlockPos pos, IBlockState oldState) {
-        this.setDefaultFacing(worldIn, pos, state);
-    }
+	@Override
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
+	}
 
-    private void setDefaultFacing(World worldIn, BlockPos pos, IBlockState state)
+    private void setDefaultFacing(World worldIn, BlockPos pos, BlockState state)
     {
         if (!worldIn.isRemote)
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos.north());
-            IBlockState iblockstate1 = worldIn.getBlockState(pos.south());
-            IBlockState iblockstate2 = worldIn.getBlockState(pos.west());
-            IBlockState iblockstate3 = worldIn.getBlockState(pos.east());
-            EnumFacing enumfacing = (EnumFacing)state.get(FACING);
+            BlockState iblockstate = worldIn.getBlockState(pos.north());
+            BlockState iblockstate1 = worldIn.getBlockState(pos.south());
+            BlockState iblockstate2 = worldIn.getBlockState(pos.west());
+            BlockState iblockstate3 = worldIn.getBlockState(pos.east());
+            Direction enumfacing = (Direction)state.get(FACING);
 
-            if (enumfacing == EnumFacing.NORTH && iblockstate.isFullCube())
+            if (enumfacing == Direction.NORTH)
             {
-                enumfacing = EnumFacing.SOUTH;
+                enumfacing = Direction.SOUTH;
             }
-            else if (enumfacing == EnumFacing.SOUTH && iblockstate1.isFullCube())
+            else if (enumfacing == Direction.SOUTH)
             {
-                enumfacing = EnumFacing.NORTH;
+                enumfacing = Direction.NORTH;
             }
-            else if (enumfacing == EnumFacing.WEST && iblockstate2.isFullCube())
+            else if (enumfacing == Direction.WEST)
             {
-                enumfacing = EnumFacing.EAST;
+                enumfacing = Direction.EAST;
             }
-            else if (enumfacing == EnumFacing.EAST && iblockstate3.isFullCube())
+            else if (enumfacing == Direction.EAST)
             {
-                enumfacing = EnumFacing.WEST;
+                enumfacing = Direction.WEST;
             }
 
             worldIn.setBlockState(pos, state.with(FACING, enumfacing), 2);
         }
     }
 
-
-
-
     @Override
-    public IBlockState rotate(IBlockState state, Rotation rot)
+    public BlockState rotate(BlockState state, Rotation rot)
     {
-        return state.with(FACING, rot.rotate((EnumFacing)state.get(FACING)));
+        return state.with(FACING, rot.rotate((Direction)state.get(FACING)));
     }
 
     @Override
-    public IBlockState mirror(IBlockState state, Mirror mirrorIn)
+    public BlockState mirror(BlockState state, Mirror mirrorIn)
     {
-        return state.rotate(mirrorIn.toRotation((EnumFacing)state.get(FACING)));
+        return state.rotate(mirrorIn.toRotation((Direction)state.get(FACING)));
     }
 
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	   builder.add(FACING);
+	}
 
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        worldIn.setBlockState(pos, state.with(FACING, placer.getHorizontalFacing().getOpposite()), 2);
-    }
-
-    public EnumFacing getFront(IBlockState state){
+    public Direction getFront(BlockState state){
     	return state.get(FACING);
     }
 
-    public IBlockState setFront(IBlockState state, EnumFacing front){
+    public BlockState setFront(BlockState state, Direction front){
     	return state.with(FACING, front);
     }
 
-    public IBlockState setFront(IBlockState state, int front){
-    	return setFront(state, EnumFacing.byHorizontalIndex(front));
+    public BlockState setFront(BlockState state, int front){
+    	return setFront(state, Direction.byHorizontalIndex(front));
     }
 }

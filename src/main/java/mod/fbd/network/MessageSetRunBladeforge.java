@@ -3,14 +3,13 @@ package mod.fbd.network;
 import java.util.function.Supplier;
 
 import mod.fbd.tileentity.TileEntityBladeforge;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MessageSetRunBladeforge {
-
-
 	BlockPos ownPos;
 	boolean isRun;
 
@@ -44,7 +43,12 @@ public class MessageSetRunBladeforge {
 		public static void handle(final MessageSetRunBladeforge pkt, Supplier<NetworkEvent.Context> ctx)
 		{
 			ctx.get().enqueueWork(() -> {
-				TileEntity te = ctx.get().getSender().world.getTileEntity(pkt.ownPos);
+				TileEntity te;
+				if (ctx.get().getSender() == null) {
+					te = Minecraft.getInstance().world.getTileEntity(pkt.ownPos);
+				}else {
+					te = ctx.get().getSender().world.getTileEntity(pkt.ownPos);
+				}
 				if (te instanceof TileEntityBladeforge){
 					((TileEntityBladeforge)te).setRun(pkt.isRun);
 				}

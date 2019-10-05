@@ -3,26 +3,27 @@ package mod.fbd.tileentity;
 import mod.fbd.block.BlockCore;
 import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.log.ModLog;
-import mod.fbd.network.MessageSetRunAirPomp;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import mod.fbd.network.MessageHandler;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
 
-public class TileEntityAirPomp extends TileEntity implements ITickable {
+public class TileEntityAirPomp extends TileEntity implements ITickableTileEntity {
 
 	public static final String NAME = "airpomp";
 
 	private boolean isBack;
-	private EnumFacing facing;
+	private Direction facing;
 	private BlockPos targetForge;
 	private int count;
 
 	public TileEntityAirPomp(){
 		super(Mod_FantomBlade.RegistryEvents.AIRPOMP);
-		facing = EnumFacing.DOWN;
+		facing = Direction.DOWN;
 		targetForge = null;
 		count = 30;
 		isBack = false;
@@ -33,7 +34,7 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 	}
 
 	@Override
-	public void update() {
+	public void tick() {
 		if (world.isRemote){
 			if (isRun(null)){
 				if (isBack){
@@ -56,6 +57,7 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 		}
 	}
 
+
 	public boolean isRun(BlockPos pos){
 		if (targetForge != null){
 			TileEntity te = world.getTileEntity(targetForge);
@@ -64,28 +66,30 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 				return ((TileEntityBladeforge)te).isRun() && (pos == null ||(pos!=null && !targetForge.equals(pos)));
 			}
 		}
-		// まだターゲットがいなかったり、ターゲットがいなかったりターゲットが炉じゃなければ
-		// 未稼働
+		// iまだターゲットがいなかったり、ターゲットがいなかったりターゲットが炉じゃなければ
+		// i未稼働
 		return false;
 	}
 
 
 	public boolean setRun(BlockPos requestPos){
-		facing = EnumFacing.DOWN;
+		facing = Direction.DOWN;
 		TileEntity te = world.getTileEntity(requestPos);
 		if (te instanceof TileEntityBladeforge){
 			targetForge = requestPos;
-			if (requestPos.equals(this.pos.offset(EnumFacing.EAST))){
-				facing = EnumFacing.EAST;
-			}else if (requestPos.equals(this.pos.offset(EnumFacing.WEST))){
-				facing = EnumFacing.WEST;
-			}else if (requestPos.equals(this.pos.offset(EnumFacing.NORTH))){
-				facing = EnumFacing.NORTH;
-			}else if (requestPos.equals(this.pos.offset(EnumFacing.SOUTH))){
-				facing = EnumFacing.SOUTH;
+			if (requestPos.equals(this.pos.offset(Direction.EAST))){
+				facing = Direction.EAST;
+			}else if (requestPos.equals(this.pos.offset(Direction.WEST))){
+				facing = Direction.WEST;
+			}else if (requestPos.equals(this.pos.offset(Direction.NORTH))){
+				facing = Direction.NORTH;
+			}else if (requestPos.equals(this.pos.offset(Direction.SOUTH))){
+				facing = Direction.SOUTH;
 			}
-			if (facing != EnumFacing.UP){
-				Mod_FantomBlade.Net_Instance.sendToAll(new MessageSetRunAirPomp(this.pos, requestPos ,facing.getIndex()));
+			if (facing != Direction.UP){
+				if (!world.isRemote) {
+					MessageHandler.Send_MessageSetRunAirPomp((ServerWorld)world, this.pos, requestPos ,facing.getIndex());
+				}
 				return true;
 			}
 		}
@@ -98,24 +102,24 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 	}
 
 	public void searchForge() {
-		facing = EnumFacing.DOWN;
+		facing = Direction.DOWN;
 		targetForge = null;
-		if (world.getTileEntity(pos.offset(EnumFacing.EAST)) instanceof TileEntityBladeforge
-				&& world.getBlockState(pos.offset(EnumFacing.EAST)).getBlock() == BlockCore.block_bladeforge){
-			this.targetForge = pos.offset(EnumFacing.EAST);
-			this.facing = EnumFacing.EAST;
-		}else if (world.getTileEntity(pos.offset(EnumFacing.WEST)) instanceof TileEntityBladeforge
-				&& world.getBlockState(pos.offset(EnumFacing.WEST)).getBlock() == BlockCore.block_bladeforge){
-			this.targetForge = pos.offset(EnumFacing.WEST);
-			this.facing = EnumFacing.WEST;
-		}else if (world.getTileEntity(pos.offset(EnumFacing.NORTH)) instanceof TileEntityBladeforge
-				&& world.getBlockState(pos.offset(EnumFacing.NORTH)).getBlock() == BlockCore.block_bladeforge){
-			this.targetForge = pos.offset(EnumFacing.NORTH);
-			this.facing = EnumFacing.NORTH;
-		}else if (world.getTileEntity(pos.offset(EnumFacing.SOUTH)) instanceof TileEntityBladeforge
-				&& world.getBlockState(pos.offset(EnumFacing.SOUTH)).getBlock() == BlockCore.block_bladeforge){
-			this.targetForge = pos.offset(EnumFacing.SOUTH);
-			this.facing = EnumFacing.SOUTH;
+		if (world.getTileEntity(pos.offset(Direction.EAST)) instanceof TileEntityBladeforge
+				&& world.getBlockState(pos.offset(Direction.EAST)).getBlock() == BlockCore.block_bladeforge){
+			this.targetForge = pos.offset(Direction.EAST);
+			this.facing = Direction.EAST;
+		}else if (world.getTileEntity(pos.offset(Direction.WEST)) instanceof TileEntityBladeforge
+				&& world.getBlockState(pos.offset(Direction.WEST)).getBlock() == BlockCore.block_bladeforge){
+			this.targetForge = pos.offset(Direction.WEST);
+			this.facing = Direction.WEST;
+		}else if (world.getTileEntity(pos.offset(Direction.NORTH)) instanceof TileEntityBladeforge
+				&& world.getBlockState(pos.offset(Direction.NORTH)).getBlock() == BlockCore.block_bladeforge){
+			this.targetForge = pos.offset(Direction.NORTH);
+			this.facing = Direction.NORTH;
+		}else if (world.getTileEntity(pos.offset(Direction.SOUTH)) instanceof TileEntityBladeforge
+				&& world.getBlockState(pos.offset(Direction.SOUTH)).getBlock() == BlockCore.block_bladeforge){
+			this.targetForge = pos.offset(Direction.SOUTH);
+			this.facing = Direction.SOUTH;
 		}
 
 		ModLog.log().debug("Serch facing :" + facing.toString() + " idx :" + facing.getHorizontalIndex() );
@@ -123,42 +127,40 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
 
 
 	@Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-		super.readFromNBT(compound);
+    public void read(CompoundNBT compound) {
+		super.read(compound);
 		try{
 			if (compound.getBoolean("hasTarget")){
-				int x = compound.getInteger("xforge");
-				int y = compound.getInteger("yforge");
-				int z = compound.getInteger("zforge");
+				int x = compound.getInt("xforge");
+				int y = compound.getInt("yforge");
+				int z = compound.getInt("zforge");
 				this.targetForge = new BlockPos(x,y,z);
 			}else{
 				this.targetForge = null;
 			}
 
-			int face = compound.getInteger("face");
-			this.facing = EnumFacing.getFront(face);
-			this.count = compound.getInteger("count");
+			int face = compound.getInt("face");
+			this.facing = Direction.byIndex(face);
+			this.count = compound.getInt("count");
 		}catch(Exception ex){
 			ModLog.log().fatal(ex.getMessage());
 		}
     }
 
 	@Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
+    public CompoundNBT write(CompoundNBT compound) {
 		try{
-			compound = super.writeToNBT(compound);
+			compound = super.write(compound);
 			if (this.targetForge != null){
-				compound.setBoolean("hasTarget", true);
-				compound.setInteger("xforge", targetForge.getX());
-				compound.setInteger("yforge", targetForge.getY());
-				compound.setInteger("zforge", targetForge.getZ());
+				compound.putBoolean("hasTarget", true);
+				compound.putInt("xforge", targetForge.getX());
+				compound.putInt("yforge", targetForge.getY());
+				compound.putInt("zforge", targetForge.getZ());
 			}else{
-				compound.setBoolean("hasTarget", false);
+				compound.putBoolean("hasTarget", false);
 			}
-			compound.setInteger("face",this.facing.getIndex());
-			compound.setInteger("count", count);
+			compound.putInt("face",this.facing.getIndex());
+			compound.putInt("count", count);
 		}catch(Exception ex){
 			ModLog.log().fatal(ex.getMessage());
 		}
@@ -166,28 +168,20 @@ public class TileEntityAirPomp extends TileEntity implements ITickable {
     }
 
 	@Override
-    public NBTTagCompound getUpdateTag()
-    {
-        NBTTagCompound cp = super.getUpdateTag();
-        return this.writeToNBT(cp);
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT cp = super.getUpdateTag();
+        return this.write(cp);
     }
 
 	@Override
-    public void handleUpdateTag(NBTTagCompound tag)
-    {
+    public void handleUpdateTag(CompoundNBT tag) {
 		super.handleUpdateTag(tag);
-		this.readFromNBT(tag);
+		this.read(tag);
     }
 
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket()
-    {
-        NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        return new SPacketUpdateTileEntity(this.pos, 1,  this.writeToNBT(nbtTagCompound));
+	public SUpdateTileEntityPacket getUpdatePacket(){
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        return new SUpdateTileEntityPacket(this.pos, 1,  this.write(CompoundNBT));
     }
-
-
-
-
-
 }

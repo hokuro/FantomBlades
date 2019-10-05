@@ -3,12 +3,12 @@ package mod.fbd.network;
 import java.util.function.Supplier;
 
 import mod.fbd.tileentity.TileEntityBladeforge;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
-
 
 public class MessageBladeforgeSmeltingStart {
 
@@ -43,11 +43,17 @@ public class MessageBladeforgeSmeltingStart {
 		public static void handle(final MessageBladeforgeSmeltingStart pkt, Supplier<NetworkEvent.Context> ctx)
 		{
 			ctx.get().enqueueWork(() -> {
-				EntityPlayer player = ctx.get().getSender();
+				PlayerEntity player = ctx.get().getSender();
 				BlockPos pos = new BlockPos(pkt.posx,pkt.posy,pkt.posz);
-				TileEntity ent = player.world.getTileEntity(pos);
-				if (ent instanceof TileEntityBladeforge){
-					((TileEntityBladeforge)ent).StartSmelting(player);
+				TileEntity te;
+				if (player == null) {
+					te = Minecraft.getInstance().world.getTileEntity(pos);
+				}else {
+					te =  player.world.getTileEntity(pos);
+				}
+
+				if (te instanceof TileEntityBladeforge){
+					((TileEntityBladeforge)te).StartSmelting(player);
 				}
 			});
 			ctx.get().setPacketHandled(true);

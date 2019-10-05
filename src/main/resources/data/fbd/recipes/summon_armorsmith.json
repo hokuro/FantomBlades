@@ -11,10 +11,10 @@
       "item": "minecraft:paper"
     },
     "O": {
-      "item": "fbd:big_hunmmer"
+      "item": "fbd:steel_big_hammer"
     },
     "K": {
-      "item": "fbd:small_hunmmer"
+      "item": "fbd:steel_small_hammer"
     },
     "A":{
       "item": "minecraft:diamond_chestplate"

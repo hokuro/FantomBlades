@@ -1,6 +1,5 @@
 {
-    "parent": "block/cube_all",
     "textures": {
-        "all": "fbd:items/airpomp"
+        "particle":"fbd:items/airpomp"
     }
 }

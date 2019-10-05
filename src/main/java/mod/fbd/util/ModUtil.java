@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import mod.fbd.core.Mod_FantomBlade;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -73,12 +73,12 @@ public class ModUtil {
 
         while (!stack.isEmpty())
         {
-            EntityItem entityitem = new EntityItem(worldIn, x + (double)f, y + (double)f1, z + (double)f2, stack.split(RANDOM.nextInt(21) + 10));
+        	ItemEntity entityitem = new ItemEntity(worldIn, x + (double)f, y + (double)f1, z + (double)f2, stack.split(RANDOM.nextInt(21) + 10));
             float f3 = 0.05F;
-            entityitem.motionX = RANDOM.nextGaussian() * 0.05000000074505806D;
-            entityitem.motionY = RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D;
-            entityitem.motionZ = RANDOM.nextGaussian() * 0.05000000074505806D;
-            worldIn.spawnEntity(entityitem);
+            entityitem.setMotion(RANDOM.nextGaussian() * 0.05000000074505806D,
+                                 RANDOM.nextGaussian() * 0.05000000074505806D + 0.20000000298023224D,
+                                 RANDOM.nextGaussian() * 0.05000000074505806D);
+            worldIn.addEntity(entityitem);
         }
     }
 
@@ -174,5 +174,18 @@ public class ModUtil {
 
 	public static <E> void setPrivateValue(Class<? super E> classToAccess, E instance, Object value, String fieldNames){
 		ObfuscationReflectionHelper.setPrivateValue(classToAccess, instance, value, fieldNames);
+	}
+
+	public static int IntMax(int arg1, int arg2, int... args) {
+		int ret = arg1;
+		if (arg1 < arg2) {
+			ret = arg2;
+		}
+		for (int i : args) {
+			if (ret < i) {
+				ret = i;
+			}
+		}
+		return ret;
 	}
 }

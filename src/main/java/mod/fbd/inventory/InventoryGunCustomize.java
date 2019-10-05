@@ -1,13 +1,13 @@
 package mod.fbd.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class InventoryGunCustomize implements IInventory {
     /** A list of one item containing the result of the crafting formula */
@@ -48,7 +48,7 @@ public class InventoryGunCustomize implements IInventory {
      */
     public ITextComponent getName()
     {
-        return new TextComponentTranslation("Result");
+        return new TranslationTextComponent("Result");
     }
 
     /**
@@ -110,16 +110,16 @@ public class InventoryGunCustomize implements IInventory {
     /**
      * Don't rename this method to canInteractWith due to conflicts with Container
      */
-    public boolean isUsableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(PlayerEntity player)
     {
         return true;
     }
 
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
     }
 
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
     }
 
@@ -150,10 +150,4 @@ public class InventoryGunCustomize implements IInventory {
     {
         this.stackResult.clear();
     }
-
-	@Override
-	public ITextComponent getCustomName() {
-		// TODO 自動生成されたメソッド・スタブ
-		return this.getName();
-	}
 }

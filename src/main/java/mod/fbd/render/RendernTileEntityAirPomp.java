@@ -1,15 +1,21 @@
 package mod.fbd.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import mod.fbd.model.ModelAirPomp;
 import mod.fbd.tileentity.TileEntityAirPomp;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RendernTileEntityAirPomp  extends TileEntityRenderer<TileEntityAirPomp> {
+public class RendernTileEntityAirPomp extends TileEntityRenderer<TileEntityAirPomp> {
 	private static final ResourceLocation tex = new ResourceLocation("fbd:textures/entity/airpomp.png");
 
-	private ModelAirPomp mainModel = new ModelAirPomp();
+	private ModelAirPomp mainModel;
+
+	public RendernTileEntityAirPomp() {
+		super();
+		mainModel = new ModelAirPomp();
+	}
 
 	@Override
 	public void render(TileEntityAirPomp te, double x, double y, double z, float partialTicks, int destroyStage) {
@@ -40,7 +46,12 @@ public class RendernTileEntityAirPomp  extends TileEntityRenderer<TileEntityAirP
 		GlStateManager.rotatef(180,0F,0F,1F);
 		int idx = te.getFace();
 		GlStateManager.rotatef((90F * idx) +90,0F,1F,0F);
-		this.mainModel.render(te,1.0F);
+		if (te.isRun(null)){
+			int cnt =  te.getCount();
+			this.mainModel.render(te, 1.0F, cnt);
+		}else {
+			this.mainModel.render(te, 1.0F, 30);
+		}
 		GlStateManager.popMatrix();
 
 

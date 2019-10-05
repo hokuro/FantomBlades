@@ -1,13 +1,13 @@
 package mod.fbd.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import mod.fbd.core.ModCommon;
 import mod.fbd.entity.EntityBurret;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderArrow;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -15,19 +15,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderEntityBurret extends Render<EntityBurret>
-{
-    public RenderEntityBurret(RenderManager renderManagerIn)
-    {
+public class RenderEntityBurret extends EntityRenderer<EntityBurret> {
+
+    public RenderEntityBurret(EntityRendererManager renderManagerIn){
         super(renderManagerIn);
-        RenderArrow x;
     }
 
-    /**
-     * Renders the desired {@code T} type Entity.
-     */
-    public void doRender(EntityBurret entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    @Override
+    public void doRender(EntityBurret entity, double x, double y, double z, float entityYaw, float partialTicks){
         this.bindEntityTexture(entity);
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
@@ -50,8 +45,7 @@ public class RenderEntityBurret extends Render<EntityBurret>
         GlStateManager.enableRescaleNormal();
         float f9 = (float)entity.arrowShake - partialTicks;
 
-        if (f9 > 0.0F)
-        {
+        if (f9 > 0.0F) {
             float f10 = -MathHelper.sin(f9 * 3.0F) * f9;
             GlStateManager.rotatef(f10, 0.0F, 0.0F, 1.0F);
         }
@@ -60,10 +54,9 @@ public class RenderEntityBurret extends Render<EntityBurret>
         GlStateManager.scalef(0.05625F, 0.05625F, 0.05625F);
         GlStateManager.translatef(-4.0F, 0.0F, 0.0F);
 
-        if (this.renderOutlines)
-        {
+        if (this.renderOutlines) {
             GlStateManager.enableColorMaterial();
-            GlStateManager.enableOutlineMode(this.getTeamColor(entity));
+            GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
         }
 
         GlStateManager.normal3f(0.05625F, 0.0F, 0.0F);
@@ -81,8 +74,7 @@ public class RenderEntityBurret extends Render<EntityBurret>
         bufferbuilder.pos(-7.0D, -2.0D, -2.0D).tex(0.0D, 0.3125D).endVertex();
         tessellator.draw();
 
-        for (int j = 0; j < 4; ++j)
-        {
+        for (int j = 0; j < 4; ++j) {
             GlStateManager.rotatef(90.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.normal3f(0.0F, 0.0F, 0.05625F);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -93,9 +85,8 @@ public class RenderEntityBurret extends Render<EntityBurret>
             tessellator.draw();
         }
 
-        if (this.renderOutlines)
-        {
-            GlStateManager.disableOutlineMode();
+        if (this.renderOutlines) {
+            GlStateManager.tearDownSolidRenderingTextureCombine();
             GlStateManager.disableColorMaterial();
         }
 
@@ -108,9 +99,7 @@ public class RenderEntityBurret extends Render<EntityBurret>
 
     public static final ResourceLocation RES_SPECTRAL_ARROW = new ResourceLocation(ModCommon.MOD_ID,"textures/entity/burret_normal.png");
 
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
+    @Override
     protected ResourceLocation getEntityTexture(EntityBurret entity)
     {
         return entity.getTexture();

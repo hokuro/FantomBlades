@@ -1,450 +1,221 @@
 package mod.fbd.entity.mob;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.annotation.Nullable;
+
+import com.google.common.collect.Maps;
 
 import mod.fbd.block.BlockCore;
 import mod.fbd.block.BlockDummyAnvil;
 import mod.fbd.block.BlockDummyFurnce;
 import mod.fbd.core.ModCommon;
 import mod.fbd.core.Mod_FantomBlade;
-import mod.fbd.core.SoundManager;
 import mod.fbd.core.log.ModLog;
-import mod.fbd.entity.ai.EntityAISmithTask;
-import mod.fbd.entity.ai.EntityAIWatchClosestSmith;
-import mod.fbd.intaractionobject.IntaractionObjectArmorSmith;
+import mod.fbd.inventory.ContainerArmorSmith;
 import mod.fbd.inventory.InventoryArmorSmith;
-import mod.fbd.item.ItemBladePiece;
-import mod.fbd.item.ItemBladePiece.EnumBladePieceType;
+import mod.fbd.inventory.InventoryBladeSmith;
+import mod.fbd.inventory.InventorySmithBase;
 import mod.fbd.item.ItemCore;
-import mod.fbd.resource.TextureInfo;
+import mod.fbd.item.armor.ItemHaganeAromor;
+import mod.fbd.item.piece.ItemBladePiece.EnumBladePieceType;
 import mod.fbd.util.ModUtil;
-import net.minecraft.block.BlockCauldron;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.INpc;
-import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.init.Particles;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.CauldronBlock;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.particles.BasicParticleType;
-import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.tileentity.FurnaceTileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.DifficultyInstance;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.FMLPlayMessages;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-public class EntityArmorSmith  extends EntitySmithBase implements INpc
-{
+public class EntityArmorSmith extends EntitySmithBase {
 	public static final ResourceLocation TEXTURE_DEFAULT = new ResourceLocation("fbd","textures/entity/armorsmith_default.png");
 	public static final String NAME= "armorsmith";
-	public static final int REGISTERID = 2;
 	public static final ResourceLocation loot = new ResourceLocation("fbd:"+NAME);
-	public static final int MAX_LEVEL = 255;
-
-	private int randomTickDivider;
-    private final InventoryArmorSmith smithInventory;
+	public static final int[] EXP_TABLE = {0,100,300,600,1000,1500,2100,3000,3900,4900,
+			6100,7400,8900,10700,12500,14000,15700,17900,19800,21800,
+			24400,27100,29400,32500,35600,38500,41500,44600,48400,51400,
+			54500,58900,62200,66000,70200,74000,78800,83600,88800,94000,
+			98800,103500,109000,114300,120000,126200,132600,138500,143300,148500,
+			154600,161600,166900,173800,181300,188900,196200,204400,211700,217900,
+			224100,231100,238200,246000,252900,261900,271300,278000,286500,294600,
+			304000,312400,321200,328600,337600,348000,358100,367900,379300,390700,
+			399900,409000,417800,430100,440500,449200,460200,470100,482400,494900,
+			508200,520200,533300,545500,556600,568100,577700,588900,602000,614800,
+			629500,640700,652700,667600,679300,692400,703600,717100,730300,743500,
+			756700,771900,783400,796400,809000,822900,836800,849700,865400,881700,
+			895400,908500,923400,941300,959200,973800,989800,1005100,1021100,1039000,
+			1054000,1067600,1085500,1101100,1120000,1138400,1157100,1174800,1194200,1208300,
+			1226300,1245400,1259600,1276000,1291300,1307300,1324800,1341900,1356800,1371900,
+			1387900,1410400,1427800,1447900,1465900,1483000,1502600,1523300,1543800,1562200,
+			1582200,1599200,1616500,1637700,1661100,1682100,1705100,1729300,1754300,1771800,
+			1790000,1808600,1830200,1848500,1872900,1898000,1923900,1949900,1972300,1998400,
+			2022700,2047400,2072300,2098800,2123100,2142800,2161400,2185300,2204100,2225800,
+			2250000,2270600,2293900,2319600,2341900,2365000,2393000,2416200,2445400,2470500,
+			2500100,2520200,2547700,2569200,2598900,2625600,2654000,2676800,2707800,2737200,
+			2765000,2787100,2809100,2832800,2859000,2890700,2913500,2941400,2970700,2997600,
+			3024800,3050100,3082000,3106500,3132400,3162700,3185500,3215000,3238100,3265000,
+			3290100,3319500,3346000,3377500,3409000,3443900,3473100,3501800,3536300,3570500,
+			3600600,3632300,3665300,3691900,3727700,3763400,3789700,3820800,3850300,3875400,
+			3910300,3944000,3972200,4005500,4036100};
+	private final InventoryArmorSmith smithInventory;
     private int nextExp=0;
 
 
-    public EntityArmorSmith(World worldIn)
-    {
-        super(Mod_FantomBlade.RegistryEvents.ARMORSMITH,worldIn);
-        this.smithInventory = new InventoryArmorSmith();
-        this.setSize(0.6F, 1.95F);
+    public EntityArmorSmith(World worldIn) {
+        this(Mod_FantomBlade.RegistryEvents.ARMORSMITH, worldIn);
     }
 
-    @Override
-    protected void initEntityAI()
-    {
-    	this.tasks.addTask(0, new EntityAIWatchClosestSmith(this, EntityPlayer.class,64));
-    	this.tasks.addTask(0, new EntityAISmithTask(this));
-    }
+	public EntityArmorSmith(FMLPlayMessages.SpawnEntity packet, World world) {
+		this(Mod_FantomBlade.RegistryEvents.ARMORSMITH, world);
+	}
 
-    @Override
-    protected void registerAttributes()
-    {
-        super.registerAttributes();
-    }
-
-    private int soundCount = 100;
-    @Override
-    protected void updateAITasks()
-    {
-        super.updateAITasks();
-        if (this.Dw_ISWORK()){
-        	soundCount++;
-        	if (soundCount > 80){
-        		if (ModUtil.random(100) < 80){
-        			playSound(SoundManager.sound_bladesmith_work, this.getSoundVolume(), this.getSoundPitch());
-        			soundCount = 0;
-        		}
-        	}
-        }else{
-        	soundCount = 100;
-        }
-
-    }
-
-    @Override
-    public void tick()
-    {
-    	super.tick();
-
-    	BlockPos summonPos = Dw_SUMMONPOS();
-    	if (!this.getPos().equals(summonPos)){
-    		if (!(summonPos == null)){
-    			this.setPosition(summonPos.getX()+0.5f, summonPos.getY(), summonPos.getZ()+0.5f);
-    			ModLog.log().debug("now:"+this.getPos().toString() + "   :  summon:"+summonPos.toString());
-    		}
-    	}
+    public EntityArmorSmith(EntityType<? extends CreatureEntity> etype, World worldIn) {
+        super(etype ,worldIn);
+        this.smithInventory = new InventoryArmorSmith(this);
     }
 
 
     @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand)
-    {
+    public boolean processInteract(PlayerEntity player, Hand hand){
+    	if (player.isSneaking()) {return false;}
     	if (!player.world.isRemote){
         	if (!Dw_ISWORK()){
         		ModLog.log().debug("open gui entity id:"+this.getEntityId());
-        		NetworkHooks.openGui((EntityPlayerMP)player,
-            			new IntaractionObjectArmorSmith(this.getEntityId()),
+        		NetworkHooks.openGui((ServerPlayerEntity)player,
+            			new INamedContainerProvider() {
+        					@Override
+        					@Nullable
+        					public Container createMenu(int id, PlayerInventory playerInv, PlayerEntity player) {
+        						return new ContainerArmorSmith(id, playerInv, smithInventory);
+        					}
+
+        					@Override
+        					public ITextComponent getDisplayName() {
+        						return new TranslationTextComponent("container.bladesmith");
+        					}
+        				},
             			(buf)->{
     						buf.writeInt(this.getEntityId());
     					});
-            	//player.openGui(Mod_FantomBlade.instance, ModGui.GUI_ID_ARMORSMITH + this.getEntityId(), world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
         	}
     	}
     	return true;
     }
 
     @Override
-    protected void registerData()
-    {
-        super.registerData();
-        this.dataManager.register(DW_TEXTURE,"");
-        this.dataManager.register(DW_ISWORK,false);
-        this.dataManager.register(DW_WORKTIMER,0);
-        this.dataManager.register(DW_SWING,0);
-    }
-
-    @Override
-    public void knockBack(Entity entityIn, float strength, double xRatio, double zRatio)
-    {
-    	// ノックバックしないさせないやらせない
-    }
-
-    @Override
-    public boolean startRiding(Entity entityIn, boolean force)
-    {
-        // 刀鍛冶は座らない座れない
-    	return false;
-    }
-
-    @Override
-    public void applyEntityCollision(Entity entityIn){
-    	// 体当たりなんてへっちゃら
-    }
-
-    @Override
-    public void writeAdditional(NBTTagCompound compound)
-    {
+    public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
-        NBTTagList nbttaglist = new NBTTagList();
-        for (int i = 0; i < this.smithInventory.getSizeInventory(); ++i)
-        {
+        ListNBT ListNBT = new ListNBT();
+        for (int i = 0; i < this.smithInventory.getSizeInventory(); ++i) {
             ItemStack itemstack = this.smithInventory.getStackInSlot(i);
 
-            if (!itemstack.isEmpty())
-            {
-				NBTTagCompound nbttagcompound = new NBTTagCompound();
-				nbttagcompound.setByte("Slot", (byte)i);
-				itemstack.write(nbttagcompound);
-				nbttaglist.add(nbttagcompound);
+            if (!itemstack.isEmpty()) {
+				CompoundNBT CompoundNBT = new CompoundNBT();
+				CompoundNBT.putInt("Slot", i);
+				itemstack.write(CompoundNBT);
+				ListNBT.add(CompoundNBT);
             }
         }
-        compound.setTag("InventorySmith", nbttaglist);
+        compound.put("InventorySmith", ListNBT);
 
-        if (Dw_Texture() != ""){
-        	compound.setString("texture", Dw_Texture());
-        }
-
-        compound.setBoolean("isWork", Dw_ISWORK());
-        if (Dw_ISWORK()){
-        	compound.setInt("workTimer", Dw_WORKTIMER());
-        }else{
-        	compound.setInt("workTimer", 0);
-        }
-        compound.setInt("nextExp", nextExp);
+        compound.putInt("nextExp", nextExp);
     }
 
-
-
-
     @Override
-    public void readAdditional(NBTTagCompound compound)
+    public void readAdditional(CompoundNBT compound)
     {
         super.readAdditional(compound);
 
-        NBTTagList nbttaglist = compound.getList("InventorySmith", 10);
-        for (int i = 0; i < nbttaglist.size(); ++i)
-        {
-			NBTTagCompound nbttagcompound = nbttaglist.getCompound(i);
-			int j = nbttagcompound.getByte("Slot");
+        ListNBT ListNBT = compound.getList("InventorySmith", 10);
+        for (int i = 0; i < ListNBT.size(); ++i) {
+			CompoundNBT CompoundNBT = ListNBT.getCompound(i);
+			int j = CompoundNBT.getInt("Slot");
 
-			if (j >= 0 && j < this.smithInventory.getSizeInventory())
-			{
-				this.smithInventory.setInventorySlotContents(j, ItemStack.read(nbttagcompound));
+			if (j >= 0 && j < this.smithInventory.getSizeInventory()) {
+				this.smithInventory.setInventorySlotContents(j, ItemStack.read(CompoundNBT));
 			}
         }
 
-        if (compound.hasKey("texture")){
-        	String file = compound.getString("texture");
-        	setCustomResourceLocation(Mod_FantomBlade.TextureManager().getTexture(NAME, file));
-        }else{
-        	setCustomResourceLocation(Mod_FantomBlade.TextureManager().getRandomTexture(NAME));
-        }
-
-        Dw_ISWORK(compound.getBoolean("isWork"));
-    	Dw_WORKTIMER(compound.getInt("workTimer"));
     	nextExp = compound.getInt("nextExp");
     }
 
-    public int getVerticalFaceSpeed()
-    {
-        return 80;
-    }
-
-    public int getHorizontalFaceSpeed()
-    {
-        return 90;
-    }
-
-
-    @Override
-    public boolean canBePushed(){
-    	return false;
-    }
-
-
-    @Override
-	public boolean canDespawn()
-    {
-        return false;
-    }
-
-    @Override
-    protected SoundEvent getAmbientSound()
-    {
-       return mod.fbd.core.SoundManager.sound_bladesmith_hart;
-    }
-
-    @Override
-    protected SoundEvent getHurtSound(DamageSource damageSourceIn)
-    {
-        return mod.fbd.core.SoundManager.sound_bladesmith_damage;
-    }
-
-    @Override
-    protected SoundEvent getDeathSound()
-    {
-        return mod.fbd.core.SoundManager.sound_bladesmith_dead;
-    }
-
     @Nullable
-    protected ResourceLocation getLootTable()
-    {
+    protected ResourceLocation getLootTable() {
         return loot;
     }
 
-
     @Override
-    public void notifyDataManagerChange(DataParameter<?> key)
-    {
-        super.notifyDataManagerChange(key);
-    }
+	public ResourceLocation getDefaultTexture() {
+		return this.TEXTURE_DEFAULT;
+	}
 
-
-    @Override
-    public void setRevengeTarget(@Nullable EntityLivingBase livingBase)
-    {
-        super.setRevengeTarget(livingBase);
-    }
-
-    @Override
-    public void onDeath(DamageSource cause)
-    {
-        super.onDeath(cause);
-    }
-
-    public World getWorld()
-    {
-        return this.world;
-    }
-
-    public BlockPos getPos()
-    {
-        return new BlockPos(this);
-    }
-
-    @Override
-    public ITextComponent getDisplayName()
-    {
-        Team team = this.getTeam();
-        ITextComponent s = this.getCustomName();
-
-        if (s != null && !s.getFormattedText().isEmpty())
-        {
-            ITextComponent textcomponentstring = ScorePlayerTeam.formatMemberName(team, s);
-            textcomponentstring.getStyle().setHoverEvent(this.getHoverEvent());
-            textcomponentstring.getStyle().setInsertion(this.getCachedUniqueIdString());
-            return textcomponentstring;
-        }
-        return null;
-    }
-
-    @Override
-    public float getEyeHeight()
-    {
-        return 1.62F;
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void handleStatusUpdate(byte id)
-    {
-        if (id == 12)
-        {
-            this.spawnParticles(Particles.HEART);
-        }
-        else if (id == 13)
-        {
-            this.spawnParticles(Particles.ANGRY_VILLAGER);
-        }
-        else if (id == 14)
-        {
-            this.spawnParticles(Particles.HAPPY_VILLAGER);
-        }
-        else
-        {
-            super.handleStatusUpdate(id);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private void spawnParticles(BasicParticleType particleType)
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            double d0 = this.rand.nextGaussian() * 0.02D;
-            double d1 = this.rand.nextGaussian() * 0.02D;
-            double d2 = this.rand.nextGaussian() * 0.02D;
-            this.world.spawnParticle(particleType, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 1.0D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2);
-        }
-    }
-
-    @Override
-    @Nullable
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData entityLivingData, @Nullable NBTTagCompound itemNbt) {
-        return this.finalizeMobSpawn(difficulty, entityLivingData, true, itemNbt);
-    }
-
-    public IEntityLivingData finalizeMobSpawn(DifficultyInstance p_190672_1_, @Nullable IEntityLivingData p_190672_2_, boolean p_190672_3_,@Nullable NBTTagCompound itemNbt)
-    {
-        p_190672_2_ = super.onInitialSpawn(p_190672_1_, p_190672_2_,itemNbt);
-        return p_190672_2_;
-    }
-
-    @Override
-    public boolean canBeLeashedTo(EntityPlayer player)
-    {
-        return false;
-    }
-
-    @Override
-    public void onStruckByLightning(EntityLightningBolt lightningBolt)
-    {
-        //雷にあたったときの処理
-    }
-
-    public IInventory getSmithInventory()
-    {
-        return this.smithInventory;
-    }
-
-
-    @Override
-    protected void updateEquipmentIfNeeded(EntityItem itemEntity)
-    {
-    	// エンティティが何か拾った時の処理
-    }
-
-    private boolean canPickupItem(Item itemIn)
-    {
-        return false;
-    }
-
-    public void startWork(World world,BlockPos pos, ItemStack katana){
+    public void startWork(World world,BlockPos pos, ItemStack armor){
     	// ブロックの配置を作業用に変更
-    	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
-    	IBlockState state = world.getBlockState(pos1);
+    	BlockPos pos1 = pos.offset(Direction.NORTH);
+    	BlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.EAST));
     	}else if (state.getBlock() == Blocks.FURNACE){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.SOUTH));
     	}
 
-    	pos1 = pos.offset(EnumFacing.SOUTH);
+    	pos1 = pos.offset(Direction.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.WEST));
     	}else if (state.getBlock() == Blocks.FURNACE){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.NORTH));
     	}
 
-    	pos1 = pos.offset(EnumFacing.EAST);
+    	pos1 = pos.offset(Direction.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.NORTH));
     	}else if (state.getBlock() == Blocks.FURNACE){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.WEST));
     	}
 
-    	pos1 = pos.offset(EnumFacing.WEST);
+    	pos1 = pos.offset(Direction.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == Blocks.ANVIL){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.SOUTH));
     	}else if (state.getBlock() == Blocks.FURNACE){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.EAST));
     	}
 
     	// パラメータを設定
@@ -456,7 +227,7 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
     		Dw_WORKTIMER(1200); // 60 * 20 (1分をTicで)
     	}
 
-    	this.smithInventory.setBlade(katana);
+    	this.smithInventory.setResult(armor);
     }
 
     @Override
@@ -465,81 +236,81 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
     	boolean flag_furnce = false;
     	boolean flag_cauldron = false;
     	boolean flag_crafting = false;
-    	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
-    	IBlockState state = world.getBlockState(pos1);
+    	BlockPos pos1 = pos.offset(Direction.NORTH);
+    	BlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
-    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.EAST){
+    		if (state.get(BlockDummyAnvil.FACING) != Direction.EAST){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.EAST));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
-    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.SOUTH){
+    		if (state.get(BlockDummyFurnce.FACING) != Direction.SOUTH){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.SOUTH));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(CauldronBlock.LEVEL) == 3){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE){
     		flag_crafting = true;
     	}
 
-    	pos1 = pos.offset(EnumFacing.SOUTH);
+    	pos1 = pos.offset(Direction.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.WEST){
+    		if (state.get(BlockDummyAnvil.FACING) != Direction.WEST){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.WEST));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.NORTH){
+    		if (state.get(BlockDummyFurnce.FACING) != Direction.NORTH){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.NORTH));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(CauldronBlock.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
     	}
 
-    	pos1 = pos.offset(EnumFacing.EAST);
+    	pos1 = pos.offset(Direction.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.NORTH){
+    		if (state.get(BlockDummyAnvil.FACING) != Direction.NORTH){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.NORTH));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.WEST){
+    		if (state.get(BlockDummyFurnce.FACING) != Direction.WEST){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.WEST));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(CauldronBlock.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
     	}
 
-    	pos1 = pos.offset(EnumFacing.WEST);
+    	pos1 = pos.offset(Direction.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy && !flag_anvil ){
-    		if (state.get(BlockDummyAnvil.FACING) != EnumFacing.SOUTH){
+    		if (state.get(BlockDummyAnvil.FACING) != Direction.SOUTH){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+        		world.setBlockState(pos1, BlockCore.block_anvildummy.getDefaultState().with(BlockDummyAnvil.FACING, Direction.SOUTH));
     		}
     		flag_anvil = true;
     	}else if (state.getBlock() == BlockCore.block_furncedummy && !flag_furnce){
-    		if (state.get(BlockDummyFurnce.FACING) != EnumFacing.EAST){
+    		if (state.get(BlockDummyFurnce.FACING) != Direction.EAST){
         		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
+        		world.setBlockState(pos1, BlockCore.block_furncedummy.getDefaultState().with(BlockDummyFurnce.FACING, Direction.EAST));
     		}
     		flag_furnce = true;
-    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(BlockCauldron.LEVEL) == 3 && !flag_cauldron){
+    	}else if (state.getBlock() == Blocks.CAULDRON && state.get(CauldronBlock.LEVEL) == 3 && !flag_cauldron){
     		flag_cauldron = true;
     	}else if (state.getBlock() == Blocks.CRAFTING_TABLE && !flag_crafting){
     		flag_crafting = true;
@@ -550,55 +321,54 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
 
     @Override
     public void finishWork(World world,BlockPos pos, boolean success){
-
     	// ブロックをもとに戻す
-    	BlockPos pos1 = pos.offset(EnumFacing.NORTH);
-    	IBlockState state = world.getBlockState(pos1);
+    	BlockPos pos1 = pos.offset(Direction.NORTH);
+    	BlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, Direction.EAST));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, Direction.SOUTH));
     	}else if (state.getBlock() == Blocks.CAULDRON){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
-    	pos1 = pos.offset(EnumFacing.SOUTH);
+    	pos1 = pos.offset(Direction.SOUTH);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, Direction.WEST));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, Direction.NORTH));
     	}else if (state.getBlock() == Blocks.CAULDRON){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
-    	pos1 = pos.offset(EnumFacing.EAST);
+    	pos1 = pos.offset(Direction.EAST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.NORTH));
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, Direction.NORTH));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.WEST));
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, Direction.WEST));
     	}else if (state.getBlock() == Blocks.CAULDRON){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
     	}
 
-    	pos1 = pos.offset(EnumFacing.WEST);
+    	pos1 = pos.offset(Direction.WEST);
     	state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, EnumFacing.SOUTH));
+    		world.setBlockState(pos1, Blocks.ANVIL.getDefaultState().with(BlockDummyAnvil.FACING, Direction.SOUTH));
     	}else if (state.getBlock() == BlockCore.block_furncedummy){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
-    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, EnumFacing.EAST));
+    		world.setBlockState(pos1, Blocks.FURNACE.getDefaultState().with(BlockDummyFurnce.FACING, Direction.EAST));
     	}else if (state.getBlock() == Blocks.CAULDRON){
     		world.setBlockState(pos1,Blocks.AIR.getDefaultState());
     		world.setBlockState(pos1, Blocks.CAULDRON.getDefaultState());
@@ -610,30 +380,26 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
     	Dw_WORKTIMER(0);
 
     	// 道具乱を整理
-    	int clear = 2;
+    	int clear = InventoryArmorSmith.INV_05_RESULT;
 		if (!success){
-			// 失敗した場合できるはずだった刀もクリア
-			clear = 3;
+			// 失敗した場合できるはずだった防具もクリア
+			clear = InventoryArmorSmith.INV_06_TOOL_BIGHAMMER;
 		}else{
 			// 成功した場合経験値取得
-//			this.addExp(nextExp);
+			this.addExp(nextExp);
 		}
 		nextExp = 0;
 
 		// 作成に使ったアイテムをクリア
 		for (int i = 0; i < clear; i++){
-			if (this.smithInventory.getStackInSlot(i).getItem() == ItemCore.item_tamahagane){
-				// 玉鋼は最高等級以外刀の作成に使わない
-				continue;
-			}
 			this.smithInventory.setInventorySlotContents(i, ItemStack.EMPTY);
 		}
 
 		// 使った道具を破損させる
-		for (int i = 3; i < this.smithInventory.getSizeInventory(); i++){
+		for (int i = InventoryBladeSmith.INV_06_TOOL_BIGHAMMER; i < this.smithInventory.getSizeInventory(); i++){
 			ItemStack stack = this.smithInventory.getStackInSlot(i);
 			if (stack.isDamageable()){
-				stack.damageItem(1, this);
+				stack.damageItem(1, this, (entity)->{entity.sendBreakAnimation(Hand.MAIN_HAND);});
 				if (stack.getDamage() == 0){
 					// 道具が壊れた
 					this.smithInventory.setInventorySlotContents(i, ItemStack.EMPTY);
@@ -643,96 +409,43 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
 				this.smithInventory.setInventorySlotContents(i, ItemStack.EMPTY);
 			}
 		}
-
     }
 
+    @Override
+	public boolean canStartSmith(World world, BlockPos pos, boolean isWork, EntitySmithBase smith) {
+		boolean ret = true;
 
+		BlockPos pos1 = pos.offset(Direction.NORTH);
+		BlockPos pos2 = pos.offset(Direction.EAST);
+		BlockPos pos3 = pos.offset(Direction.SOUTH);
+		BlockPos pos4 = pos.offset(Direction.WEST);
+		BlockState state1 = world.getBlockState(pos1); // アンビル
+		BlockState state2 = world.getBlockState(pos2); // 竈
+		BlockState state3 = world.getBlockState(pos3); // 作業台
+		BlockState state4 = world.getBlockState(pos4); // 大釜
 
-
-
-	public static boolean canStartArmorSmith(World world, BlockPos pos, boolean isWork, EntityArmorSmith smith) {
-		boolean ret = false;
-		boolean flag_fun = false;
-
-		BlockPos pos1 = pos.add(1,1,0);
-		BlockPos pos2 = pos.add(0,1,1);
-		BlockPos pos3 = pos.add(-1,1,0);
-		BlockPos pos4 = pos.add(0,1,-1);
-		IBlockState state1 = world.getBlockState(pos1); // アンビル
-		IBlockState state2 = world.getBlockState(pos2); // 竈
-		IBlockState state3 = world.getBlockState(pos3); // 作業台
-		IBlockState state4 = world.getBlockState(pos4); // 大釜
-
-
-		IBlockState swap;
-		BlockPos furnace_pos = pos2;;
-		if ((state1.getBlock() == Blocks.ANVIL)){
-			// 何もしない
-		}else if (state2.getBlock() == Blocks.ANVIL){
-			swap = state1;
-			state1 = state2;
-			state2 = state3;
-			state3 = state4;
-			state4 = swap;
-			furnace_pos = pos3;
-		}else if (state3.getBlock() == Blocks.ANVIL){
-			swap = state1;
-			state1 = state3;
-			state3 = swap;
-			swap = state4;
-			state4 = state2;
-			state2 = swap;
-			furnace_pos = pos4;
-		}else if (state4.getBlock() == Blocks.ANVIL){
-			swap = state1;
-			state1 = state4;
-			state4 = state3;
-			state3 = state2;
-			state2 = swap;
-			furnace_pos = pos1;
-		}else{
-			return ret;
+		// 周囲のブロックで同じブロックがあるか確認
+		if (state1.getBlock() == state2.getBlock() || state1.getBlock() == state3.getBlock() || state1.getBlock() == state4.getBlock() ||
+			state2.getBlock() == state3.getBlock() || state2.getBlock() == state4.getBlock() || state3.getBlock() == state4.getBlock()) {
+			// 同じブロックがある場合作業できない
+			return false;
 		}
 
-		if (!(state2.getBlock() ==  Blocks.FURNACE)){
-			return ret;
-		}
-
-		if (!(state3.getBlock() == Blocks.CRAFTING_TABLE)){
-			return ret;
-		}
-
-		if (!(state4.getBlock() == Blocks.CAULDRON)){
-			return ret;
+		// ブロックの種類と状態のチェック
+		if (!checkBlockState(state1, pos1) ||
+			!checkBlockState(state2, pos2) ||
+			!checkBlockState(state3, pos3) ||
+			!checkBlockState(state4, pos4)) {
+			return false;
 		}
 
 		if (isWork){
-			// 竈の中が空っぽか？
-			try{
-				TileEntityFurnace furnace = (TileEntityFurnace)world.getTileEntity(furnace_pos);
-				for (int i = 0;i < furnace.getSizeInventory(); i++){
-					if (furnace.getStackInSlot(i).isEmpty()){
-						ret = true;
-					}else{
-						ret = false;
-						break;
-					}
-				}
-			}catch(Exception ex){}
-
-			// 大釜に水が入っているか?
-			if (ret && state4.get(BlockCauldron.LEVEL) != 3){
-				ret = false;
-			}
-
 			// 所持品チェック
 			if (ret && smith != null){
-				ret = smith.itemCheck();
+				ret = smithInventory.checkItem();
 			}else{
 				ret = false;
 			}
-
-
 		}else{
 			ret = true;
 		}
@@ -740,149 +453,296 @@ public class EntityArmorSmith  extends EntitySmithBase implements INpc
 		return ret;
 	}
 
-	private boolean itemCheck() {
-		return smithInventory.checkItem();
+	private boolean checkBlockState(BlockState state, BlockPos pos) {
+		boolean ret = false;
+		if (state.getBlock() == Blocks.ANVIL || state.getBlock() == Blocks.CRAFTING_TABLE || state.getBlock() == BlockCore.block_anvildummy || state.getBlock() == BlockCore.block_furncedummy) {
+			// アンビルか、ワークベンチの場合特に問題なし
+			ret = true;
+		}else if (state.getBlock() == Blocks.CAULDRON && state.get(CauldronBlock.LEVEL) ==3) {
+			// 大釜の場合満タンでなきゃダメ
+			ret = true;
+		}else if (state.getBlock() == Blocks.FURNACE) {
+			try {
+				// 竈の場合空っぽじゃなきゃダメ
+				FurnaceTileEntity ent = (FurnaceTileEntity)this.world.getTileEntity(pos);
+				ret = ent.isEmpty();
+			}catch(Throwable e) {
+				// 竈以外のTileEntityの場合失敗にする
+			}
+		}
+		return ret;
 	}
 
 	@Override
-	public TextureInfo getTexture(){
-		return Mod_FantomBlade.TextureManager().getTexture(NAME, Dw_Texture());
+	public int getMaxExp() {
+		return EXP_TABLE[EXP_TABLE.length-1];
 	}
 
-	public void setCustomResourceLocation(TextureInfo txture ){
-		if (txture != null){
-			try {
-				// 特製テクスチャを読み込む
-				this.dataManager.set(DW_TEXTURE, txture.FileName());
-			} catch (Exception e) {
-				// 読み込めない場合デフォルトテクスチャを使用する]
-			}
+	@Override
+	public int getExpValue(int level) {
+		if (level >= EXP_TABLE.length) {
+			return EXP_TABLE[EXP_TABLE.length-1];
 		}
-	}
-
-	private boolean textureUpdate = false;
-	public boolean updateTexture() {
-		return textureUpdate;
-	}
-	public void updateTexture(boolean flag) {
-		textureUpdate = flag;
-	}
-
-
-    private static final EnumBladePieceType[] names ={
-    		EnumBladePieceType.NORMAL,EnumBladePieceType.SEIRYU,
-    		EnumBladePieceType.SUZAKU,EnumBladePieceType.BYAKO,
-    		EnumBladePieceType.GENBU,EnumBladePieceType.KIRIN,EnumBladePieceType.NIJI};
-    private static float[] parcent = {100,0,0,0,0,0,0};
-
-    public ItemStack createBlade(){
-		ItemStack ret = ItemStack.EMPTY;
-		int count = 0;
-		int level = getLevel();
-
-		ItemStack armor = this.smithInventory.getArmor();
-		ItemStack material = this.smithInventory.getMaterial();
-		if (armor.getCount() <= 0 || material.getCount() < 64){
-			// ざいりょうがねーよん
-			return ret;
-		}
-
-		// 出来上がるアイテム
-		if (material.getItem() == ItemCore.item_tamahagane){
-			if (armor.getItem() == Items.IRON_HELMET){
-				ret = new ItemStack(ItemCore.item_haganehelmet,1);
-			}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-				ret = new ItemStack(ItemCore.item_haganebody,1);
-			}else if (armor.getItem() == Items.IRON_LEGGINGS){
-				ret = new ItemStack(ItemCore.item_haganelegs,1);
-			}else if (armor.getItem() == Items.IRON_BOOTS){
-				ret = new ItemStack(ItemCore.item_haganeboots,1);
-			}
-		}else if (material.getItem() instanceof ItemBladePiece){
-			switch(((ItemBladePiece)material.getItem()).getPieceType()){
-			case BYAKO:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_byakohelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_byakobody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_byakolegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_byakoboots,1);
-				}
-				break;
-			case GENBU:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_genbuhelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_genbubody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_genbulegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_genbuboots,1);
-				}
-				break;
-			case KIRIN:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_kirinhelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_kirinbody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_kirinlegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_kirinboots,1);
-				}
-				break;
-			case NIJI:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_nijihelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_nijibody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_nijilegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_nijiboots,1);
-				}
-				break;
-			case SEIRYU:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_seiryuhelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_seiryubody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_seiryulegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_seiryuboots,1);
-				}
-				break;
-			case SUZAKU:
-				if (armor.getItem() == Items.IRON_HELMET){
-					ret = new ItemStack(ItemCore.item_suzakuhelmet,1);
-				}else if (armor.getItem() == Items.IRON_CHESTPLATE){
-					ret = new ItemStack(ItemCore.item_suzakubody,1);
-				}else if (armor.getItem() == Items.IRON_LEGGINGS){
-					ret = new ItemStack(ItemCore.item_suzakulegs,1);
-				}else if (armor.getItem() == Items.IRON_BOOTS){
-					ret = new ItemStack(ItemCore.item_suzakuboots,1);
-				}
-				break;
-			default:
-				break;
-
-			}
-
-		}
-    	return ret;
+		return EXP_TABLE[level];
 	}
 
 	@Override
 	public int getLevel() {
-		// TODO 自動生成されたメソッド・スタブ
-		return 1;
+		int ret = EXP_TABLE.length;
+		int exp = this.Dw_Exp();
+		for (int i = 0; i < EXP_TABLE.length-1; i++){
+			if (EXP_TABLE[i] <= exp && exp < EXP_TABLE[i+1]){
+				ret = i+1;
+				break;
+			}
+		}
+		return ret;
 	}
 
-	public void repairArmor() {
-		this.smithInventory.repairArmor();
-
+	@Override
+	public InventorySmithBase getInventory() {
+		return this.smithInventory;
 	}
+
+	@Override
+	public ItemStack create() {
+		return this.createArmor();
+	}
+
+	@Override
+	public void repair() {
+		this.smithInventory.repair();
+	}
+
+	@Override
+	public String getSmithName() {
+		return NAME;
+	}
+
+    public ItemStack createArmor(){
+		ItemStack ret = ItemStack.EMPTY;
+		int count = 0;
+		int level = getLevel();
+
+		// 材料の数を取得
+		int tamahagane = this.smithInventory.getTamahagane(ItemCore.item_tamahagane);
+		List<ItemStack> base = this.smithInventory.getBaseEqipent();
+		int[] piece = this.smithInventory.getBladePiece();
+		int seiryu = piece[EnumBladePieceType.SEIRYU.getIndex()];
+		int suzaku = piece[EnumBladePieceType.SUZAKU.getIndex()];
+		int kirin = piece[EnumBladePieceType.KIRIN.getIndex()];
+		int byako = piece[EnumBladePieceType.BYAKO.getIndex()];
+		int genbu = piece[EnumBladePieceType.GENBU.getIndex()];
+		int niji = piece[EnumBladePieceType.NIJI.getIndex()];
+
+		// 五行の強弱をつける
+		seiryu = seiryu + genbu - byako;
+		suzaku = suzaku + seiryu - genbu;
+		kirin = kirin + suzaku - seiryu;
+		byako = kirin + suzaku - seiryu;
+		genbu = genbu + byako - kirin;
+		// 欠片の最大数を計算
+		int max = ModUtil.IntMax(niji, seiryu, suzaku, kirin, byako, genbu);
+
+		// 玉鋼がないか、ベースが指定されているのに欠片の力が弱い場合作れない
+		if (tamahagane <= 0 || (base.size() != 0 && max <= 0)) {
+			// ざいりょうがねーよん
+			return ret;
+		}
+
+		Item baseEquipment;
+		if (base.size() > 0) {
+			// ベースが指定されている場合指定されているベースのうちどれができるかを決める
+			baseEquipment = base.get(ModUtil.random(base.size())).getItem();
+		}else {
+			// 指定がない場合ランダム
+			Item[] work = new Item[]{ItemCore.item_haganebody,ItemCore.item_haganeboots, ItemCore.item_haganehelmet, ItemCore.item_haganelegs};
+			baseEquipment = work[ModUtil.random(work.length)];
+		}
+
+		// デフォルト
+		EnumBladePieceType pieceType = EnumBladePieceType.NORMAL;
+
+		// 出来上がる防具を決める
+		if (base.size() > 0) {
+			// ベース指定がある場合は確定
+			baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
+		}else {
+			// 欠片が使用されている場合
+			if (max > 0) {
+				if (level >= 250){
+					// レベル250以上の場合確実に特殊鎧ができる
+					baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
+				}else{
+					// 特殊鎧ができる確率を計算 最大70%
+					// レベル/10*5(5% からstart 70%になるのはLv140以上)
+					// 最初の1スタック分は 欠片/10.0F*3.0F(0.3% ～ 19.2%分の補助
+					// 2スタック目以降は欠片/64%分の補助(最大2%)
+					if (Math.min((level/10.0F*5.0F) + ((max%65)/10.0F*5.0F) + Math.max((max-64)/64,0), 70.0F) >= ModUtil.random(101)){
+						baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
+					}
+				}
+			}
+		}
+
+		pieceType = ((ItemHaganeAromor)baseEquipment).getPieceType();
+
+		// 返却用アイテムを作る
+		ret = new ItemStack(baseEquipment);
+		// 経験値確定
+		nextExp = pieceType.getBaseExp();
+		if (base.size()>0) {
+			ItemHaganeAromor.setHardness(ret, -1 * ModUtil.random(10));
+			ItemHaganeAromor.setWeight(ret, -1 * ModUtil.random(10));
+			ItemHaganeAromor.setEndurance(ret, -1 * ModUtil.random(10));
+		}else {
+			// ベースを使用していない場合だけ追加経験値を得られる
+			nextExp += pieceType.getOptionExp();
+			// レベルと玉鋼の数による強化処理
+			int rd = 0;
+			List<ItemStack> tm = this.smithInventory.getTamahagane();
+			for (int i = 0; i < tm.size(); i++) {
+				rd += (tm.get(i).getCount()/((i+1)*10));
+			}
+			// 重さは設定しない
+			ItemHaganeAromor.setHardness(ret, ModUtil.random(rd) + (level / 20));
+			ItemHaganeAromor.setEndurance(ret, ModUtil.random(rd) + (level / 20));
+		}
+
+		// レベル5以下とベース指定の場合エンチャントはつけられない
+		if (base.size() <= 0 && this.getLevel() > 5) {
+			// エンチャント本を取り出す
+			List<ItemStack> encbook = this.smithInventory.getEnchangedBooks();
+
+			// レベル80で5つ確定、レベル60で4つ確定、レベル40で3つ確定、レベル20で2つ確定、レベル10で1つ確定
+			int confirm = level >= 80?5:level>=60?4:level>=40?3:level>=20?2:level>10?1:0;
+			Map<Enchantment, Integer> encMap = Maps.newHashMap();
+
+			// エンチャントチェック用のゾンビ
+			ZombieEntity living = EntityType.ZOMBIE.create(world);
+			living.setItemStackToSlot(((ItemHaganeAromor)baseEquipment).getEquipmentSlot(), new ItemStack(baseEquipment));
+
+			// 登録用マップを作る
+			for (ItemStack stack: encbook) {
+				for (Entry<Enchantment,Integer> enc : EnchantmentHelper.getEnchantments(stack).entrySet()) {
+					Enchantment enchant = enc.getKey();
+					int encLevel = enc.getValue();
+					// エンチャントできるか確認
+					if (enchant.getEntityEquipment(living).size() != 0) {
+						// 同じエンチャントが登録済みの場合レベルを高い方に更新
+						if (encMap.containsKey(enchant)) {
+							if (encMap.get(enchant) < encLevel) {
+								encMap.put(enchant, encLevel);
+							}
+						}else {
+							// 確定の残りあり又はレベル200越えもしくは特殊刀の場合100%成功
+							if (confirm > 0 || level > 200) {
+								encMap.put(enchant, encLevel);
+								confirm--;
+							}else {
+								// 20%の確率でエンチャント成功
+								if (ModUtil.random(1000) < 200) {
+									encMap.put(enchant, encLevel);
+									confirm--;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (encMap.size() > 0) {
+				// エンチャント追加
+				EnchantmentHelper.setEnchantments(encMap, ret);
+			}
+		}
+
+		// レベル10以下とベース指定の場合及び、にじ以外の防具エンチャントはつけられない
+		if (base.size() <= 0 && this.getLevel() > 10 && pieceType == EnumBladePieceType.NIJI) {
+			// レベル10以上ならポーション効果をつける
+			List<ItemStack> potion = this.smithInventory.getPotions();
+			// レベル50以上なら2つ確定,レベル25以上なら1つ確定
+			int confirm = level>=50?2:level>=25?1:0;
+
+			// エフェクトリストを作る
+			List<EffectInstance> effects = new ArrayList<EffectInstance>();
+			for (ItemStack stack : potion) {
+				for (EffectInstance effect2 : PotionUtils.getFullEffectsFromItem(stack)){
+					boolean update = false;
+					int updateIdx = 0;
+					for (int i = 0; i < effects.size() && !update; i++) {
+						if (effects.get(i).getPotion() == effect2.getPotion() && effects.get(i).getAmplifier() < effect2.getAmplifier()) {
+							// 同じ効果で強度が強い場合更新
+							updateIdx = i;
+							update = true;
+						}
+					}
+					if (update) {
+						// エフェクト更新
+						effects.set(updateIdx, new EffectInstance(effect2.getPotion(),effect2.getDuration(), effect2.getAmplifier()));
+					} else {
+						// 確定分が残っているなら登録
+						if (confirm > 0) {
+							effects.add(new EffectInstance(effect2.getPotion(),effect2.getDuration(), effect2.getAmplifier()));
+							confirm--;
+						}else {
+							// 30%の確率でエンチャント成功
+							if (ModUtil.random(1000) < 300) {
+								effects.add(new EffectInstance(effect2.getPotion(),effect2.getDuration(), effect2.getAmplifier()));
+								confirm--;
+							}
+						}
+					}
+				}
+			}
+
+			// エフェクト登録
+			if (effects.size() > 0) {
+				ItemHaganeAromor.setPotionEffects(ret, effects);
+			}
+		}
+
+    	return ret;
+	}
+
+    public Item getBaseEquipment(int max, int niji, int seiryu, int suzaku, int kirin, int byako, int genbu, Item base) {
+		Item baseItem;
+    	if (max == niji) {
+			// にじシリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_nijihelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_nijibody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_nijilegs;}
+			else {baseItem = ItemCore.item_nijiboots;}
+		}else if (max == seiryu) {
+			// 青龍シリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_seiryuhelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_seiryubody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_seiryulegs;}
+			else {baseItem = ItemCore.item_seiryuboots;}
+		}else if (max == suzaku) {
+			// 朱雀シリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_suzakuhelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_suzakubody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_suzakulegs;}
+			else {baseItem = ItemCore.item_suzakuboots;}
+		}else if (max == kirin) {
+			// 麒麟シリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_kirinhelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_kirinbody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_kirinlegs;}
+			else {baseItem = ItemCore.item_kirinboots;}
+		}else if (max == byako) {
+			// 白虎シリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_byakohelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_byakobody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_byakolegs;}
+			else {baseItem = ItemCore.item_byakoboots;}
+		}else {
+			// 玄武シリーズ
+			if (base == ItemCore.item_haganehelmet) {baseItem = ItemCore.item_genbuhelmet;}
+			else if(base == ItemCore.item_haganebody) {baseItem = ItemCore.item_genbubody;}
+			else if(base == ItemCore.item_haganelegs) {baseItem = ItemCore.item_genbulegs;}
+			else {baseItem = ItemCore.item_genbuboots;}
+		}
+    	return baseItem;
+    }
 }

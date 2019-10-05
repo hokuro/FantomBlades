@@ -1,9 +1,6 @@
 {
     "variants": {
-        "facing=north": { "model": "fbd:block/bladealter"},
-        "facing=south": { "model": "fbd:block/bladealter", "y": 180 },
-        "facing=west":  { "model": "fbd:block/bladealter", "y": 270 },
-        "facing=east":  { "model": "fbd:block/bladealter", "y": 90 }
+        "": { "model": "fbd:block/bladealter"}
     }
 }
 

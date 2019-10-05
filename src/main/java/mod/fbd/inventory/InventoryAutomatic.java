@@ -1,14 +1,12 @@
 package mod.fbd.inventory;
 
-import mod.fbd.item.ItemAutomatic;
-import mod.fbd.item.ItemCartridge;
-import net.minecraft.entity.player.EntityPlayer;
+import mod.fbd.item.guns.ItemAutomatic;
+import mod.fbd.item.guns.ItemCartridge;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 
 public class InventoryAutomatic implements IInventory {
 	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(1,ItemStack.EMPTY);
@@ -17,16 +15,6 @@ public class InventoryAutomatic implements IInventory {
 	public InventoryAutomatic(ItemStack gun){
 		automatic = gun;
 		stacks.set(0, ItemAutomatic.getCartridge(automatic));
-	}
-
-	@Override
-	public ITextComponent getName() {
-		return new TextComponentTranslation("inventory.automatic");
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override
@@ -56,7 +44,7 @@ public class InventoryAutomatic implements IInventory {
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		 return ItemStackHelper.getAndSplit(this.stacks, index, count);
+		return ItemStackHelper.getAndSplit(this.stacks, index, count);
 	}
 
 	@Override
@@ -79,16 +67,16 @@ public class InventoryAutomatic implements IInventory {
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(EntityPlayer player) {
+	public void openInventory(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(EntityPlayer player) {
+	public void closeInventory(PlayerEntity player) {
 		ItemAutomatic.setCartridge(automatic, stacks.get(0));
 	}
 
@@ -98,33 +86,7 @@ public class InventoryAutomatic implements IInventory {
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
 		stacks.clear();
-	}
-
-	@Override
-	public ITextComponent getDisplayName() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public ITextComponent getCustomName() {
-		// TODO 自動生成されたメソッド・スタブ
-		return this.getName();
 	}
 }

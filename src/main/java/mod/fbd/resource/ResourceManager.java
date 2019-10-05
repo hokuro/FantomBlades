@@ -15,18 +15,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import mod.fbd.core.ModCommon;
-import mod.fbd.core.Mod_FantomBlade;
 import mod.fbd.core.log.ModLog;
 import mod.fbd.util.ModUtil;
 
 public class ResourceManager {
 
-    // カスタムテクスチャ用のディレクトリ
+    // iカスタムテクスチャ用のディレクトリ
 	public static final String DirName = "texture";
-    // デフォルトリソースのパス
+    // iデフォルトリソースのパス
 	private static final String ORIGINAL_RESOURCE = "assets/fbd/textures/entity";
 
-	// カスタムリソースの使用ができるか
+	// iカスタムリソースの使用ができるか
 	private boolean canCustomResource = false;
 
 	// マップ
@@ -83,7 +82,7 @@ public class ResourceManager {
 
 	public ResourceManager(){
 		texturemaps = new HashMap<String,List<TextureInfo>>();
-		for (String name : Mod_FantomBlade.modelNames){
+		for (String name : TextureUtil.modelNames){
 			texturemaps.put(name, new ArrayList<TextureInfo>());
 		}
 	}
@@ -118,7 +117,7 @@ public class ResourceManager {
 						if (ModCommon.isDebug)ModLog.log().debug("[check target]:"+entry.getName());
 						if (entry.isDirectory()) continue;
 
-						// パーツフォルダの中身だけ検索
+						// iパーツフォルダの中身だけ検索
 						if (entry.getName().startsWith(ORIGINAL_RESOURCE)){
 							if (ModCommon.isDebug)ModLog.log().debug("[read start]:"+entry.getName());
 							try(InputStream istream = zip.getInputStream(entry)){

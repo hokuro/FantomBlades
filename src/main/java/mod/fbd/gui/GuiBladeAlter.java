@@ -1,24 +1,24 @@
 package mod.fbd.gui;
 
-import java.io.IOException;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 import mod.fbd.inventory.ContainerBladeAlter;
 import mod.fbd.item.ItemCore;
-import mod.fbd.item.ItemKatana;
-import mod.fbd.item.ItemKatanaNiji;
+import mod.fbd.item.katana.AbstractItemKatana;
+import mod.fbd.item.katana.ItemKatanaNiji;
 import mod.fbd.network.MessageHandler;
 import mod.fbd.network.Message_BladeLevelUpdate.EnumLevelKind;
 import mod.fbd.tileentity.TileEntityBladeAlter;
 import mod.fbd.util.Enchant;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
-public class GuiBladeAlter extends GuiContainer {
+public class GuiBladeAlter extends ContainerScreen<ContainerBladeAlter> {
 	private static final ResourceLocation tex = new ResourceLocation("fbd", "textures/gui/bladealter.png");
 
 	private static final int[] BUTTON1_X = {0,0,0};
@@ -47,90 +47,89 @@ public class GuiBladeAlter extends GuiContainer {
 	private int idx_enchant = 0;
 	private int idx_potion = 0;
 
-	public GuiBladeAlter(EntityPlayer player, IInventory tileEntity){
-		super(new ContainerBladeAlter(player, tileEntity));
-		entity = (TileEntityBladeAlter)tileEntity;
+	public GuiBladeAlter(ContainerBladeAlter container, PlayerInventory playerInv, ITextComponent titleIn){
+		super(container, playerInv, titleIn);
+		entity = container.getTileEntity();
 		this.xSize =199;
 		this.ySize = 207;
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j){
-		fontRenderer.drawString(net.minecraft.client.resources.I18n.format("gui.bladealter.title"),8,4,4210752);
-        fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 5, 4210752);
+		this.font.drawString(net.minecraft.client.resources.I18n.format("gui.bladealter.title"),8,4,4210752);
+        this.font.drawString("Inventory", 8, this.ySize - 96 + 5, 4210752);
 
-        fontRenderer.drawString("Lv+", 11, 58, 0xFFFFFFFF);
+        this.font.drawString("Lv+", 11, 58, 0xFFFFFFFF);
 
-        fontRenderer.drawString("Lv+", 83, 38, 0xFFFFFFFF);
-        fontRenderer.drawString("Lv-", 115, 38, 0xFFFFFFFF);
-        fontRenderer.drawString("del", 143, 38, 0xFFFFFFFF);
+        this.font.drawString("Lv+", 83, 38, 0xFFFFFFFF);
+        this.font.drawString("Lv-", 115, 38, 0xFFFFFFFF);
+        this.font.drawString("del", 143, 38, 0xFFFFFFFF);
 
 
-        fontRenderer.drawString("Lv+", 83, 86, 0xFFFFFFFF);
-        fontRenderer.drawString("Lv-", 83, 102, 0xFFFFFFFF);
+        this.font.drawString("Lv+", 83, 86, 0xFFFFFFFF);
+        this.font.drawString("Lv-", 83, 102, 0xFFFFFFFF);
 
-        fontRenderer.drawString("+30", 115, 86, 0xFFFFFFFF);
-        fontRenderer.drawString("-30", 115, 102, 0xFFFFFFFF);
+        this.font.drawString("+30", 115, 86, 0xFFFFFFFF);
+        this.font.drawString("-30", 115, 102, 0xFFFFFFFF);
 
-        fontRenderer.drawString("del", 143, 92, 0xFFFFFFFF);
+        this.font.drawString("del", 143, 92, 0xFFFFFFFF);
 
         ItemStack katana = entity.getKatana();
         if (katana != ItemStack.EMPTY){
-        	ItemKatana k = ((ItemKatana)katana.getItem());
+        	AbstractItemKatana k = ((AbstractItemKatana)katana.getItem());
             int lvCost = k.getLevelUpExp();
             int encCost = k.getEnchantLevelUpExp();
             int potCost = k.getPotionEffectUpExp();
-            int exp = ItemKatana.getExp(katana);
-	        fontRenderer.drawString("Lv:"+((ItemKatana)katana.getItem()).getLevel(katana), 7,  35, 0x00FFFFFF);
-	        fontRenderer.drawString(ItemKatana.getExp(katana)+"Exp", 7,  44, 0x00FFFFFF);
-	        fontRenderer.drawString("cost:"+lvCost, 7,  70, (lvCost < exp?6684463:16711680));
-	        if (!katana.isEmpty() && katana.getItem() != ItemCore.item_katana){
-	        	fontRenderer.drawString("cost:"+encCost, 88, 51, (encCost < exp?6684463:16711680));
-	        }
-	        if (katana.getItem() == ItemCore.item_katana_niji || katana.getItem() == ItemCore.item_katana_mugen){
-	        	fontRenderer.drawString("cost:"+potCost, 89, 114, (potCost < exp?6684463:16711680));
-	        }
+            int exp = AbstractItemKatana.getExp(katana);
+            this.font.drawString("Lv:"+((AbstractItemKatana)katana.getItem()).getLevel(katana), 7,  35, 0x00FFFFFF);
+            this.font.drawString(AbstractItemKatana.getExp(katana)+"Exp", 7,  44, 0x00FFFFFF);
+            this.font.drawString("cost:"+lvCost, 7,  70, (lvCost < exp?6684463:16711680));
+            if (!katana.isEmpty() && katana.getItem() != ItemCore.item_katana){
+            	this.font.drawString("cost:"+encCost, 88, 51, (encCost < exp?6684463:16711680));
+            }
+            if (katana.getItem() == ItemCore.item_katana_niji || katana.getItem() == ItemCore.item_katana_mugen){
+            	this.font.drawString("cost:"+potCost, 89, 114, (potCost < exp?6684463:16711680));
+            }
 
-	        if (katana.getItem() == ItemCore.item_katana_niji && ((ItemKatanaNiji)katana.getItem()).getKillCount(katana) >= 1000){
-	        	fontRenderer.drawString("YUME", 10, 84, 0x00FFFFFF);
-	        }
-	        String[] encStr = entity.getStrEnchant().split("/");
-	        fontRenderer.drawString(encStr[0], 81, 16, 0x00FFFFFF);
-	        if (encStr.length == 2){
-		        fontRenderer.drawString(encStr[1], 87, 24, 0x00FFFFFF);
-	        }
+            if (katana.getItem() == ItemCore.item_katana_niji && ((ItemKatanaNiji)katana.getItem()).getKillCount(katana) >= 1000){
+            	this.font.drawString("YUME", 10, 84, 0x00FFFFFF);
+            }
+            String[] encStr = entity.getStrEnchant().split("/");
+            this.font.drawString(encStr[0], 81, 16, 0x00FFFFFF);
+            if (encStr.length == 2){
+            	this.font.drawString(encStr[1], 87, 24, 0x00FFFFFF);
+            }
 
-	        String[] potStr = entity.getStrPotion().split("/");
-	        fontRenderer.drawString(potStr[0], 81, 64, 0x00FFFFFF);
-	        if (potStr.length == 2){
-		        fontRenderer.drawString(potStr[1], 87, 72, 0x00FFFFFF);
-	        }
+            String[] potStr = entity.getStrPotion().split("/");
+            this.font.drawString(potStr[0], 81, 64, 0x00FFFFFF);
+            if (potStr.length == 2){
+            	this.font.drawString(potStr[1], 87, 72, 0x00FFFFFF);
+            }
         }
 	}
 
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
         super.mouseClicked(mouseX, mouseY, mouseButton);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;;
 
-        int j2 = mouseX - i;
-        int k2 = mouseY - j;
+        int j2 = (int)mouseX - i;
+        int k2 = (int)mouseY - j;
         ItemStack katana = entity.getKatana();
         int lvCost = 0;
         int encCost = 0;
         int potCost =0;
         int exp = -1;
-        if (katana.getItem() instanceof ItemKatana){
-            lvCost = ((ItemKatana)katana.getItem()).getLevelUpExp();
-            encCost = ((ItemKatana)katana.getItem()).getEnchantLevelUpExp();
-            potCost = ((ItemKatana)katana.getItem()).getPotionEffectUpExp();
-            exp = ItemKatana.getExp(katana);
+        if (katana.getItem() instanceof AbstractItemKatana){
+            lvCost = ((AbstractItemKatana)katana.getItem()).getLevelUpExp();
+            encCost = ((AbstractItemKatana)katana.getItem()).getEnchantLevelUpExp();
+            potCost = ((AbstractItemKatana)katana.getItem()).getPotionEffectUpExp();
+            exp = AbstractItemKatana.getExp(katana);
         }
         // level Up
         if (this.canLevelUp()){
-            if ((j2-BUTTON_LVUP[0]-1) >= 0 && (k2-BUTTON_LVUP[1]-1) >= 0 && (j2-BUTTON_LVUP[0]-1) < 27 && (k2-BUTTON_LVUP[1]-1) < 13)
-            {
+            if ((j2-BUTTON_LVUP[0]-1) >= 0 && (k2-BUTTON_LVUP[1]-1) >= 0 && (j2-BUTTON_LVUP[0]-1) < 27 && (k2-BUTTON_LVUP[1]-1) < 13) {
                 // 刀レベルアップ
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_BLADE, entity.getPos());
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_BLADE, entity.getPos()));
@@ -139,9 +138,8 @@ public class GuiBladeAlter extends GuiContainer {
 
         // upglade
         if (this.classUpMugen()){
-            if ((j2-BUTTON_MUGEN[0]-1) >= 0 && (k2-BUTTON_MUGEN[1]-1) >= 0 && (j2-BUTTON_MUGEN[0]-1) < 27 && (k2-BUTTON_MUGEN[1]-1) < 13)
-            {
-                // 虹ランクアップ
+            if ((j2-BUTTON_MUGEN[0]-1) >= 0 && (k2-BUTTON_MUGEN[1]-1) >= 0 && (j2-BUTTON_MUGEN[0]-1) < 27 && (k2-BUTTON_MUGEN[1]-1) < 13) {
+                // i虹ランクアップ
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.NIJI, entity.getPos());
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.NIJI, entity.getPos()));
             }
@@ -149,9 +147,8 @@ public class GuiBladeAlter extends GuiContainer {
 
         // Lv+
         if (this.canLevelUpEnchant()){
-        	if ((j2-BUTTON_ENC_UP[0]-1) >= 0 && (k2-BUTTON_ENC_UP[1]-1) >= 0 && (j2-BUTTON_ENC_UP[0]-1) < 27 && (k2-BUTTON_ENC_UP[1]-1) < 13)
-            {
-                // エンチャントレベルアップ
+        	if ((j2-BUTTON_ENC_UP[0]-1) >= 0 && (k2-BUTTON_ENC_UP[1]-1) >= 0 && (j2-BUTTON_ENC_UP[0]-1) < 27 && (k2-BUTTON_ENC_UP[1]-1) < 13) {
+                // iエンチャントレベルアップ
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),1));
             }
@@ -159,9 +156,8 @@ public class GuiBladeAlter extends GuiContainer {
 
         // Lv-
     	if (this.canLevelDownEnchant()){
-            if ((j2-BUTTON_ENC_DOWN[0]-1) >= 0 && (k2-BUTTON_ENC_DOWN[1]-1) >= 0 && (j2-BUTTON_ENC_DOWN[0]-1) < 27 && (k2-BUTTON_ENC_DOWN[1]-1) < 13)
-            {
-                // エンチャントレベルダウン
+            if ((j2-BUTTON_ENC_DOWN[0]-1) >= 0 && (k2-BUTTON_ENC_DOWN[1]-1) >= 0 && (j2-BUTTON_ENC_DOWN[0]-1) < 27 && (k2-BUTTON_ENC_DOWN[1]-1) < 13) {
+                // iエンチャントレベルダウン
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),-1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),-1));
             }
@@ -169,19 +165,17 @@ public class GuiBladeAlter extends GuiContainer {
 
         // del
     	if (this.canRemoveEnchant()){
-            if ((j2-BUTTON_ENC_DEL[0]-1) >= 0 && (k2-BUTTON_ENC_DEL[1]-1) >= 0 && (j2-BUTTON_ENC_DEL[0]-1) < 27 && (k2-BUTTON_ENC_DEL[1]-1) < 13)
-            {
-                // エンチャント削除
+            if ((j2-BUTTON_ENC_DEL[0]-1) >= 0 && (k2-BUTTON_ENC_DEL[1]-1) >= 0 && (j2-BUTTON_ENC_DEL[0]-1) < 27 && (k2-BUTTON_ENC_DEL[1]-1) < 13) {
+                // iエンチャント削除
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),0);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_ENCHANT, entity.getPos(),entity.getEnchantIndex(),0));
             }
         }
 
-        	  // lv+
+        	// lv+
     	if (this.canLevelUpPotion()){
-            if ((j2-BUTTON_POT_UP[0]-1) >= 0 && (k2-BUTTON_POT_UP[1]-1) >= 0 && (j2-BUTTON_POT_UP[0]-1) < 27 && (k2-BUTTON_POT_UP[1]-1) < 13)
-            {
-            	// ポーション効果レベルアップ
+            if ((j2-BUTTON_POT_UP[0]-1) >= 0 && (k2-BUTTON_POT_UP[1]-1) >= 0 && (j2-BUTTON_POT_UP[0]-1) < 27 && (k2-BUTTON_POT_UP[1]-1) < 13) {
+            	// iポーション効果レベルアップ
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),1));
             }
@@ -189,9 +183,8 @@ public class GuiBladeAlter extends GuiContainer {
 
             // lv-
     	if (this.canLevelDownPotion()){
-            if ((j2-BUTTON_POT_DOWN[0]-1) >= 0 && (k2-BUTTON_POT_DOWN[1]-1) >= 0 && (j2-BUTTON_POT_DOWN[0]-1) < 27 && (k2-BUTTON_POT_DOWN[1]-1) < 13)
-            {
-            	// ポーション効果レベルダウン
+            if ((j2-BUTTON_POT_DOWN[0]-1) >= 0 && (k2-BUTTON_POT_DOWN[1]-1) >= 0 && (j2-BUTTON_POT_DOWN[0]-1) < 27 && (k2-BUTTON_POT_DOWN[1]-1) < 13) {
+            	// iポーション効果レベルダウン
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),-1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),-1));
             }
@@ -199,9 +192,8 @@ public class GuiBladeAlter extends GuiContainer {
 
             // 30+
     	if (this.canLevelUpPotionDuration()){
-            if ((j2-BUTTON_POT_TUP[0]-1) >= 0 && (k2-BUTTON_POT_TUP[1]-1) >= 0 && (j2-BUTTON_POT_TUP[0]-1) < 27 && (k2-BUTTON_POT_TUP[1]-1) < 13)
-            {
-                // ポーション効果時間延長
+            if ((j2-BUTTON_POT_TUP[0]-1) >= 0 && (k2-BUTTON_POT_TUP[1]-1) >= 0 && (j2-BUTTON_POT_TUP[0]-1) < 27 && (k2-BUTTON_POT_TUP[1]-1) < 13) {
+                // iポーション効果時間延長
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),1));
             }
@@ -209,9 +201,8 @@ public class GuiBladeAlter extends GuiContainer {
 
             // 30-
     	if (this.canLevelDownPotionDuration()){
-            if ((j2-BUTTON_POT_TDOWN[0]-1) >= 0 && (k2-BUTTON_POT_TDOWN[1]-1) >= 0 && (j2-BUTTON_POT_TDOWN[0]-1) < 27 && (k2-BUTTON_POT_TDOWN[1]-1) < 13)
-            {
-               // ポーション効果時間短縮
+            if ((j2-BUTTON_POT_TDOWN[0]-1) >= 0 && (k2-BUTTON_POT_TDOWN[1]-1) >= 0 && (j2-BUTTON_POT_TDOWN[0]-1) < 27 && (k2-BUTTON_POT_TDOWN[1]-1) < 13) {
+               // iポーション効果時間短縮
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),-1);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION_DURATION, entity.getPos(),entity.getPotionIndex(),-1));
             }
@@ -219,9 +210,8 @@ public class GuiBladeAlter extends GuiContainer {
 
             // del
     	if(this.canRemovePotion()){
-            if ((j2-BUTTON_POT_DEL[0]-1) >= 0 && (k2-BUTTON_POT_DEL[1]-1) >= 0 && (j2-BUTTON_POT_DEL[0]-1) < 27 && (k2-BUTTON_POT_DEL[1]-1) < 13)
-            {
-                // ポーション効果削除
+            if ((j2-BUTTON_POT_DEL[0]-1) >= 0 && (k2-BUTTON_POT_DEL[1]-1) >= 0 && (j2-BUTTON_POT_DEL[0]-1) < 27 && (k2-BUTTON_POT_DEL[1]-1) < 13) {
+                // iポーション効果削除
             	MessageHandler.Send_MessageBladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),0);
             	//Mod_FantomBlade.Net_Instance.sendToServer(new Message_BladeLevelUpdate(EnumLevelKind.LEVEL_POTION, entity.getPos(),entity.getPotionIndex(),0));
             }
@@ -229,51 +219,48 @@ public class GuiBladeAlter extends GuiContainer {
 
         if (!katana.isEmpty() && katana.getItem() != ItemCore.item_katana){
             // 1
-            if ((j2-66) >= 0 && (k2-14) >= 0 && (j2-66) < 11 && (k2-14) < 18)
-            {
-               // エンチャント変更
+            if ((j2-66) >= 0 && (k2-14) >= 0 && (j2-66) < 11 && (k2-14) < 18)  {
+               // iエンチャント変更
             	entity.addEnchantIndex(-1);
             }
             // 2
-            if ((j2-185) >= 0 && (k2-14) >= 0 && (j2-185) < 11 && (k2-14) < 18)
-            {
-               // エンチャント変更
+            if ((j2-185) >= 0 && (k2-14) >= 0 && (j2-185) < 11 && (k2-14) < 18) {
+               // iエンチャント変更
             	entity.addEnchantIndex(1);
             }
         }
 
         if (katana.getItem() == ItemCore.item_katana_niji || katana.getItem() == ItemCore.item_katana_mugen){
             // 3
-            if ((j2-66) >= 0 && (k2-62) >= 0 && (j2-66) < 11 && (k2-62) < 18)
-            {
-                // ポーション効果変更
+            if ((j2-66) >= 0 && (k2-62) >= 0 && (j2-66) < 11 && (k2-62) < 18) {
+                // iポーション効果変更
             	entity.addPotionIndex(-1);
             }
             // 4
-            if ((j2-185) >= 0 && (k2-62) >= 0 && (j2-185) < 11 && (k2-62) < 18)
-            {
-                // ポーション効果変更
+            if ((j2-185) >= 0 && (k2-62) >= 0 && (j2-185) < 11 && (k2-62) < 18) {
+                // iポーション効果変更
             	entity.addPotionIndex(1);
             }
         }
+        return true;
     }
 
 
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks){
-        this.drawDefaultBackground();
+        this.renderBackground();
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int x, int y){
-		// 背景
+		// i背景
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(tex);
+        Minecraft.getInstance().getTextureManager().bindTexture(tex);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        this.blit(i, j, 0, 0, this.xSize, this.ySize);
 
         int j2 = x - i;
         int k2 = y - j;
@@ -283,189 +270,147 @@ public class GuiBladeAlter extends GuiContainer {
         int encCost = 0;
         int potCost =0;
         int exp = -1;
-        if (katana.getItem() instanceof ItemKatana){
-            lvCost = ((ItemKatana)katana.getItem()).getLevelUpExp();
-            encCost = ((ItemKatana)katana.getItem()).getEnchantLevelUpExp();
-            potCost = ((ItemKatana)katana.getItem()).getPotionEffectUpExp();
-            exp = ItemKatana.getExp(katana);
+        if (katana.getItem() instanceof AbstractItemKatana){
+            lvCost = ((AbstractItemKatana)katana.getItem()).getLevelUpExp();
+            encCost = ((AbstractItemKatana)katana.getItem()).getEnchantLevelUpExp();
+            potCost = ((AbstractItemKatana)katana.getItem()).getPotionEffectUpExp();
+            exp = AbstractItemKatana.getExp(katana);
         }
 
         // level Up
         if (this.canLevelUp()){
-            if ((j2-BUTTON_LVUP[0]-1) >= 0 && (k2-BUTTON_LVUP[1]-1) >= 0 && (j2-BUTTON_LVUP[0]-1) < 27 && (k2-BUTTON_LVUP[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_LVUP[0]-1) >= 0 && (k2-BUTTON_LVUP[1]-1) >= 0 && (j2-BUTTON_LVUP[0]-1) < 27 && (k2-BUTTON_LVUP[1]-1) < 13) {
+                this.blit(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-        	this.drawTexturedModalRect(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+        	this.blit(i+BUTTON_LVUP[0], j+BUTTON_LVUP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
         // upglade
         if (this.classUpMugen()){
-            if ((j2-BUTTON_MUGEN[0]-1) >= 0 && (k2-BUTTON_MUGEN[1]-1) >= 0 && (j2-BUTTON_MUGEN[0]-1) < 27 && (k2-BUTTON_MUGEN[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_MUGEN[0], j+BUTTON_MUGEN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_MUGEN[0], j+BUTTON_MUGEN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_MUGEN[0]-1) >= 0 && (k2-BUTTON_MUGEN[1]-1) >= 0 && (j2-BUTTON_MUGEN[0]-1) < 27 && (k2-BUTTON_MUGEN[1]-1) < 13) {
+                this.blit(i+BUTTON_MUGEN[0], j+BUTTON_MUGEN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_MUGEN[0], j+BUTTON_MUGEN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }
 
         // Lv+
         if (this.canLevelUpEnchant()){
-        	if ((j2-BUTTON_ENC_UP[0]-1) >= 0 && (k2-BUTTON_ENC_UP[1]-1) >= 0 && (j2-BUTTON_ENC_UP[0]-1) < 27 && (k2-BUTTON_ENC_UP[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+        	if ((j2-BUTTON_ENC_UP[0]-1) >= 0 && (k2-BUTTON_ENC_UP[1]-1) >= 0 && (j2-BUTTON_ENC_UP[0]-1) < 27 && (k2-BUTTON_ENC_UP[1]-1) < 13) {
+                this.blit(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+            this.blit(i+BUTTON_ENC_UP[0], j+BUTTON_ENC_UP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
         if (this.canLevelDownEnchant()){
             // Lv-
-            if ((j2-BUTTON_ENC_DOWN[0]-1) >= 0 && (k2-BUTTON_ENC_DOWN[1]-1) >= 0 && (j2-BUTTON_ENC_DOWN[0]-1) < 27 && (k2-BUTTON_ENC_DOWN[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_ENC_DOWN[0]-1) >= 0 && (k2-BUTTON_ENC_DOWN[1]-1) >= 0 && (j2-BUTTON_ENC_DOWN[0]-1) < 27 && (k2-BUTTON_ENC_DOWN[1]-1) < 13) {
+                this.blit(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+            this.blit(i+BUTTON_ENC_DOWN[0], j+BUTTON_ENC_DOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
         if (this.canRemoveEnchant()){
             // del
-            if ((j2-BUTTON_ENC_DEL[0]-1) >= 0 && (k2-BUTTON_ENC_DEL[1]-1) >= 0 && (j2-BUTTON_ENC_DEL[0]-1) < 27 && (k2-BUTTON_ENC_DEL[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[2], BUTTON3_Y[2], 18, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[1], BUTTON3_Y[1], 18, 15);
+            if ((j2-BUTTON_ENC_DEL[0]-1) >= 0 && (k2-BUTTON_ENC_DEL[1]-1) >= 0 && (j2-BUTTON_ENC_DEL[0]-1) < 27 && (k2-BUTTON_ENC_DEL[1]-1) < 13) {
+                this.blit(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[2], BUTTON3_Y[2], 18, 15);
+            } else {
+                this.blit(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[1], BUTTON3_Y[1], 18, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[0], BUTTON3_Y[0], 18, 15);
+            this.blit(i+BUTTON_ENC_DEL[0], j+BUTTON_ENC_DEL[1], BUTTON3_X[0], BUTTON3_Y[0], 18, 15);
         }
 
-        	  // lv+
+        	// lv+
         if (this.canLevelUpPotion()){
-            if ((j2-BUTTON_POT_UP[0]-1) >= 0 && (k2-BUTTON_POT_UP[1]-1) >= 0 && (j2-BUTTON_POT_UP[0]-1) < 27 && (k2-BUTTON_POT_UP[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_POT_UP[0]-1) >= 0 && (k2-BUTTON_POT_UP[1]-1) >= 0 && (j2-BUTTON_POT_UP[0]-1) < 27 && (k2-BUTTON_POT_UP[1]-1) < 13) {
+                this.blit(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+            this.blit(i+BUTTON_POT_UP[0], j+BUTTON_POT_UP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
             // lv-
         if (this.canLevelDownPotion()){
-            if ((j2-BUTTON_POT_DOWN[0]-1) >= 0 && (k2-BUTTON_POT_DOWN[1]-1) >= 0 && (j2-BUTTON_POT_DOWN[0]-1) < 27 && (k2-BUTTON_POT_DOWN[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_POT_DOWN[0]-1) >= 0 && (k2-BUTTON_POT_DOWN[1]-1) >= 0 && (j2-BUTTON_POT_DOWN[0]-1) < 27 && (k2-BUTTON_POT_DOWN[1]-1) < 13) {
+                this.blit(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+            this.blit(i+BUTTON_POT_DOWN[0], j+BUTTON_POT_DOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
             // 30+
         if (this.canLevelUpPotionDuration()){
-            if ((j2-BUTTON_POT_TUP[0]-1) >= 0 && (k2-BUTTON_POT_TUP[1]-1) >= 0 && (j2-BUTTON_POT_TUP[0]-1) < 27 && (k2-BUTTON_POT_TUP[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_POT_TUP[0]-1) >= 0 && (k2-BUTTON_POT_TUP[1]-1) >= 0 && (j2-BUTTON_POT_TUP[0]-1) < 27 && (k2-BUTTON_POT_TUP[1]-1) < 13) {
+                this.blit(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-            this.drawTexturedModalRect(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+            this.blit(i+BUTTON_POT_TUP[0], j+BUTTON_POT_TUP[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
             // 30-
         if (this.canLevelDownPotionDuration()){
-            if ((j2-BUTTON_POT_TDOWN[0]-1) >= 0 && (k2-BUTTON_POT_TDOWN[1]-1) >= 0 && (j2-BUTTON_POT_TDOWN[0]-1) < 27 && (k2-BUTTON_POT_TDOWN[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
+            if ((j2-BUTTON_POT_TDOWN[0]-1) >= 0 && (k2-BUTTON_POT_TDOWN[1]-1) >= 0 && (j2-BUTTON_POT_TDOWN[0]-1) < 27 && (k2-BUTTON_POT_TDOWN[1]-1) < 13) {
+                this.blit(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[2], BUTTON1_Y[2], 29, 15);
+            } else {
+                this.blit(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[1], BUTTON1_Y[1], 29, 15);
             }
         }else{
-        	this.drawTexturedModalRect(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
+        	this.blit(i+BUTTON_POT_TDOWN[0], j+BUTTON_POT_TDOWN[1], BUTTON1_X[0], BUTTON1_Y[0], 29, 15);
         }
 
             // del
         if (this.canRemovePotion()){
-            if ((j2-BUTTON_POT_DEL[0]-1) >= 0 && (k2-BUTTON_POT_DEL[1]-1) >= 0 && (j2-BUTTON_POT_DEL[0]-1) < 27 && (k2-BUTTON_POT_DEL[1]-1) < 13)
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[2], BUTTON3_Y[2], 18, 15);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[1], BUTTON3_Y[1], 18, 15);
+            if ((j2-BUTTON_POT_DEL[0]-1) >= 0 && (k2-BUTTON_POT_DEL[1]-1) >= 0 && (j2-BUTTON_POT_DEL[0]-1) < 27 && (k2-BUTTON_POT_DEL[1]-1) < 13) {
+                this.blit(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[2], BUTTON3_Y[2], 18, 15);
+            } else {
+                this.blit(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[1], BUTTON3_Y[1], 18, 15);
             }
         }else{
-        	this.drawTexturedModalRect(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[0], BUTTON3_Y[0], 18, 15);
+        	this.blit(i+BUTTON_POT_DEL[0], j+BUTTON_POT_DEL[1], BUTTON3_X[0], BUTTON3_Y[0], 18, 15);
         }
 
         if (!katana.isEmpty() && katana.getItem() != ItemCore.item_katana){
             // 1
-            if ((j2-66) >= 0 && (k2-14) >= 0 && (j2-66) < 11 && (k2-14) < 18)
-            {
-                this.drawTexturedModalRect(i+66, j+14, 211, 0, 11, 18);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+66, j+14, 211, 19, 11, 18);
+            if ((j2-66) >= 0 && (k2-14) >= 0 && (j2-66) < 11 && (k2-14) < 18) {
+                this.blit(i+66, j+14, 211, 0, 11, 18);
+            } else {
+                this.blit(i+66, j+14, 211, 19, 11, 18);
             }
             // 2
-            if ((j2-185) >= 0 && (k2-14) >= 0 && (j2-185) < 11 && (k2-14) < 18)
-            {
-                this.drawTexturedModalRect(i+185, j+14, 200, 0, 11, 18);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+185, j+14, 200, 19, 11, 18);
+            if ((j2-185) >= 0 && (k2-14) >= 0 && (j2-185) < 11 && (k2-14) < 18) {
+                this.blit(i+185, j+14, 200, 0, 11, 18);
+            } else {
+                this.blit(i+185, j+14, 200, 19, 11, 18);
             }
         }
 
         if (katana.getItem() == ItemCore.item_katana_niji || katana.getItem() == ItemCore.item_katana_mugen){
             // 3
-            if ((j2-66) >= 0 && (k2-62) >= 0 && (j2-66) < 11 && (k2-62) < 18)
-            {
-                this.drawTexturedModalRect(i+66, j+62, 211, 0, 11, 18);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+66, j+62, 211, 19, 11, 18);
+            if ((j2-66) >= 0 && (k2-62) >= 0 && (j2-66) < 11 && (k2-62) < 18) {
+                this.blit(i+66, j+62, 211, 0, 11, 18);
+            } else {
+                this.blit(i+66, j+62, 211, 19, 11, 18);
             }
             // 4
-            if ((j2-185) >= 0 && (k2-62) >= 0 && (j2-185) < 11 && (k2-62) < 18)
-            {
-                this.drawTexturedModalRect(i+185, j+62, 200, 0, 11, 18);
-            }
-            else
-            {
-                this.drawTexturedModalRect(i+185, j+62, 200, 19, 11, 18);
+            if ((j2-185) >= 0 && (k2-62) >= 0 && (j2-185) < 11 && (k2-62) < 18) {
+                this.blit(i+185, j+62, 200, 0, 11, 18);
+            } else {
+                this.blit(i+185, j+62, 200, 19, 11, 18);
             }
         }
 	}
@@ -473,7 +418,7 @@ public class GuiBladeAlter extends GuiContainer {
 
 	private boolean canLevelUp(){
 		ItemStack stack = entity.getKatana();
-		if (!stack.isEmpty() && (ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getLevelUpExp())){
+		if (!stack.isEmpty() && (AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getLevelUpExp())){
 			return true;
 		}
 		return false;
@@ -494,8 +439,8 @@ public class GuiBladeAlter extends GuiContainer {
 		if (!stack.isEmpty()){
 			if (stack.getItem() != ItemCore.item_katana){
 				Enchant ent = entity.getEnchant();
-				if (ent != null && (ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getEnchantLevelUpExp())){
-					int lv = ((ItemKatana)stack.getItem()).getLevel(stack);
+				if (ent != null && (AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getEnchantLevelUpExp())){
+					int lv = ((AbstractItemKatana)stack.getItem()).getLevel(stack);
 					if (lv <= 10 && ent.Level() < lv){
 						// 10レベルまでは刀のレベルまで上げられる
 						return true;
@@ -517,7 +462,7 @@ public class GuiBladeAlter extends GuiContainer {
 		if (!stack.isEmpty()){
 			if (stack.getItem() != ItemCore.item_katana){
 				Enchant ent = entity.getEnchant();
-				if (ent != null && (ent.Level() > 1 && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getEnchantLevelUpExp())){
+				if (ent != null && (ent.Level() > 1 && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getEnchantLevelUpExp())){
 					return true;
 				}
 			}
@@ -531,7 +476,7 @@ public class GuiBladeAlter extends GuiContainer {
 		if (!stack.isEmpty()){
 			if (stack.getItem() != ItemCore.item_katana){
 				Enchant ent = entity.getEnchant();
-				if (ent!=null && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
+				if (ent!=null && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
 					if (ent.Level() > 0){
 						return true;
 					}
@@ -545,11 +490,11 @@ public class GuiBladeAlter extends GuiContainer {
 	private boolean canLevelUpPotion(){
 		ItemStack stack = entity.getKatana();
 		if (!stack.isEmpty()){
-			PotionEffect ent = entity.getPotion();
+			EffectInstance ent = entity.getPotion();
 			if (ent == null ){return false;}
 			if (stack.getItem() == ItemCore.item_katana_niji){
-				if (ent != null && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
-					int lv = ((ItemKatana)stack.getItem()).getLevel(stack);
+				if (ent != null && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
+					int lv = ((AbstractItemKatana)stack.getItem()).getLevel(stack);
 					if (lv <= 10 && ent.getAmplifier() < lv){
 						// 10レベルまでは刀のレベルまで上げられる
 						return true;
@@ -562,8 +507,8 @@ public class GuiBladeAlter extends GuiContainer {
 					}
 				}
 			}else if (stack.getItem() == ItemCore.item_katana_mugen){
-				if (ent != null && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
-					int lv = ((ItemKatana)stack.getItem()).getLevel(stack);
+				if (ent != null && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
+					int lv = ((AbstractItemKatana)stack.getItem()).getLevel(stack);
 					if (ent.getAmplifier() < lv){
 						// 刀のレベルまで上げられる
 						return true;
@@ -578,8 +523,8 @@ public class GuiBladeAlter extends GuiContainer {
 		ItemStack stack = entity.getKatana();
 		if (!stack.isEmpty()){
 			if (stack.getItem() == ItemCore.item_katana_niji || stack.getItem() == ItemCore.item_katana_mugen){
-				PotionEffect ent = entity.getPotion();
-				if (ent != null && ent.getAmplifier() > 0 && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
+				EffectInstance ent = entity.getPotion();
+				if (ent != null && ent.getAmplifier() > 0 && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
 					return true;
 				}
 			}
@@ -590,12 +535,12 @@ public class GuiBladeAlter extends GuiContainer {
 	private boolean canLevelUpPotionDuration(){
 		ItemStack stack = entity.getKatana();
 		if (!stack.isEmpty()){
-			PotionEffect ent = entity.getPotion();
+			EffectInstance ent = entity.getPotion();
 			if (ent == null){return false;}
 			if (ent.getPotion().isInstant()){return false;}
 			if (stack.getItem() == ItemCore.item_katana_niji){
-				if (ent != null && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp() && ent.getAmplifier() >= 0){
-					int lv = ((ItemKatana)stack.getItem()).getLevel(stack);
+				if (ent != null && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp() && ent.getAmplifier() >= 0){
+					int lv = ((AbstractItemKatana)stack.getItem()).getLevel(stack);
 					int duration = (ent.getDuration()/600);
 					if (lv <= 10 && duration < lv){
 						// 10レベルまでは刀のレベルまで上げられる
@@ -609,8 +554,8 @@ public class GuiBladeAlter extends GuiContainer {
 					}
 				}
 			}else if (stack.getItem() == ItemCore.item_katana_mugen){
-				if (ent != null && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
-					int lv = ((ItemKatana)stack.getItem()).getLevel(stack);
+				if (ent != null && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
+					int lv = ((AbstractItemKatana)stack.getItem()).getLevel(stack);
 					int duration = (ent.getDuration()/600);
 					if (duration < lv){
 						// 刀のレベルまで上げられる
@@ -626,8 +571,8 @@ public class GuiBladeAlter extends GuiContainer {
 		ItemStack stack = entity.getKatana();
 		if (!stack.isEmpty()){
 			if (stack.getItem() == ItemCore.item_katana_niji || stack.getItem() == ItemCore.item_katana_mugen){
-				PotionEffect ent = entity.getPotion();
-				if (ent != null && ent.getDuration() > 600 && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
+				EffectInstance ent = entity.getPotion();
+				if (ent != null && ent.getDuration() > 600 && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
 					return true;
 				}
 			}
@@ -640,8 +585,8 @@ public class GuiBladeAlter extends GuiContainer {
 		ItemStack stack = entity.getKatana();
 		if (!stack.isEmpty()){
 			if (stack.getItem() == ItemCore.item_katana_niji || stack.getItem() == ItemCore.item_katana_mugen){
-				PotionEffect ent = entity.getPotion();
-				if (ent != null && ent.getAmplifier() >= 0 && ItemKatana.getExp(stack) >= ((ItemKatana)stack.getItem()).getPotionEffectUpExp()){
+				EffectInstance ent = entity.getPotion();
+				if (ent != null && ent.getAmplifier() >= 0 && AbstractItemKatana.getExp(stack) >= ((AbstractItemKatana)stack.getItem()).getPotionEffectUpExp()){
 					return true;
 				}
 			}

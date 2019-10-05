@@ -1,6 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "fbd:block/bladeforge"},
         "frame=0": { "model": "fbd:block/bladeforge"},
         "frame=1": { "model": "fbd:block/bladeforge_off"},
         "frame=2": { "model": "fbd:block/bladeforge_on"},

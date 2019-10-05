@@ -1,25 +1,32 @@
 package mod.fbd.item;
 
-import mod.fbd.core.log.ModLog;
 import mod.fbd.entity.mob.EntityArmorSmith;
 import mod.fbd.entity.mob.EntityBladeSmith;
 import mod.fbd.entity.mob.EntityElmBase;
-import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.player.EntityPlayer;
+import mod.fbd.entity.mob.EntitySmithBase;
+import mod.fbd.resource.TextureUtil;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 public class ItemSummonSeal extends Item {
-
 	private EnumSummonType summonEntity;
 
 	ItemSummonSeal(EnumSummonType summon, Item.Properties property){
@@ -28,43 +35,86 @@ public class ItemSummonSeal extends Item {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand){
-		ItemStack itemstack = player.getHeldItem(hand);
-			RayTraceResult movingbjectposition = this.rayTrace(world, player,true);
+	public ActionResultType onItemUse(ItemUseContext context) {
+		World world = context.getWorld();
+		if (world.isRemote) {
+			return ActionResultType.SUCCESS;
+		} else {
+			ItemStack itemstack = context.getItem();
+			BlockPos blockpos = context.getPos();
+			Direction direction = context.getFace();
+			BlockState blockstate = world.getBlockState(blockpos);
 
-			if (movingbjectposition == null){
-				return new ActionResult(EnumActionResult.FAIL, itemstack);
+			BlockPos blockpos1;
+			if (blockstate.getCollisionShape(world, blockpos).isEmpty()) {
+				blockpos1 = blockpos;
+			} else {
+				blockpos1 = blockpos.offset(direction);
 			}
-
-			if (movingbjectposition.type == RayTraceResult.Type.BLOCK){
-				BlockPos blockpos = movingbjectposition.getBlockPos();
-				if (world.isAirBlock(blockpos.add(0,1,0)) && world.isAirBlock(blockpos.add(0,2,0)) && blockpos.getY() <= player.posY+1){
-					if (!world.isRemote){
-						try{
-							EntityElmBase summon = this.summonEntity.summonEntity(world,blockpos);
-							if (summon != null){
-								summon.setLocationAndAngles(blockpos.getX()+0.5F, blockpos.getY()+1, blockpos.getZ()+0.5F,
-										(MathHelper.floor((double)((player.rotationYaw*4F)/360F)+2.5D)&3)*90,0.0F);
-								summon.rotationYawHead = summon.rotationYaw;
-								summon.renderYawOffset = summon.rotationYaw;
-								summon.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(summon)), (IEntityLivingData)null, new NBTTagCompound());
-								world.spawnEntity(summon);
-								summon.Dw_SUMMONPOS(blockpos.add(0,1,0));
-							}else{
-								player.sendStatusMessage(new TextComponentString("can't summon"),false);
-							}
-						}catch(Exception e){
-							ModLog.log().error(e.getMessage());
-						}
-					}
-					if(!player.isCreative()){
-						itemstack.shrink(1);
-					}
+			EntityElmBase summon = summonEntity.summonEntity(world, blockpos1);
+			if (summon != null){
+				summon.setLocationAndAngles(blockpos.getX()+0.5F, blockpos.getY()+1, blockpos.getZ()+0.5F,
+						(MathHelper.floor((double)((context.getPlayer().rotationYaw*4F)/360F)+2.5D)&3)*90,0.0F);
+				summon.rotationYawHead = summon.rotationYaw;
+				summon.renderYawOffset = summon.rotationYaw;
+				summon.onInitialSpawn(world, world.getDifficultyForLocation(blockpos1), SpawnReason.SPAWN_EGG, (ILivingEntityData)null, (CompoundNBT)null);
+				if (summon instanceof EntitySmithBase) {
+					((EntitySmithBase)summon).setCustomResourceLocation(TextureUtil.TextureManager().getRandomTexture(((EntitySmithBase)summon).getSmithName()));
 				}
+				world.addEntity(summon);
+				summon.Dw_SUMMONPOS(blockpos.add(0,1,0));
+				if (!context.getPlayer().abilities.isCreativeMode) {
+					itemstack.shrink(1);
+				}
+			}else{
+				context.getPlayer().sendStatusMessage(new StringTextComponent("can't summon"),false);
 			}
-		return new ActionResult(EnumActionResult.SUCCESS,itemstack);
+			return ActionResultType.SUCCESS;
+		}
 	}
 
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+		ItemStack itemstack = playerIn.getHeldItem(handIn);
+		if (worldIn.isRemote) {
+			return new ActionResult<>(ActionResultType.PASS, itemstack);
+		} else {
+			RayTraceResult raytraceresult = rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
+			if (raytraceresult.getType() != RayTraceResult.Type.BLOCK) {
+				return new ActionResult<>(ActionResultType.PASS, itemstack);
+			} else {
+				BlockRayTraceResult blockraytraceresult = (BlockRayTraceResult)raytraceresult;
+				BlockPos blockpos = blockraytraceresult.getPos();
+				if (!(worldIn.getBlockState(blockpos).getBlock() instanceof FlowingFluidBlock)) {
+					return new ActionResult<>(ActionResultType.PASS, itemstack);
+				} else if (worldIn.isBlockModifiable(playerIn, blockpos) && playerIn.canPlayerEdit(blockpos, blockraytraceresult.getFace(), itemstack)) {
+
+					EntityElmBase summon = summonEntity.summonEntity(worldIn, blockpos);
+					if (summon != null){
+						summon.setLocationAndAngles(blockpos.getX()+0.5F, blockpos.getY()+1, blockpos.getZ()+0.5F,
+								(MathHelper.floor((double)((playerIn.rotationYaw*4F)/360F)+2.5D)&3)*90,0.0F);
+						summon.rotationYawHead = summon.rotationYaw;
+						summon.renderYawOffset = summon.rotationYaw;
+						summon.onInitialSpawn(worldIn, worldIn.getDifficultyForLocation(blockpos), SpawnReason.SPAWN_EGG, (ILivingEntityData)null, (CompoundNBT)null);
+						if (summon instanceof EntitySmithBase) {
+							((EntitySmithBase)summon).setCustomResourceLocation(TextureUtil.TextureManager().getRandomTexture(((EntitySmithBase)summon).getSmithName()));
+						}
+						worldIn.addEntity(summon);
+						summon.Dw_SUMMONPOS(blockpos.add(0,1,0));
+						if (!playerIn.abilities.isCreativeMode) {
+							itemstack.shrink(1);
+						}
+						return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
+					}else{
+						playerIn.sendStatusMessage(new StringTextComponent("can't summon"),false);
+						return new ActionResult<>(ActionResultType.PASS, itemstack);
+					}
+				} else {
+					return new ActionResult<>(ActionResultType.FAIL, itemstack);
+				}
+			}
+		}
+	}
 
 	public static enum EnumSummonType{
 		BLADESMITH(0,"bladesmith"),
@@ -89,15 +139,9 @@ public class ItemSummonSeal extends Item {
 		public EntityElmBase summonEntity(World world, BlockPos pos){
 			EntityElmBase summon = null;
 			if (this == BLADESMITH){
-				if (EntityBladeSmith.canStartBladeSmith(world, pos, false, null)){
-					EntityBladeSmith smith = new EntityBladeSmith(world);
-					summon = smith;
-				}
+				summon = new EntityBladeSmith(world);
 			}else if (this == ARMORSMITH){
-				if (EntityArmorSmith.canStartArmorSmith(world, pos, false, null)){
-					EntityArmorSmith smith = new EntityArmorSmith(world);
-					summon = smith;
-				}
+				summon = new EntityArmorSmith(world);
 			}else if (this == IMOUTO){
 
 			}

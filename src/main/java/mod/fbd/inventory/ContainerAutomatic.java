@@ -1,19 +1,21 @@
 package mod.fbd.inventory;
 
-import mod.fbd.item.ItemCartridge;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
+import mod.fbd.core.Mod_FantomBlade;
+import mod.fbd.item.guns.ItemCartridge;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerAutomatic  extends Container{
+public class ContainerAutomatic extends Container{
 	/** Instance of Merchant. */
     private final IInventory automatic;
-    private final EntityPlayer player;
+    private final PlayerInventory player;
 
-    public ContainerAutomatic(EntityPlayer playerIn, IInventory gun)
-    {
+    public ContainerAutomatic(int id, PlayerInventory playerIn,  IInventory gun) {
+    	super(Mod_FantomBlade.CONTAINER_AUTOMATIC, id);
     	automatic = gun;
     	player = playerIn;
     	this.addSlot(new Slot(automatic, 0, 86, 65)
@@ -23,34 +25,28 @@ public class ContainerAutomatic  extends Container{
 					return  (stack.getItem() instanceof ItemCartridge);
 				}
 			});
-        // プレイヤースロット
+        // iプレイヤースロット
         for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlot(new Slot(player.inventory, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
+                this.addSlot(new Slot(playerIn, j + i * 9 + 9, 8 + j * 18, 111 + i * 18));
             }
         }
 
         for (int k = 0; k < 9; ++k)
         {
-            this.addSlot(new Slot(player.inventory, k, 8 + k * 18, 169));
+            this.addSlot(new Slot(playerIn, k, 8 + k * 18, 169));
         }
     }
 
-    /**
-     * Determines whether supplied player can use this container
-     */
-    public boolean canInteractWith(EntityPlayer playerIn)
-    {
+    @Override
+    public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
     }
 
-    /**
-     * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
-     * inventory and the other inventory(s).
-     */
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    @Override
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
@@ -96,12 +92,14 @@ public class ContainerAutomatic  extends Container{
         return itemstack;
     }
 
-    /**
-     * Called when the container is closed.
-     */
-    public void onContainerClosed(EntityPlayer playerIn)
+    @Override
+    public void onContainerClosed(PlayerEntity playerIn)
     {
         super.onContainerClosed(playerIn);
         automatic.closeInventory(playerIn);
+    }
+
+    public IInventory gunInventory() {
+    	return automatic;
     }
 }
