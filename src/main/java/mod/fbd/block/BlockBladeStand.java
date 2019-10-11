@@ -45,13 +45,16 @@ public class BlockBladeStand extends BlockHorizontalContainer {
 
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    	if (!worldIn.isRemote){
-    		TileEntity ent = worldIn.getTileEntity(pos);
-    		if (ent instanceof TileEntityBladeStand){
-    			InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory)ent);
-    		}
+    	if (state.getBlock() != newState.getBlock()) {
+	    	if (!worldIn.isRemote){
+	    		TileEntity ent = worldIn.getTileEntity(pos);
+	    		if (ent instanceof TileEntityBladeStand){
+	    			InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory)ent);
+	                worldIn.updateComparatorOutputLevel(pos, this);
+	    		}
+	    	}
+	    	super.onReplaced(state, worldIn, pos, newState, isMoving);
     	}
-    	super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 
     @Override

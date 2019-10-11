@@ -104,19 +104,22 @@ public class BlockBladeforge extends ContainerBlock {
 
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    	if (!worldIn.isRemote){
+    	if (state.getBlock() != newState.getBlock()) {
+	    	if (!worldIn.isRemote){
+	    		TileEntity ent = worldIn.getTileEntity(pos);
+		   		if (ent instanceof TileEntityBladeforge){
+		   			for (ItemStack drop : ((TileEntityBladeforge)ent).getDropItem()){
+		   				ModUtil.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), drop, worldIn.rand);
+		   			}
+		   		}
+	    	}
+	    	super.onReplaced(state, worldIn, pos, newState, isMoving);
+    	}else {
     		TileEntity ent = worldIn.getTileEntity(pos);
     		if (state.getBlock() == BlockCore.block_bladeforge && newState.getBlock() == BlockCore.block_bladeforge && ent instanceof TileEntityBladeforge) {
     			((TileEntityBladeforge)ent).setField(TileEntityBladeforge.FIELD_STATE, newState.get(FRAME));
-    		}else {
-	    		if (ent instanceof TileEntityBladeforge){
-	    			for (ItemStack drop : ((TileEntityBladeforge)ent).getDropItem()){
-	    				ModUtil.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), drop, worldIn.rand);
-	    			}
-	    		}
     		}
     	}
-    	super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
