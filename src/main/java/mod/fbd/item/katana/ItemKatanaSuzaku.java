@@ -15,16 +15,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
@@ -69,32 +64,17 @@ public class ItemKatanaSuzaku extends AbstractItemKatana{
 			return  ActionResultType.SUCCESS;
 		}
 		return ActionResultType.PASS;
-
 	}
+
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		ItemStack stack = playerIn.getHeldItemMainhand();
-		if (stack.getItem() == this){
-			RayTraceResult movingbjectposition = rayTrace(worldIn, playerIn,RayTraceContext.FluidMode.SOURCE_ONLY);
-			if (movingbjectposition.getType() == RayTraceResult.Type.ENTITY) {
-				// iモブを炎上させる
-				if (movingbjectposition.hitInfo instanceof LivingEntity) {
-					int level = getLevel(stack);
-					LivingEntity target = (LivingEntity)movingbjectposition.hitInfo;
-					if (!target.isImmuneToFire()) {
-						worldIn.playSound(playerIn, playerIn.getPosition(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, 1.0F);
-						if (!worldIn.isRemote) {
-							target.setFire(level * 5);
-							stack.damageItem(1, playerIn, (living) -> {
-								living.sendBreakAnimation(EquipmentSlotType.MAINHAND);
-					         });
-						}
-						return new ActionResult(ActionResultType.SUCCESS,stack);
-					}
-				}
-			}
+	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+		if (!playerIn.world.isRemote) {
+			target.setFire(playerIn.world.rand.nextInt(this.getLevel(stack)*10));
+			stack.damageItem(1, playerIn, (living) -> {
+				living.sendBreakAnimation(hand);
+	         });
 		}
-		return new ActionResult(ActionResultType.PASS, stack);
+		return true;
 	}
 
 	@Override
