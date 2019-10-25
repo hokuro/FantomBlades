@@ -20,12 +20,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -34,6 +34,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.Direction;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -62,10 +63,7 @@ public class ItemHaganeAromor extends ArmorItem {
 		if (entity instanceof LivingEntity) {
 			LivingEntity living = (LivingEntity)entity;
 
-			// ポーション効果付きならポーション効果を付与
-			ItemHaganeAromor.getPotionEffects(stack).forEach((effect)->{
-				living.addPotionEffect(new EffectInstance(effect.getPotion(), effect.getDuration(), effect.getAmplifier()));
-			});
+
 
 			ItemStack helmet = living.getItemStackFromSlot(EquipmentSlotType.HEAD);
 			ItemStack chest = living.getItemStackFromSlot(EquipmentSlotType.CHEST);
@@ -205,15 +203,21 @@ public class ItemHaganeAromor extends ArmorItem {
 					}
 				}
 			}
-		}
 
-		// 性能変更
-		int maxdamage = this.material.getDurability(this.slot);
-		ModUtil.setPrivateValue(Item.class, this, maxdamage  + (maxdamage * (this.getEndurance(stack)/10)), "maxDamage");
-		reduce = (double)this.damageReduceAmount + ((double)this.damageReduceAmount*(this.getHardness(stack)/10));
-		speed = this.getWeight(stack)/10;
-		if (entity instanceof PlayerEntity){
-			updateAttackAmplifier(stack,(PlayerEntity)entity);
+			if (living.getItemStackFromSlot(this.slot).getItem() == this) {
+				// iポーション効果付きならポーション効果を付与
+				ItemHaganeAromor.getPotionEffects(stack).forEach((effect)->{
+					living.addPotionEffect(new EffectInstance(effect.getPotion(), effect.getDuration(), effect.getAmplifier()));
+				});
+				reduce = ItemHaganeAromor.getHardness(stack);
+				speed = ItemHaganeAromor.getWeight(stack);
+				// i性能変更
+				int maxdamage = (int)(this.material.getDurability(this.slot) * ItemHaganeAromor.getEndurance(stack));
+				ModUtil.setPrivateValue(Item.class, this, maxdamage, "maxDamage");
+				if (entity instanceof PlayerEntity){
+					updateAttackAmplifier(stack,(PlayerEntity)entity);
+				}
+			}
 		}
 	}
 
@@ -226,10 +230,11 @@ public class ItemHaganeAromor extends ArmorItem {
 	private static final UUID[] ARMOR_MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
     @Override
     public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);
+    	Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);
         if (equipmentSlot == this.slot) {
-        	multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.reduce, AttributeModifier.Operation.ADDITION));
-        	multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(UUID.fromString("40ce64b3-52c8-4d77-b2b8-b012bc6de1dd"), "weight modifier", speed,  Operation.MULTIPLY_TOTAL));
+        	multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(UUID.fromString("40ce64b3-52c8-4d77-b2b8-b012bc6de1dd"), "weight modifier", speed,  AttributeModifier.Operation.MULTIPLY_TOTAL));
+            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.damageReduceAmount * reduce, AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", (double)this.toughness, AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
@@ -241,13 +246,13 @@ public class ItemHaganeAromor extends ArmorItem {
         nbtTagList.add(
                 getAttrTag(
                 		SharedMonsterAttributes.ARMOR.getName()
-                        , new AttributeModifier(ARMOR_MODIFIERS[this.getEquipmentSlot().getIndex()], "Armor modifier", reduce,  AttributeModifier.Operation.ADDITION)
+                        , new AttributeModifier(ARMOR_MODIFIERS[this.getEquipmentSlot().getIndex()], "Armor modifier", (double)this.damageReduceAmount * reduce,  AttributeModifier.Operation.ADDITION)
                         , this.getEquipmentSlot())
         );
 
         nbtTagList.add(
                 getAttrTag(SharedMonsterAttributes.MOVEMENT_SPEED.getName(),
-                		new AttributeModifier(UUID.fromString("40ce64b3-52c8-4d77-b2b8-b012bc6de1dd"), "weight modifier", speed,  Operation.MULTIPLY_TOTAL),
+                		new AttributeModifier(UUID.fromString("40ce64b3-52c8-4d77-b2b8-b012bc6de1dd"), "weight modifier",  speed,  AttributeModifier.Operation.MULTIPLY_TOTAL),
                         EquipmentSlotType.MAINHAND)
         );
         CompoundNBT.put("AttributeModifiers",nbtTagList);
@@ -294,43 +299,43 @@ public class ItemHaganeAromor extends ArmorItem {
 		return ret;
 	}
 
-    public static int getHardness(ItemStack stack){
+    public static double getHardness(ItemStack stack){
         CompoundNBT tag = getItemTagCompound(stack);
         if (tag.contains("hardness")){
-        	return tag.getInt("hardness");
+        	return tag.getDouble("hardness");
         }
         return 0;
     }
 
-    public static void setHardness(ItemStack stack, int value){
+    public static void setHardness(ItemStack stack, double value){
     	CompoundNBT tag = getItemTagCompound(stack);
-    	tag.putInt("hardness", value);
+    	tag.putDouble("hardness", value);
     }
 
-    public static int getWeight(ItemStack stack){
+    public static double getWeight(ItemStack stack){
         CompoundNBT tag = getItemTagCompound(stack);
         if (tag.contains("weight")){
-        	return tag.getInt("weight");
+        	return tag.getDouble("weight");
         }
         return 0;
     }
 
-    public static void setWeight(ItemStack stack, int value){
+    public static void setWeight(ItemStack stack, double value){
     	CompoundNBT tag = getItemTagCompound(stack);
-    	tag.putInt("weight", value);
+    	tag.putDouble("weight", value);
     }
 
-    public static int getEndurance(ItemStack stack){
+    public static double getEndurance(ItemStack stack){
         CompoundNBT tag = getItemTagCompound(stack);
         if (tag.contains("MaxEndurance")){
-        	return tag.getInt("MaxEndurance");
+        	return tag.getDouble("MaxEndurance");
         }
         return 0;
     }
 
-    public static void setEndurance(ItemStack stack, int value){
+    public static void setEndurance(ItemStack stack, double value){
     	CompoundNBT tag = getItemTagCompound(stack);
-    	tag.putInt("MaxEndurance", value);
+    	tag.putDouble("MaxEndurance", value);
     }
 
     public static List<EffectInstance> getPotionEffects(ItemStack stack){
@@ -350,6 +355,16 @@ public class ItemHaganeAromor extends ArmorItem {
 			stack.setTag(tag);
 		}
 		return tag;
+	}
+
+    @Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			ItemStack stack = new ItemStack(this);
+			//ItemHaganeAromor.setWeight(stack, -0.5);
+			ItemHaganeAromor.setHardness(stack, 1.5);
+			items.add(stack);
+		}
 	}
 
 }

@@ -88,26 +88,26 @@ public class ResourceManager {
 	}
 
 	public void initResource() throws Exception {
-		// デフォルトテクスチャ、デフォルトオプションパーツをマップに登録
+		// aデフォルトテクスチャ、デフォルトオプションパーツをマップに登録
 		File dir;
 		Class target = this.getClass();
 		if (ModCommon.isDevelop){
-			// 自分のクラス自身のパス(URL)を取得する
+			// a自分のクラス自身のパス(URL)を取得する
 			URL location = target.getResource("/" + ORIGINAL_RESOURCE);
 			dir = new File(location.getPath());
 			ModLog.log().info("[Default Resource Path]:" + location.getPath());
 
-			// マップ作製
+			// aマップ作製
 			this.searchPng(dir);
 		}else{
-			// 自分のクラス自身のパス(URL)を取得する
+			// a自分のクラス自身のパス(URL)を取得する
 			URL location = target.getResource("");
 			ModLog.log().debug(location.getPath());
 			dir = new File(location.getPath().substring(location.getPath().indexOf(":")+1, location.getPath().lastIndexOf(".jar")+4));
 			if (ModCommon.isDebug)ModLog.log().debug("[Default Resource Path]:" + location.getPath());
 			if (ModCommon.isDebug)ModLog.log().debug("[ZipFile]: " + dir.getPath());
 
-			//マップ作製
+			// aマップ作製
 			ZipFile zip = null;
 			try{
 				if (dir.exists()){

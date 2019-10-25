@@ -37,11 +37,9 @@ public class ContainerGunCustomizer extends Container {
 		world = playerIn.player.world;
 		player = playerIn;//
 		this.outputSlot = new InventoryGunCustomize();
-		this.inputSlot = new Inventory(2)
-		{
+		this.inputSlot = new Inventory(2) {
 			@Override
-			public void markDirty()
-			{
+			public void markDirty() {
 				super.markDirty();
 				ContainerGunCustomizer.this.onCraftMatrixChanged(this);
 			}
@@ -111,7 +109,6 @@ public class ContainerGunCustomizer extends Container {
 
     public void updateRepairOutput() {
     	ItemStack stack = makeResult(inputSlot.getStackInSlot(0), inputSlot.getStackInSlot(1));
-    	//this.inputSlot.setInventorySlotContents(2, stack.copy());
         this.outputSlot.setInventorySlotContents(0, stack.copy());
         this.detectAndSendChanges();
     }
@@ -230,7 +227,16 @@ public class ContainerGunCustomizer extends Container {
 					// i麒麟弾に更新
 					ret = makeBurret(stack1, (ItemBurret)ItemCore.item_burret_kirin);
 				}
-
+			}else if (stack0.getItem() == ItemCore.item_gunpowder_wither) {
+				if (stack1.getItem() == ItemCore.item_burret) {
+					// iウィザー弾に更新
+					ret = makeBurret(stack1, (ItemBurret)ItemCore.item_burret_wither);
+				}
+			}else if (stack0.getItem() == ItemCore.item_gunpowder_revitate) {
+				if (stack1.getItem() == ItemCore.item_burret) {
+					// iレビテート弾に更新
+					ret = makeBurret(stack1, (ItemBurret)ItemCore.item_burret_revitate);
+				}
 			} else if (stack0.getItem() == ItemCore.item_gunpowder_water){
 				if (((ItemBurret)stack1.getItem()).getBurret().canWater() && !ItemBurret.canWater(stack1)){
 					// i水中弾に更新できるなら水中弾に更新
@@ -293,6 +299,8 @@ public class ContainerGunCustomizer extends Container {
 			new ItemStack(ItemCore.item_gunpowder_byako),
 			new ItemStack(ItemCore.item_gunpowder_genbu),
 			new ItemStack(ItemCore.item_gunpowder_seiryu),
+			new ItemStack(ItemCore.item_gunpowder_wither),
+			new ItemStack(ItemCore.item_gunpowder_revitate),
 			new ItemStack(ItemCore.item_steel),
 			new ItemStack(Items.POTION),
 			new ItemStack(Items.SPLASH_POTION),

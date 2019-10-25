@@ -12,6 +12,7 @@ import mod.fbd.item.guns.ItemBurret;
 import mod.fbd.item.guns.ItemBurret.EnumBurret;
 import mod.fbd.item.guns.ItemBurretPotion;
 import mod.fbd.item.guns.ItemCartridge;
+import mod.fbd.item.guns.ItemMusket;
 import mod.fbd.item.guns.ItemRevolver;
 import mod.fbd.item.katana.ItemKatana;
 import mod.fbd.item.katana.ItemKatanaByako;
@@ -59,6 +60,7 @@ public class ItemCore {
 	public static final String NAME_REVOLVER = "revolver";
 	public static final String NAME_AUTOMATIC = "automatic";
 	public static final String NAME_CARTRIDGE = "cartridge";
+	public static final String NAME_MUSKET = "musket";
 
 	public static final String NAME_BURRET = "burret_normal";
 	public static final String NAME_BURRET_POTION = "burret_potion";
@@ -78,6 +80,10 @@ public class ItemCore {
 	public static final String NAME_BURRET_BYAKO = "burret_byako";
 	public static final String NAME_BURRET_GENBU = "burret_genbu";
 	public static final String NAME_BURRET_SEIRYU = "burret_seiryu";
+	public static final String NAME_BURRET_SILVER = "burret_silver";
+	public static final String NAME_BURRET_GRAVITY = "burret_gravity";
+	public static final String NAME_BURRET_REVITATE = "burret_revitate";
+	public static final String NAME_BURRET_WITHER = "burret_wither";
 
 	public static final String NAEM_GUNPOWDER_TELEPORT = "gunpowder_teleport";
 	public static final String NAME_GUNPOWDER_DRAW = "gunpowder_draw";
@@ -90,6 +96,8 @@ public class ItemCore {
 	public static final String NAME_GUNPOWDER_BYAKO = "gunpowder_byako";
 	public static final String NAME_GUNPOWDER_GENBU = "gunpowder_genbu";
 	public static final String NAME_GUNPOWDER_SEIRYU = "gunpowder_seiryu";
+	public static final String NAME_GUNPOWDER_WITHER = "gunpowder_wither";
+	public static final String NAME_GUNPOWDER_REVITATE = "gunpowder_revitate";
 
 	public static final String NAME_BYAKOBODY = "byakobody";
 	public static final String NAME_BYAKOBOOTS = "byakoboots";
@@ -193,6 +201,7 @@ public class ItemCore {
 			NAME_REVOLVER,
 			NAME_AUTOMATIC,
 			NAME_CARTRIDGE,
+			NAME_MUSKET,
 			NAME_BURRET,
 			NAME_BURRET_POTION,
 			NAME_BURRET_TELEPORT,
@@ -211,6 +220,10 @@ public class ItemCore {
 			NAME_BURRET_BYAKO,
 			NAME_BURRET_GENBU,
 			NAME_BURRET_SEIRYU,
+			NAME_BURRET_SILVER,
+			NAME_BURRET_GRAVITY,
+			NAME_BURRET_REVITATE,
+			NAME_BURRET_WITHER,
 			NAEM_GUNPOWDER_TELEPORT,
 			NAME_GUNPOWDER_DRAW,
 			NAME_GUNPOWDER_EXPLOAD,
@@ -222,6 +235,8 @@ public class ItemCore {
 			NAME_GUNPOWDER_BYAKO,
 			NAME_GUNPOWDER_GENBU,
 			NAME_GUNPOWDER_SEIRYU,
+			NAME_GUNPOWDER_WITHER,
+			NAME_GUNPOWDER_REVITATE,
 			NAME_WOODBIGHAMMER,
 			NAME_STONEBIGHAMMER,
 			NAME_IRONBIGHAMMER,
@@ -267,6 +282,7 @@ public class ItemCore {
 	public static Item item_revolver = new ItemRevolver(new Item.Properties().defaultMaxDamage(500).group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_REVOLVER);
 	public static Item item_automatic = new ItemAutomatic(new Item.Properties().maxStackSize(1).defaultMaxDamage(500).group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_AUTOMATIC);
 	public static Item item_cartridge = new ItemCartridge(new Item.Properties().maxStackSize(1).group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_CARTRIDGE);
+	public static Item item_musket = new ItemMusket(new Item.Properties().maxStackSize(1).defaultMaxDamage(500).group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_MUSKET);
 	public static Item item_burret = new ItemBurret(EnumBurret.NORMAL, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET);
 	public static Item item_burret_potion = new ItemBurretPotion(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_POTION);
 	public static Item item_burret_teleport = new ItemBurret(EnumBurret.TELEPORT, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_TELEPORT);
@@ -285,6 +301,11 @@ public class ItemCore {
 	public static Item item_burret_byako = new ItemBurret(EnumBurret.BYAKO, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_BYAKO);
 	public static Item item_burret_genbu = new ItemBurret(EnumBurret.GENBU, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_GENBU);
 	public static Item item_burret_seiryu = new ItemBurret(EnumBurret.SEIRYU, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_SEIRYU);
+	public static Item item_burret_silver = new ItemBurret(EnumBurret.SILVER, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_SILVER);
+	public static Item item_burret_gravity = new ItemBurret(EnumBurret.GRAVITY, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_GRAVITY);
+	public static Item item_burret_revitate = new ItemBurret(EnumBurret.REVITATE, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_REVITATE);
+	public static Item item_burret_wither = new ItemBurret(EnumBurret.WITHER, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BURRET_WITHER);
+
 	public static Item item_gunpowder_teleport = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAEM_GUNPOWDER_TELEPORT);
 	public static Item item_gunpowder_draw = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_DRAW);
 	public static Item item_gunpowder_expload = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_EXPLOAD);
@@ -296,6 +317,8 @@ public class ItemCore {
 	public static Item item_gunpowder_byako = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_BYAKO);
 	public static Item item_gunpowder_genbu = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_GENBU);
 	public static Item item_gunpowder_seiryu = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_SEIRYU);
+	public static Item item_gunpowder_wither = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_WITHER);
+	public static Item item_gunpowder_revitate = new Item(new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_GUNPOWDER_REVITATE);
 	public static Item item_byakobody= new ItemHaganeAromor(ArmorMaterialHagane.BYAKO, EnumBladePieceType.BYAKO, EquipmentSlotType.CHEST, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BYAKOBODY);
 	public static Item item_byakoboots= new ItemHaganeAromor(ArmorMaterialHagane.BYAKO, EnumBladePieceType.BYAKO, EquipmentSlotType.FEET, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BYAKOBOOTS);
 	public static Item item_byakohelmet= new ItemHaganeAromor(ArmorMaterialHagane.BYAKO, EnumBladePieceType.BYAKO, EquipmentSlotType.HEAD, new Item.Properties().group(Mod_FantomBlade.tabElmWepon)).setRegistryName(NAME_BYAKOHELMET);
@@ -371,6 +394,7 @@ public class ItemCore {
 			{put(NAME_REVOLVER,item_revolver);}
 			{put(NAME_AUTOMATIC,item_automatic);}
 			{put(NAME_CARTRIDGE,item_cartridge);}
+			{put(NAME_MUSKET,item_musket);}
 			{put(NAME_BURRET,item_burret);}
 			{put(NAME_BURRET_POTION,item_burret_potion);}
 			{put(NAME_BURRET_TELEPORT,item_burret_teleport);}
@@ -389,6 +413,10 @@ public class ItemCore {
 			{put(NAME_BURRET_BYAKO,item_burret_byako);}
 			{put(NAME_BURRET_GENBU,item_burret_genbu);}
 			{put(NAME_BURRET_SEIRYU,item_burret_seiryu);}
+			{put(NAME_BURRET_SILVER,item_burret_silver);}
+			{put(NAME_BURRET_GRAVITY,item_burret_gravity);}
+			{put(NAME_BURRET_REVITATE,item_burret_revitate);}
+			{put(NAME_BURRET_WITHER,item_burret_wither);}
 			{put(NAEM_GUNPOWDER_TELEPORT,item_gunpowder_teleport);}
 			{put(NAME_GUNPOWDER_DRAW,item_gunpowder_draw);}
 			{put(NAME_GUNPOWDER_EXPLOAD,item_gunpowder_expload);}
@@ -400,6 +428,8 @@ public class ItemCore {
 			{put(NAME_GUNPOWDER_BYAKO,item_gunpowder_byako);}
 			{put(NAME_GUNPOWDER_GENBU,item_gunpowder_genbu);}
 			{put(NAME_GUNPOWDER_SEIRYU,item_gunpowder_seiryu);}
+			{put(NAME_GUNPOWDER_WITHER,item_gunpowder_wither);}
+			{put(NAME_GUNPOWDER_REVITATE,item_gunpowder_revitate);}
 			{put(NAME_BYAKOBODY,item_byakobody);}
 			{put(NAME_BYAKOBOOTS,item_byakoboots);}
 			{put(NAME_BYAKOHELMET,item_byakohelmet);}

@@ -67,15 +67,19 @@ public abstract class AbstractItemKatana  extends SwordItem {
 
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int indexOfMainSlot, boolean isCurrent) {
-		// i攻撃力設定
-		attackDamage = calcurateAttackDamage(stack,world,entity);
+		if (entity instanceof LivingEntity) {
+			if (((LivingEntity)entity).getHeldItemMainhand().getItem() == this) {
+				// i攻撃力設定
+				attackDamage = calcurateAttackDamage(stack,world,entity);
 
-		// i攻撃速度設定
-		attackSpeed = calcureteAttackSpeed(stack,world,entity);
+				// i攻撃速度設定
+				attackSpeed = calcureteAttackSpeed(stack,world,entity);
 
-		ModUtil.setPrivateValue(Item.class, this, this.getEndurance(stack), "maxDamage");
-		if (entity instanceof PlayerEntity){
-			updateAttackAmplifier(stack,(PlayerEntity)entity);
+				ModUtil.setPrivateValue(Item.class, this, this.getEndurance(stack), "maxDamage");
+				if (entity instanceof PlayerEntity){
+					updateAttackAmplifier(stack,(PlayerEntity)entity);
+				}
+			}
 		}
 	}
 
@@ -329,7 +333,6 @@ public abstract class AbstractItemKatana  extends SwordItem {
                         , EquipmentSlotType.MAINHAND)
         );
         CompoundNBT.put("AttributeModifiers",nbtTagList);
-
         player.getAttributes().removeAttributeModifiers(itemStack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
         player.getAttributes().applyAttributeModifiers(itemStack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
     }
@@ -358,8 +361,7 @@ public abstract class AbstractItemKatana  extends SwordItem {
 	}
 
 
-    public CompoundNBT getAttrTag(String attrName , AttributeModifier par0AttributeModifier, EquipmentSlotType slot)
-    {
+    public CompoundNBT getAttrTag(String attrName , AttributeModifier par0AttributeModifier, EquipmentSlotType slot) {
         CompoundNBT CompoundNBT = new CompoundNBT();
         CompoundNBT.putString("AttributeName",attrName);
         CompoundNBT.putString("Name", par0AttributeModifier.getName());

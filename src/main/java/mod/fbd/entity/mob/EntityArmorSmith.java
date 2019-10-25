@@ -321,7 +321,7 @@ public class EntityArmorSmith extends EntitySmithBase {
 
     @Override
     public void finishWork(World world,BlockPos pos, boolean success){
-    	// ブロックをもとに戻す
+    	// iブロックをもとに戻す
     	BlockPos pos1 = pos.offset(Direction.NORTH);
     	BlockState state = world.getBlockState(pos1);
     	if (state.getBlock() == BlockCore.block_anvildummy){
@@ -524,7 +524,7 @@ public class EntityArmorSmith extends EntitySmithBase {
 		int count = 0;
 		int level = getLevel();
 
-		// 材料の数を取得
+		// i材料の数を取得
 		int tamahagane = this.smithInventory.getTamahagane(ItemCore.item_tamahagane);
 		List<ItemStack> base = this.smithInventory.getBaseEqipent();
 		int[] piece = this.smithInventory.getBladePiece();
@@ -535,48 +535,48 @@ public class EntityArmorSmith extends EntitySmithBase {
 		int genbu = piece[EnumBladePieceType.GENBU.getIndex()];
 		int niji = piece[EnumBladePieceType.NIJI.getIndex()];
 
-		// 五行の強弱をつける
+		// i五行の強弱をつける
 		seiryu = seiryu + genbu - byako;
 		suzaku = suzaku + seiryu - genbu;
 		kirin = kirin + suzaku - seiryu;
 		byako = kirin + suzaku - seiryu;
 		genbu = genbu + byako - kirin;
-		// 欠片の最大数を計算
+		// i欠片の最大数を計算
 		int max = ModUtil.IntMax(niji, seiryu, suzaku, kirin, byako, genbu);
 
-		// 玉鋼がないか、ベースが指定されているのに欠片の力が弱い場合作れない
+		// i玉鋼がないか、ベースが指定されているのに欠片の力が弱い場合作れない
 		if (tamahagane <= 0 || (base.size() != 0 && max <= 0)) {
-			// ざいりょうがねーよん
+			// iざいりょうがねーよん
 			return ret;
 		}
 
 		Item baseEquipment;
 		if (base.size() > 0) {
-			// ベースが指定されている場合指定されているベースのうちどれができるかを決める
+			// aベースが指定されている場合指定されているベースのうちどれができるかを決める
 			baseEquipment = base.get(ModUtil.random(base.size())).getItem();
 		}else {
-			// 指定がない場合ランダム
+			// a指定がない場合ランダム
 			Item[] work = new Item[]{ItemCore.item_haganebody,ItemCore.item_haganeboots, ItemCore.item_haganehelmet, ItemCore.item_haganelegs};
 			baseEquipment = work[ModUtil.random(work.length)];
 		}
 
-		// デフォルト
+		// aデフォルト
 		EnumBladePieceType pieceType = EnumBladePieceType.NORMAL;
 
-		// 出来上がる防具を決める
+		// a出来上がる防具を決める
 		if (base.size() > 0) {
-			// ベース指定がある場合は確定
+			// aベース指定がある場合は確定
 			baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
 		}else {
-			// 欠片が使用されている場合
+			// a欠片が使用されている場合
 			if (max > 0) {
 				if (level >= 250){
-					// レベル250以上の場合確実に特殊鎧ができる
+					// aレベル250以上の場合確実に特殊鎧ができる
 					baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
 				}else{
-					// 特殊鎧ができる確率を計算 最大70%
-					// レベル/10*5(5% からstart 70%になるのはLv140以上)
-					// 最初の1スタック分は 欠片/10.0F*3.0F(0.3% ～ 19.2%分の補助
+					// a特殊鎧ができる確率を計算 最大70%
+					// aレベル/10*5(5% からstart 70%になるのはLv140以上)
+					// a最初の1スタック分は 欠片/10.0F*3.0F(0.3% ～ 19.2%分の補助
 					// 2スタック目以降は欠片/64%分の補助(最大2%)
 					if (Math.min((level/10.0F*5.0F) + ((max%65)/10.0F*5.0F) + Math.max((max-64)/64,0), 70.0F) >= ModUtil.random(101)){
 						baseEquipment = getBaseEquipment(max, niji, seiryu, suzaku, kirin, byako, genbu, baseEquipment);
@@ -587,26 +587,26 @@ public class EntityArmorSmith extends EntitySmithBase {
 
 		pieceType = ((ItemHaganeAromor)baseEquipment).getPieceType();
 
-		// 返却用アイテムを作る
+		// a返却用アイテムを作る
 		ret = new ItemStack(baseEquipment);
-		// 経験値確定
+		// a経験値確定
 		nextExp = pieceType.getBaseExp();
 		if (base.size()>0) {
-			ItemHaganeAromor.setHardness(ret, -1 * ModUtil.random(10));
-			ItemHaganeAromor.setWeight(ret, -1 * ModUtil.random(10));
-			ItemHaganeAromor.setEndurance(ret, -1 * ModUtil.random(10));
+			ItemHaganeAromor.setHardness(ret, ModUtil.random(60)/100 + 0.2D);
+			ItemHaganeAromor.setWeight(ret, -1 * ((ModUtil.random(300)/1000)+0.2D));
+			ItemHaganeAromor.setEndurance(ret, ModUtil.random(60)/100 + 0.2D);
 		}else {
-			// ベースを使用していない場合だけ追加経験値を得られる
+			// aベースを使用していない場合だけ追加経験値を得られる
 			nextExp += pieceType.getOptionExp();
-			// レベルと玉鋼の数による強化処理
+			// aレベルと玉鋼の数による強化処理
 			int rd = 0;
 			List<ItemStack> tm = this.smithInventory.getTamahagane();
 			for (int i = 0; i < tm.size(); i++) {
 				rd += (tm.get(i).getCount()/((i+1)*10));
 			}
-			// 重さは設定しない
-			ItemHaganeAromor.setHardness(ret, ModUtil.random(rd) + (level / 20));
-			ItemHaganeAromor.setEndurance(ret, ModUtil.random(rd) + (level / 20));
+			// i重さは設定しない
+			ItemHaganeAromor.setHardness(ret, 1 + (ModUtil.random(rd) + (level / 20))/1000);
+			ItemHaganeAromor.setEndurance(ret, 1 + (ModUtil.random(rd) + (level / 20))/1000);
 		}
 
 		// レベル5以下とベース指定の場合エンチャントはつけられない

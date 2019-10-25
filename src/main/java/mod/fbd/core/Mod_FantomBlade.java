@@ -12,6 +12,8 @@ import mod.fbd.block.BlockCore;
 import mod.fbd.config.ConfigValue;
 import mod.fbd.creative.CreativeTabElmWepon;
 import mod.fbd.entity.EntityBurret;
+import mod.fbd.entity.EntityGravity;
+import mod.fbd.entity.EntityLevitate;
 import mod.fbd.entity.mob.EntityArmorSmith;
 import mod.fbd.entity.mob.EntityBladeSmith;
 import mod.fbd.entity.mob.EntitySmithBase;
@@ -44,6 +46,7 @@ import mod.fbd.render.RenderEntitySmith;
 import mod.fbd.render.RenderTileEntityBladeAlter;
 import mod.fbd.render.RenderTileEntityBladeStand;
 import mod.fbd.render.RenderTileEntityBladeforge;
+import mod.fbd.render.RenderVoid;
 import mod.fbd.render.RendernTileEntityAirPomp;
 import mod.fbd.tileentity.TileEntityAirPomp;
 import mod.fbd.tileentity.TileEntityBladeAlter;
@@ -131,6 +134,8 @@ public class Mod_FantomBlade {
 	public void registRender(){
 		RenderingRegistry.registerEntityRenderingHandler(EntitySmithBase.class, RenderEntitySmith::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityBurret.class, RenderEntityBurret::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityGravity.class, RenderVoid::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLevitate.class, RenderVoid::new);
 
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBladeforge.class, new RenderTileEntityBladeforge());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAirPomp.class, new RendernTileEntityAirPomp());
@@ -265,6 +270,8 @@ public class Mod_FantomBlade {
         public static EntityType<EntityBladeSmith> BLADESMITH;
         public static EntityType<EntityArmorSmith> ARMORSMITH;
         public static EntityType<EntityBurret> BURRET;
+        public static EntityType<EntityGravity> GRAVITY;
+        public static EntityType<EntityLevitate> LEVITATE;
 
         @SubscribeEvent
         public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> etRegistryEvent){
@@ -285,6 +292,19 @@ public class Mod_FantomBlade {
         			 .setCustomClientFactory(EntityBurret::new).build(ModCommon.MOD_ID + ":" + EntityBurret.NAME);
         	BURRET.setRegistryName(new ResourceLocation(ModCommon.MOD_ID,EntityBurret.NAME));
         	etRegistryEvent.getRegistry().register(BURRET);
+
+
+            GRAVITY = EntityType.Builder.<EntityGravity>create(EntityGravity::new, EntityClassification.MISC)
+       			 .setTrackingRange(10).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false).size(1.0F, 1.0F)
+       			 .setCustomClientFactory(EntityGravity::new).build(ModCommon.MOD_ID + ":" + EntityBurret.NAME);
+            GRAVITY.setRegistryName(new ResourceLocation(ModCommon.MOD_ID,EntityGravity.NAME));
+        	etRegistryEvent.getRegistry().register(GRAVITY);
+
+            LEVITATE = EntityType.Builder.<EntityLevitate>create(EntityLevitate::new, EntityClassification.MISC)
+       			 .setTrackingRange(10).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false).size(1.0F, 1.0F)
+       			 .setCustomClientFactory(EntityLevitate::new).build(ModCommon.MOD_ID + ":" + EntityLevitate.NAME);
+            LEVITATE.setRegistryName(new ResourceLocation(ModCommon.MOD_ID,EntityLevitate.NAME));
+        	etRegistryEvent.getRegistry().register(LEVITATE);
         }
 
     	public static TileEntityType<?> BLADEFORGE;
@@ -366,6 +386,7 @@ public class Mod_FantomBlade {
         					1, new VillagerTrades.ITrade[]{
         							new Trades.ItemForItemToTrade(Items.EMERALD, 30, ItemCore.item_automatic, 1, 64, 5),
         							new Trades.ItemForItemToTrade(Items.EMERALD, 30, ItemCore.item_revolver, 1, 64, 5),
+        							new Trades.ItemForItemToTrade(Items.EMERALD, 30, ItemCore.item_musket, 1, 64, 5),
         							new Trades.ItemForItemToTrade(Items.EMERALD, 10, ItemCore.item_burret, 1, 22, 1)
         					},
         					2, new VillagerTrades.ITrade[]{
@@ -379,6 +400,8 @@ public class Mod_FantomBlade {
         					3, new VillagerTrades.ITrade[]{
         							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_golem, 8, 44, 3),
         							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_snowman, 8, 44, 3),
+        							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_revitate, 8, 44, 3),
+        							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_gravity, 8, 44, 3),
         					},
         					4, new VillagerTrades.ITrade[]{
         							new Trades.ItemForItemToTrade(Items.EMERALD, 10, ItemCore.item_burret_byako, 8, 22, 2),
@@ -391,6 +414,8 @@ public class Mod_FantomBlade {
         							new Trades.ItemForItemToTrade(Items.EMERALD, 30, ItemCore.item_burret_assasination, 8, 64, 5),
         							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_teleport, 8, 44, 3),
         							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_thunder, 8, 44, 3),
+        							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_wither, 8, 44, 3),
+        							new Trades.ItemForItemToTrade(Items.EMERALD, 20, ItemCore.item_burret_silver, 8, 44, 3),
         							})));
 
 

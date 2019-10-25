@@ -6,7 +6,7 @@ public final class ModCommon {
 	// デバッグモードかどうか
 	public static boolean isDebug = false;
 
-	public static boolean isDevelop= true;
+	public static boolean isDevelop= false;
 
 	// モッドID
 	public static final String MOD_ID = "fbd";

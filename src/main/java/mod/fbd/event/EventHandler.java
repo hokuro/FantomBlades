@@ -36,7 +36,7 @@ public class EventHandler {
 
 	@SubscribeEvent
 	public void LivingAttack(LivingAttackEvent event) {
-		LivingEntity living = event.getEntityLiving();
+ 		LivingEntity living = event.getEntityLiving();
 		Entity source = event.getSource().getTrueSource();
 
 		// iダメージソースがプレイヤー

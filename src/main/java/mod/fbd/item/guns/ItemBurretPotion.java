@@ -157,8 +157,9 @@ public class ItemBurretPotion extends ItemBurret {
 
 	public static EffectInstance getEffectInstance(ItemStack stack){
 		List<EffectInstance> effects = PotionUtils.getEffectsFromStack(stack);
+		int powderLevel = ItemBurret.getGunPowder(stack);
 		if (effects != null && effects.size() > 0){
-			return new EffectInstance(effects.get(0).getPotion(),effects.get(0).getDuration(),effects.get(0).getAmplifier());
+			return new EffectInstance(effects.get(0).getPotion(),effects.get(0).getDuration() + 20 * powderLevel,effects.get(0).getAmplifier() + powderLevel);
 		}
 		return null;
 	}

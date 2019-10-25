@@ -321,7 +321,7 @@ public class EntityBurret extends AbstractArrowEntity implements IEntityAddition
     	this.playSound(this.getHitGroundSound(), 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
     	this.inGround = true;
     	this.arrowShake = 7;
-        ((ItemBurret)burret.getItem()).getBurret().hitBlock(world, burret, this.getShooter(),this);
+        ((ItemBurret)burret.getItem()).getBurret().hitBlock(world, burret, this.getShooter(),this, blockstate, blockraytraceresult.getPos());
     	this.setIsCritical(false);
     	this.func_213872_b((byte)0);
     	this.setHitSound(SoundEvents.ENTITY_ARROW_HIT);
