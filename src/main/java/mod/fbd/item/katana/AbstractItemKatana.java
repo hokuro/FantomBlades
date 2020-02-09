@@ -75,9 +75,8 @@ public abstract class AbstractItemKatana  extends SwordItem {
 				// i攻撃速度設定
 				attackSpeed = calcureteAttackSpeed(stack,world,entity);
 
-				ModUtil.setPrivateValue(Item.class, this, this.getEndurance(stack), "maxDamage");
-				if (entity instanceof PlayerEntity){
-					updateAttackAmplifier(stack,(PlayerEntity)entity);
+				if (entity instanceof LivingEntity){
+					updateAttackAmplifier(stack, (LivingEntity)entity);
 				}
 			}
 		}
@@ -139,6 +138,12 @@ public abstract class AbstractItemKatana  extends SwordItem {
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return isEnchantable;
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+    	int dmg = getEndurance(stack);
+    	return dmg>0?dmg:this.getMaxDamage();
     }
 
     @Override
@@ -318,7 +323,7 @@ public abstract class AbstractItemKatana  extends SwordItem {
 		return tag;
 	}
 
-    protected void updateAttackAmplifier(@Nonnull ItemStack itemStack, @Nonnull PlayerEntity player) {
+    protected void updateAttackAmplifier(@Nonnull ItemStack itemStack, @Nonnull LivingEntity player) {
         CompoundNBT CompoundNBT = getItemTagCompound(itemStack);
         ListNBT nbtTagList = new ListNBT();
         nbtTagList.add(

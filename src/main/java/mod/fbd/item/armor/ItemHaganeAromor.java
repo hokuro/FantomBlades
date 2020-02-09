@@ -11,7 +11,6 @@ import com.google.common.collect.Multimap;
 
 import mod.fbd.item.ItemCore;
 import mod.fbd.item.piece.ItemBladePiece.EnumBladePieceType;
-import mod.fbd.util.ModUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -212,8 +211,6 @@ public class ItemHaganeAromor extends ArmorItem {
 				reduce = ItemHaganeAromor.getHardness(stack);
 				speed = ItemHaganeAromor.getWeight(stack);
 				// i性能変更
-				int maxdamage = (int)(this.material.getDurability(this.slot) * ItemHaganeAromor.getEndurance(stack));
-				ModUtil.setPrivateValue(Item.class, this, maxdamage, "maxDamage");
 				if (entity instanceof PlayerEntity){
 					updateAttackAmplifier(stack,(PlayerEntity)entity);
 				}
@@ -278,6 +275,12 @@ public class ItemHaganeAromor extends ArmorItem {
 		if (type != EnumBladePieceType.NIJI) {
 			super.setDamage(stack,damage);
 		}
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+    	double dmg = getEndurance(stack);
+    	return (int)Math.round(this.getMaxDamage() * dmg>0?dmg:1);
     }
 
 	public EnumBladePieceType getPieceType() {
